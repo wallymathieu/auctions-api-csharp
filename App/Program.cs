@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using App;
 using App.Data;
+using Auctions.Json;
+using Auctions.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

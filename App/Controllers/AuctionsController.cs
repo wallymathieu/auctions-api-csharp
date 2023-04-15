@@ -1,4 +1,5 @@
 using App.Data;
+using App.Models;
 using Auctions.Domain;
 using Auctions.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -101,23 +102,4 @@ public class AuctionsController : ControllerBase
             return BadRequest(error);
         }
     }
-
-    public class CreateBidModel
-    {
-        public string Amount { get; set; }
-    }
-    public class BidModel
-    {
-        public string Amount { get; set; }
-        public string Bidder { get; set; }
-    }
-    public class CreateAuctionModel
-    {
-        public CurrencyCode Currency { get; set; }
-        public DateTimeOffset StartsAt { get; set; }
-        public DateTimeOffset EndsAt { get; set; }
-        public string Title { get; set; }
-    }
-
-    public record AuctionModel(long Id, DateTimeOffset StartsAt,string Title,DateTimeOffset Expiry, string User,CurrencyCode Currency, BidModel[] Bids);
 }

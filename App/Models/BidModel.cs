@@ -1,7 +1,7 @@
 namespace App.Models;
 
-public class BidModel
+public record BidModel
 {
-    public string Amount { get; set; }
-    public string Bidder { get; set; }
+    public string Amount { get; init; }
+    public string Bidder { get; init; }
 }
