@@ -17,7 +17,10 @@ public class Auction
         Currency = currency;
     }
 
-    public long Id { get; set; } 
+    public AuctionId Id { get=>new AuctionId(AuctionId); }
+
+    public long AuctionId { get; set; }
+
     public DateTimeOffset StartsAt { get; init; }
     public string Title { get; init; }
 

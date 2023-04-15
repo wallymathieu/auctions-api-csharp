@@ -21,9 +21,9 @@ public class AuctionDbContext: DbContext
         builder.Entity<TimedAscendingAuction>(entity =>
         {
             entity.ToTable("Auctions");
-            entity.HasKey(e => e.Id);
+            entity.HasKey(e => e.AuctionId);
             entity.Property(e => e.Title).HasMaxLength(200);
-            entity.Property(o => o.Id).UseIdentityColumn();
+            entity.Property(o => o.AuctionId).UseIdentityColumn();
             WithUserId(entity.Property(o => o.User));
             var opts=entity.OwnsOne<TimedAscendingOptions>(e=>e.Options);
                 opts.OwnsOne(e=>e.ReservePrice);

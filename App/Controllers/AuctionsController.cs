@@ -25,7 +25,7 @@ public class AuctionsController : ControllerBase
     }
 
     private AuctionModel MapAuctionToModel(TimedAscendingAuction arg) =>
-        new(arg.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency);
+        new(arg.Id.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency);
 
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<AuctionModel> GetSingle(long auctionId)

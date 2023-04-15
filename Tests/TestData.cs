@@ -14,7 +14,7 @@ public class TestData
     public static TimedAscendingAuction GetAuction()=>
         new TimedAscendingAuction
         {
-            Id = AuctionId.Id,
+            AuctionId = AuctionId.Id,
             Title = Title,
             StartsAt = StartsAt,
             Expiry = EndsAt,
