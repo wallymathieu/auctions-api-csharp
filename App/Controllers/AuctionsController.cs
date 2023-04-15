@@ -1,5 +1,6 @@
 using App.Data;
 using Auctions.Domain;
+using Auctions.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,9 +32,9 @@ public class AuctionsController : ControllerBase
         new(arg.Id.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency, 
             arg.GetBids(_time.Now)?.Select(MapBidToModel).ToArray()??Array.Empty<BidModel>());
 
-    private BidModel MapBidToModel(Bid arg)
+    private static BidModel MapBidToModel(Bid arg)
     {
-        return new BidModel()
+        return new BidModel
         {
             Amount = arg.Amount.ToString(),
             Bidder = arg.User.ToString()

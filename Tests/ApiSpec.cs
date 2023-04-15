@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using App;
 using App.Data;
+using Auctions.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Testing;
