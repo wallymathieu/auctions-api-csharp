@@ -86,7 +86,9 @@ public class TimedAscendingAuction : Auction, IState
             case State.HasEnded:
             {
                 var winningBid = Bids.MaxBy(b => b.Amount);
-                return winningBid != null ? (winningBid.Amount, winningBid.User) : null;
+                return winningBid?.Amount.Value >= Options.ReservePrice
+                    ? (winningBid.Amount, winningBid.User)
+                    : null;
             }
             case State.AwaitingStart:
             case State.OnGoing:

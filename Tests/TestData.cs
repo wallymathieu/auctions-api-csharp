@@ -19,18 +19,18 @@ public class TestData
             StartsAt = StartsAt,
             Expiry = EndsAt,
             User = Seller,
-            Currency = new Currency(CurrencyCode.SEK),
+            Currency = CurrencyCode.SEK,
             Options = 
             {
                 MinRaise = 1,
                 TimeFrame = TimeSpan.FromMinutes(1),
-                ReservePrice = 100,
+                ReservePrice = 0,
             }
         };
 
     public static Amount Sek(long a) =>
         new(Value: a,
-            Currency: new Currency(CurrencyCode.SEK));
+            Currency: CurrencyCode.SEK);
 
     public static Bid BidOf100 =>
         new(
