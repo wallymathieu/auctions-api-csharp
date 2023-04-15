@@ -2,8 +2,8 @@ namespace Auctions.Domain;
 
 public class TimedAscendingAuction : Auction, IState
 {
-    public TimedAscendingOptions Options { get; init; }
-    public IList<Bid> Bids { get; init; }
+    public TimedAscendingOptions Options { get; init; } = new();
+    public IList<BidEntity> Bids { get; init; } = new List<BidEntity>();
 
     private State GetState(DateTimeOffset time)
     {
@@ -48,7 +48,7 @@ public class TimedAscendingAuction : Auction, IState
                 if (errors != Errors.None) return false;
                 
                 Expiry = new[] { Expiry, time + Options.TimeFrame }.Max();
-                Bids.Add(bid);
+                Bids.Add(new BidEntity(0,bid.AuctionId,bid.User,bid.Amount,bid.At));
                 return true;
             }
             case State.HasEnded:
@@ -71,13 +71,13 @@ public class TimedAscendingAuction : Auction, IState
         switch (GetState(time))
         {
             case State.OnGoing:
-            case State.HasEnded: return Bids;
+            case State.HasEnded: return Bids.Select(b=>new Bid(b.AuctionId,b.User,b.Amount,b.At));
         }
 
         return Array.Empty<Bid>();
     }
 
-    public (Amount, User)? TryGetAmountAndWinner(DateTimeOffset time)
+    public (Amount, UserId)? TryGetAmountAndWinner(DateTimeOffset time)
     {
         switch (GetState(time))
         {

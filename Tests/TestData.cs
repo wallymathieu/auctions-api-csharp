@@ -8,22 +8,21 @@ public class TestData
     public static readonly string Title = "auction";
     public static DateTimeOffset StartsAt = new DateTime(2016, 1, 1);
     public static DateTimeOffset EndsAt = new DateTime(2016, 2, 1);
-    public static readonly User Seller = User.NewBuyerOrSeller(new("x1"), "Seller");
-    public static readonly User Buyer = User.NewBuyerOrSeller(new("x2"), "Buyer");
+    public static readonly UserId Seller = new("x1");
+    public static readonly UserId Buyer = new("x2");
 
     public static TimedAscendingAuction GetAuction()=>
         new TimedAscendingAuction
         {
-            Id = AuctionId,
+            Id = AuctionId.Id,
             Title = Title,
             StartsAt = StartsAt,
             Expiry = EndsAt,
             User = Seller,
             Currency = new Currency(CurrencyCode.SEK),
-            Bids = new List<Bid>(),
-            Options = new TimedAscendingOptions
+            Options = 
             {
-                MinRaise = Sek(10),
+                MinRaise = Sek(1),
                 TimeFrame = TimeSpan.FromMinutes(1),
                 ReservePrice = Sek(100),
             }
@@ -39,8 +38,8 @@ public class TestData
             Amount: Sek(100L),
             At: new DateTime(2016, 1, 2));
 
-    public static readonly User Buyer1 = User.NewBuyerOrSeller(new("x2"), "Buyer");
-    public static readonly User Buyer2 = User.NewBuyerOrSeller(new("x3"), "Buyer");
+    public static readonly UserId Buyer1 = new("x2");
+    public static readonly UserId Buyer2 = new("x3");
 
     public static Bid Bid1 => new Bid(AuctionId: AuctionId,
         User: Buyer1,
@@ -54,16 +53,8 @@ public class TestData
 
     public static T WithBids<T>(T state) where T:IState
     {
-        var time = new TestTime();
-        time.Now = Bid1.At;
-        state.TryAddBid(time, Bid1, out _);
-        time.Now = Bid2.At;
-        state.TryAddBid(time, Bid2, out _);
+        Assert.True(state.TryAddBid(Bid1.At, Bid1, out var e1),e1.ToString());
+        Assert.True(state.TryAddBid(Bid2.At, Bid2, out var e2),e2.ToString());
         return state;
     }
-}
-
-public class TestTime:ITime
-{
-    public DateTimeOffset Now { get; set; }
 }

@@ -8,23 +8,22 @@ public class Auction
     {
         
     }
-    public Auction(AuctionId id, DateTimeOffset startsAt, string title, DateTimeOffset expiry, User user, Currency currency)
+    public Auction(DateTimeOffset startsAt, string title, DateTimeOffset expiry, UserId user, CurrencyCode currency)
     {
-        Id = id ?? throw new ArgumentNullException(nameof(id));
         StartsAt = startsAt;
         Title = title ?? throw new ArgumentNullException(nameof(title));
         Expiry = expiry;
         User = user ?? throw new ArgumentNullException(nameof(user));
-        Currency = currency ?? throw new ArgumentNullException(nameof(currency));
+        Currency = currency;
     }
 
-    public AuctionId Id { get; init; }
+    public long Id { get; set; } 
     public DateTimeOffset StartsAt { get; init; }
     public string Title { get; init; }
 
     ///<summary> initial expiry </summary>
     public DateTimeOffset Expiry { get; set; }
 
-    public User User { get; init; }
-    public Currency Currency { get; init; }
+    public UserId User { get; init; }
+    public CurrencyCode Currency { get; init; }
 }

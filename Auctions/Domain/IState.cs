@@ -15,7 +15,7 @@ public interface IState
     /// <summary>
     ///try to get amount and winner, will return None if no winner 
     /// </summary>
-    (Amount, User)? TryGetAmountAndWinner(DateTimeOffset time);
+    (Amount, UserId)? TryGetAmountAndWinner(DateTimeOffset time);
 
     /// <summary>
     /// returns true if state has ended

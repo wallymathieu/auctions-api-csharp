@@ -3,9 +3,9 @@ using System.Text.RegularExpressions;
 namespace Auctions.Domain;
 
 [Serializable]
-public record Amount(long Value, Currency Currency): IComparable<Amount>
+public record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
 {
-    public static Amount zero(Currency c)
+    public static Amount zero(CurrencyCode c)
     {
         return new Amount(0L, c);
     }
@@ -23,7 +23,7 @@ public record Amount(long Value, Currency Currency): IComparable<Amount>
         {
             var currencyString = match.Groups["currency"].Value;
             var v = match.Groups["value"].Value;
-            if (Currency.TryParse(currencyString, out var currency) && currency != null)
+            if (Domain.Currency.TryParse(currencyString, out var currency) && currency != null)
             {
                 value = new Amount(long.Parse(v), currency);
                 return true;

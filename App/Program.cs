@@ -1,12 +1,19 @@
+using System.Text.Json.Serialization;
 using App;
 using App.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-Startup.Services(builder.Services);
+builder.Services.AddControllers().AddJsonOptions(opts =>
+{
+    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    opts.JsonSerializerOptions.Converters.Add(new DateTimeOffsetConverter());
+});
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<AuctionDbContext>();
+builder.Services.AddDbContext<AuctionDbContext>(e=>e.UseSqlServer());
 
 var app = builder.Build();
 
@@ -18,7 +25,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-Startup.App(app);
+app.UseAuthorization();
 
+app.MapControllers();
 
 app.Run();

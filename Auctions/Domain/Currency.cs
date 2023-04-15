@@ -19,4 +19,6 @@ public record Currency(CurrencyCode Code)
         value = default;
         return false;
     }
+    public static implicit operator CurrencyCode(Currency d) => d.Code;
+    public static implicit operator Currency(CurrencyCode d) => new(d);
 }
