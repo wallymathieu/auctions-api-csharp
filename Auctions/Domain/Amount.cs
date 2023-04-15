@@ -36,49 +36,51 @@ public record Amount(long Value, Currency Currency): IComparable<Amount>
 
     public static Amount operator +(Amount a1, Amount a2)
     {
-        var currency = a1.Currency;
-        var currency2 = a2.Currency;
-        if (!currency.Equals(currency2))
-        {
-            throw new Exception("not defined for two different currencies");
-        }
+        AssertSameCurrency(a1,a2);
 
         return a1 with { Value = a1.Value + a2.Value };
     }
 
     public static Amount operator -(Amount a1, Amount a2)
     {
-        Currency? currency = a1.Currency;
-        Currency? currency2 = a2.Currency;
-        if (!currency.Equals(currency2))
-        {
-            throw new Exception("not defined for two different currencies");
-        }
+        AssertSameCurrency(a1, a2);
 
         return a1 with { Value = a1.Value - a2.Value };
     }
     public static bool operator <=(Amount a1, Amount a2)
     {
-        Currency? currency = a1.Currency;
-        Currency? currency2 = a2.Currency;
+        AssertSameCurrency(a1, a2);
+        return a1.Value<=a2.Value;
+    }
+
+    private static void AssertSameCurrency(Amount a1, Amount a2)
+    {
+        var currency = a1.Currency;
+        var currency2 = a2.Currency;
         if (!currency.Equals(currency2))
         {
             throw new Exception("not defined for two different currencies");
         }
-
-        return a1.Value<=a2.Value;
     }
 
     public static bool operator >=(Amount a1, Amount a2)
     {
-        Currency? currency = a1.Currency;
-        Currency? currency2 = a2.Currency;
-        if (!currency.Equals(currency2))
-        {
-            throw new Exception("not defined for two different currencies");
-        }
+        AssertSameCurrency(a1, a2);
 
         return a1.Value >= a2.Value;
+    }
+    public static bool operator >(Amount a1, Amount a2)
+    {
+        AssertSameCurrency(a1, a2);
+
+        return a1.Value > a2.Value;
+    }
+
+    public static bool operator <(Amount a1, Amount a2)
+    {
+        AssertSameCurrency(a1, a2);
+
+        return a1.Value < a2.Value;
     }
 
     public int CompareTo(Amount? other)

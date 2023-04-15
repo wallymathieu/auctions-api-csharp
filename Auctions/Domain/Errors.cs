@@ -13,5 +13,6 @@ public enum Errors
     BidCurrencyConversion=1<<6,
     InvalidUserData=1<<7,
     MustPlaceBidOverHighestBid=1<<8,
-    AlreadyPlacedBid=1<<9
+    AlreadyPlacedBid=1<<9,
+    MustRaiseWithAtLeast=1<<10,
 }

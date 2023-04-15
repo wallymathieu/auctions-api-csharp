@@ -5,9 +5,9 @@ public class TimedAscendingAuction : Auction, IState
     public TimedAscendingOptions Options { get; init; }
     public IList<Bid> Bids { get; init; }
 
-    private State GetState(ITime time)
+    private State GetState(DateTimeOffset time)
     {
-        return (time.Now > StartsAt, time.Now < Expiry) switch
+        return (time > StartsAt, time < Expiry) switch
         {
             (true, true) => State.OnGoing,
             (true, false) => State.HasEnded,
@@ -22,7 +22,7 @@ public class TimedAscendingAuction : Auction, IState
         HasEnded,
     }
 
-    public bool TryAddBid(ITime time, Bid bid, out Errors errors)
+    public bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
     {
         switch (GetState(time))
         {
@@ -30,15 +30,24 @@ public class TimedAscendingAuction : Auction, IState
             {
                 errors = bid.Validate(this);
                 
-                if (Bids.Any() && bid.Amount <= Bids.Max(b => b.Amount))
+                if (Bids.Any())
                 {
-                    errors |= Errors.MustPlaceBidOverHighestBid;
-                    return false;
+                    var maxBid = Bids.Max(b => b.Amount)!;
+                    if (bid.Amount <= maxBid)
+                    {
+                       errors |= Errors.MustPlaceBidOverHighestBid;
+                       return false;
+                    }
+                    if (bid.Amount < maxBid+Options.MinRaise)
+                    {
+                        errors |= Errors.MustRaiseWithAtLeast;
+                        return false;
+                    }
                 }
 
                 if (errors != Errors.None) return false;
                 
-                Expiry = new[] { Expiry, time.Now + Options.TimeFrame }.Max();
+                Expiry = new[] { Expiry, time + Options.TimeFrame }.Max();
                 Bids.Add(bid);
                 return true;
             }
@@ -57,7 +66,7 @@ public class TimedAscendingAuction : Auction, IState
         }
     }
 
-    public IEnumerable<Bid> GetBids(ITime time)
+    public IEnumerable<Bid> GetBids(DateTimeOffset time)
     {
         switch (GetState(time))
         {
@@ -68,7 +77,7 @@ public class TimedAscendingAuction : Auction, IState
         return Array.Empty<Bid>();
     }
 
-    public (Amount, User)? TryGetAmountAndWinner(ITime time)
+    public (Amount, User)? TryGetAmountAndWinner(DateTimeOffset time)
     {
         switch (GetState(time))
         {
@@ -83,7 +92,7 @@ public class TimedAscendingAuction : Auction, IState
         }
     }
 
-    public bool HasEnded(ITime time)
+    public bool HasEnded(DateTimeOffset time)
     {
         return GetState(time) switch
         {

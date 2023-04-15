@@ -9,6 +9,10 @@ public class AuctionDbContext: DbContext
 {
     private PropertyBuilder<T> WithAuctionIdConversion<T>(PropertyBuilder<T> self) => self.HasConversion(new ValueConverter<AuctionId, long>(v => v.Id, v => new AuctionId(v)));
 
+    public AuctionDbContext(DbContextOptions options):base(options)
+    {
+        
+    }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<TimedAscendingAuction>(entity =>
