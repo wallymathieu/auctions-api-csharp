@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Auctions.Domain;
 
 [Serializable]
-public abstract record User(UserId Id)
+public abstract partial record User(UserId Id)
 {
     [Serializable]
     public record BuyerOrSeller(UserId Id, string? Name) : User(Id)
@@ -34,7 +34,7 @@ public abstract record User(UserId Id)
 
     public static bool TryParse(string user, out User? value)
     {
-        Match match = new Regex("(?<type>\\w*)\\|(?<id>[^|]*)(\\|(?<name>.*))?").Match(user);
+        Match match = UserRegex().Match(user);
         if (match.Success)
         {
             string typ = match.Groups["type"].Value;
@@ -57,4 +57,7 @@ public abstract record User(UserId Id)
         value = default;
         return false;
     }
+
+    [GeneratedRegex("(?<type>\\w*)\\|(?<id>[^|]*)(\\|(?<name>.*))?")]
+    private static partial Regex UserRegex();
 }

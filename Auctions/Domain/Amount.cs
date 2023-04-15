@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Auctions.Domain;
 
 [Serializable]
-public record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
+public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
 {
     public static Amount zero(CurrencyCode c)
     {
@@ -18,7 +18,7 @@ public record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
 
     public static bool TryParse(string amount, out Amount? value)
     {
-        var match = new Regex("(?<currency>[A-Z]+)(?<value>[0-9]+)").Match(amount);
+        var match = AmountRegex().Match(amount);
         if (match.Success)
         {
             var currencyString = match.Groups["currency"].Value;
@@ -99,4 +99,7 @@ public record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
 
         throw new ArgumentException();
     }
+
+    [GeneratedRegex("(?<currency>[A-Z]+)(?<value>[0-9]+)")]
+    private static partial Regex AmountRegex();
 }

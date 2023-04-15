@@ -1,6 +1,8 @@
+using Auctions.Domain;
+
 namespace App.Models;
 
 public class CreateBidModel
 {
-    public string Amount { get; set; }
+    public Amount Amount { get; set; }
 }

@@ -37,7 +37,7 @@ public class AuctionsController : ControllerBase
     {
         return new BidModel
         {
-            Amount = arg.Amount.ToString(),
+            Amount = arg.Amount,
             Bidder = arg.User.ToString()
         };
     }
@@ -73,9 +73,9 @@ public class AuctionsController : ControllerBase
             User = new UserId(this.User.Identity.Name),
             Options =
             {
-                MinRaise = 0, 
-                ReservePrice = 0,
-                TimeFrame = TimeSpan.Zero,
+                MinRaise = model.MinRaise??0, 
+                ReservePrice = model.ReservePrice??0,
+                TimeFrame = model.TimeFrame?? TimeSpan.Zero,
             }
         };
         _dbContext.Auctions.Add(auction);
@@ -94,12 +94,8 @@ public class AuctionsController : ControllerBase
 
         var auction = await GetAuction(auctionId);
         if (auction is null) return NotFound();
-        if (!Amount.TryParse(model.Amount, out var amount))
-        {
-            return BadRequest();
-        }
         if (auction.TryAddBid(_time.Now, 
-                new Bid(new UserId(this.User.Identity.Name), amount!, _time.Now), out var error))
+                new Bid(new UserId(this.User.Identity.Name), model.Amount, _time.Now), out var error))
         {
             await _dbContext.SaveChangesAsync();
             return Ok();

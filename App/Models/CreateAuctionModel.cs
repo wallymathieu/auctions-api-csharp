@@ -1,11 +1,15 @@
+using System.ComponentModel.DataAnnotations;
 using Auctions.Domain;
 
 namespace App.Models;
 
 public class CreateAuctionModel
 {
-    public CurrencyCode Currency { get; set; }
-    public DateTimeOffset StartsAt { get; set; }
-    public DateTimeOffset EndsAt { get; set; }
-    public string Title { get; set; }
+    [Required] public CurrencyCode Currency { get; set; }
+    [Required] public DateTimeOffset StartsAt { get; set; }
+    [Required] public DateTimeOffset EndsAt { get; set; }
+    [Required] public string Title { get; set; }
+    public long? MinRaise { get; set; }
+    public long? ReservePrice { get; set; }
+    public TimeSpan? TimeFrame { get; set; }
 }

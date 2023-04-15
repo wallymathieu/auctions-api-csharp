@@ -12,6 +12,7 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
 {
     opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     opts.JsonSerializerOptions.Converters.Add(new DateTimeOffsetConverter());
+    opts.JsonSerializerOptions.Converters.Add(new AmountConverter());
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
