@@ -1,6 +1,6 @@
 namespace Auctions.Domain;
 
-public record Bid(AuctionId AuctionId, UserId User, Amount Amount, DateTimeOffset At)
+public record Bid(UserId User, Amount Amount, DateTimeOffset At)
 {
     public Errors Validate(Auction auction)
     {
@@ -15,19 +15,17 @@ public record Bid(AuctionId AuctionId, UserId User, Amount Amount, DateTimeOffse
 public class BidEntity
 {
 #pragma warning disable CS8618
-    internal BidEntity(){}
+    private BidEntity(){}
 #pragma warning restore CS8618
-    public BidEntity(long id, AuctionId auctionId, UserId user, Amount amount, DateTimeOffset at)
+    public BidEntity(long id, UserId user, Amount amount, DateTimeOffset at)
     {
         Id = id;
-        AuctionId = auctionId ?? throw new ArgumentNullException(nameof(auctionId));
         User = user ?? throw new ArgumentNullException(nameof(user));
         Amount = amount ?? throw new ArgumentNullException(nameof(amount));
         At = at;
     }
 
     public long Id { get; init; }
-    public AuctionId AuctionId{ get; init; }
     public UserId User{ get; init; }
     public Amount Amount{ get; init; }
     public DateTimeOffset At{ get; init; }

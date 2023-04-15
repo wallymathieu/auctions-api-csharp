@@ -7,14 +7,14 @@ public class TimedAscendingOptions
     /// and the final bid does not reach that price the item remains unsold
     /// If the reserve price is 0, that is the equivalent of not setting it.
     /// </summary>
-    public Amount ReservePrice { get; set; }
+    public long ReservePrice { get; set; }
 
 
     ///<summary>
     /// Sometimes the auctioneer sets a minimum amount by which the next bid must exceed the current highest bid.
     /// Having min raise equal to 0 is the equivalent of not setting it.
     /// </summary>
-    public Amount MinRaise { get; set; }
+    public long MinRaise { get; set; }
 
     ///<summary>
     /// If no competing bidder challenges the standing bid within a given time frame,

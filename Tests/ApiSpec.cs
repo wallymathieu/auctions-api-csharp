@@ -1,6 +1,8 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
+using App;
 using App.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -18,19 +20,10 @@ public class ApiSpec
 {
     public class ApiFixture:IDisposable
     {
-        static TestServer Create()
+   
+        TestServer Create()
         {
-            if (File.Exists(db))
-            {
-                try
-                {
-                    File.Delete(db);
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
+            RemoveDbFile(db);
 
             var application = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder =>
@@ -43,6 +36,8 @@ public class ApiSpec
                         services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + db));
                         services.AddSingleton<ApiKeyAuthorizationFilter>();
                         services.AddSingleton<IApiKeyValidator, ApiKeyValidator>();
+                        services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
+                        services.AddSingleton<ITime>(new FakeTime(new DateTime(2022,8,4)));
                         services.AddControllers(c => c.Filters.Add<ApiKeyAuthorizationFilter>());
                     });
                 });
@@ -51,26 +46,76 @@ public class ApiSpec
             context.Database.EnsureCreated();
             return application.Server;
         }
+
+        private void RemoveDbFile(string db)
+        {
+            if (File.Exists(db))
+            {
+                try
+                {
+                    File.Delete(db);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+        }
+
         private readonly TestServer _testServer;
-        public ApiFixture() => _testServer = Create();
+        private readonly string db;
+
+        public ApiFixture(string db)
+        {
+            this.db = db;
+            _testServer = Create();
+        }
+
         public void Dispose()
         {
             _testServer.Dispose();
-            if (!File.Exists(db)) return;
-            try{ File.Delete(db); }
-            catch
-            {
-                // ignored
-            }
+            RemoveDbFile(db);
         }
         public TestServer Server=>_testServer;
 
-        const string db = "ApiFixture.db";
-        
+    }
+    
+    private static async Task<HttpResponseMessage> PostAction(ApiFixture application, string auctionRequest, string auth) =>
+        await application.Server.CreateRequest("/auctions").And(r =>
+        {
+            r.Content = Json(auctionRequest);
+            AcceptJson(r);
+            AddXJwtPayload(r, auth);
+        }).PostAsync();
+
+    private static async Task<HttpResponseMessage> PostToAction(ApiFixture application, long id, string bidRequest, string auth) =>
+        await application.Server.CreateRequest($"/auctions/{id}/bids").And(r =>
+        {
+            r.Content = Json(bidRequest);
+            AcceptJson(r);
+            AddXJwtPayload(r, auth);
+        }).PostAsync();
+
+    private static StringContent Json(string bidRequest) => new(bidRequest, Encoding.UTF8, "application/json");
+
+    private static async Task<HttpResponseMessage> GetAuction(ApiFixture application, long id, string auth)=>
+        await application.Server.CreateRequest($"/auctions/{id}").And(r =>
+        {
+            AcceptJson(r);
+            AddXJwtPayload(r, auth);
+        }).GetAsync();
+
+    private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+    private static void AddXJwtPayload(HttpRequestMessage r, string auth)
+    {
+        if (!string.IsNullOrWhiteSpace(auth))
+        {
+            r.Headers.Add("x-jwt-payload", auth);
+        }
     }
 
     private const string firstAuctionRequest = @"{
-            ""id"": 1,
         ""startsAt"": ""2022-07-01T10:00:00.000Z"",
         ""endsAt"": ""2022-09-18T10:00:00.000Z"",
         ""title"": ""Some auction"",
@@ -83,12 +128,8 @@ public class ApiSpec
     [Fact]
     public async Task Create_auction_1()
     { 
-        using var application = new ApiFixture();
-        var response = await application.Server.CreateRequest("/auctions").And(r =>
-        {
-            r.Content = new StringContent(firstAuctionRequest, Encoding.UTF8, "application/json");
-            r.Headers.Add("x-jwt-payload", Seller1);
-        }).PostAsync();
+        using var application = new ApiFixture(nameof(Create_auction_1)+".db");
+        var response = await PostAction(application, firstAuctionRequest, Seller1);
         var stringContent = await response.Content.ReadAsStringAsync();
         Assert.Multiple(() =>
         {
@@ -99,11 +140,81 @@ public class ApiSpec
                 ""title"": ""Some auction"",
                 ""expiry"": ""2022-09-18T10:00:00.000Z"",
                 ""user"": ""Test"",
-                ""currency"": ""VAC""
+                ""currency"": ""VAC"",
+                ""bids"": []
         }").ToString(Formatting.Indented), 
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
+
+    private const string secondAuctionRequest = @"{
+        ""startsAt"": ""2021-12-01T10:00:00.000Z"",
+        ""endsAt"": ""2022-12-18T10:00:00.000Z"",
+        ""title"": ""Some auction"",
+        ""currency"": ""VAC""
+}";
+    [Fact]
+    public async Task Create_auction_2()
+    { 
+        using var application = new ApiFixture(nameof(Create_auction_2)+".db");
+        var response = await PostAction(application, secondAuctionRequest, Seller1);
+        var stringContent = await response.Content.ReadAsStringAsync();
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(HttpStatusCode.Created,response.StatusCode);
+            Assert.Equal(JToken.Parse(@"{
+                ""id"": 1,
+                ""startsAt"": ""2021-12-01T10:00:00.000Z"",
+                ""title"": ""Some auction"",
+                ""expiry"": ""2022-12-18T10:00:00.000Z"",
+                ""user"": ""Test"",
+                ""currency"": ""VAC"",
+                ""bids"": []
+        }").ToString(Formatting.Indented), 
+                JToken.Parse(stringContent).ToString(Formatting.Indented));
+        });
+    }
+    [Fact]
+    public async Task Place_bid_as_buyer_on_auction_1()
+    { 
+        using var application = new ApiFixture(nameof(Place_bid_as_buyer_on_auction_1)+".db");
+        var response = await PostAction(application, firstAuctionRequest, Seller1);
+        var bidResponse = await PostToAction(application, 1, @"{""amount"":""VAC11""}", Buyer1);
+        var auctionResponse = await GetAuction(application, 1, Seller1);
+        var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
+        var stringContent = await auctionResponse.Content.ReadAsStringAsync();
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(HttpStatusCode.Created,response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK,bidResponse.StatusCode);
+            Assert.Empty(bidResponseString);
+            Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
+            Assert.Equal(JToken.Parse(@"{
+                ""id"": 1,
+                ""startsAt"": ""2022-07-01T10:00:00.000Z"",
+                ""title"": ""Some auction"",
+                ""expiry"": ""2022-09-18T10:00:00.000Z"",
+                ""user"": ""Test"",
+                ""currency"": ""VAC"",
+                ""bids"": [{
+                    ""amount"": ""VAC11"",
+                    ""bidder"": ""Buyer""
+                }]}").ToString(Formatting.Indented), 
+                JToken.Parse(stringContent).ToString(Formatting.Indented));
+        });
+    } 
+}
+
+internal class FakeTime : ITime
+{
+    private readonly DateTimeOffset _now;
+
+    public FakeTime(DateTimeOffset now)
+    {
+        _now = now;
+    }
+
+    public DateTimeOffset Now => this._now;
 }
 
 internal class JwtPayload

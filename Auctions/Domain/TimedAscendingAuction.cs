@@ -38,7 +38,7 @@ public class TimedAscendingAuction : Auction, IState
                        errors |= Errors.MustPlaceBidOverHighestBid;
                        return false;
                     }
-                    if (bid.Amount < maxBid+Options.MinRaise)
+                    if (bid.Amount.Value < maxBid.Value+Options.MinRaise)
                     {
                         errors |= Errors.MustRaiseWithAtLeast;
                         return false;
@@ -47,8 +47,8 @@ public class TimedAscendingAuction : Auction, IState
 
                 if (errors != Errors.None) return false;
                 
-                Expiry = new[] { Expiry, time + Options.TimeFrame }.Max();
-                Bids.Add(new BidEntity(0,bid.AuctionId,bid.User,bid.Amount,bid.At));
+                EndsAt = new[] { EndsAt, Expiry, time + Options.TimeFrame }.Where(v=>v!=null).Max();
+                Bids.Add(new BidEntity(0,bid.User,bid.Amount,bid.At));
                 return true;
             }
             case State.HasEnded:
@@ -66,12 +66,14 @@ public class TimedAscendingAuction : Auction, IState
         }
     }
 
+    public DateTimeOffset? EndsAt { get; set; }
+
     public IEnumerable<Bid> GetBids(DateTimeOffset time)
     {
         switch (GetState(time))
         {
             case State.OnGoing:
-            case State.HasEnded: return Bids.Select(b=>new Bid(b.AuctionId,b.User,b.Amount,b.At));
+            case State.HasEnded: return Bids.Select(b=>new Bid(b.User, b.Amount, b.At));
         }
 
         return Array.Empty<Bid>();

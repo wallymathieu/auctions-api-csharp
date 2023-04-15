@@ -25,15 +25,13 @@ public class AuctionDbContext: DbContext
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(o => o.AuctionId).UseIdentityColumn();
             WithUserId(entity.Property(o => o.User));
-            var opts=entity.OwnsOne<TimedAscendingOptions>(e=>e.Options);
-                opts.OwnsOne(e=>e.ReservePrice);
-                opts.OwnsOne(e => e.MinRaise);
+            entity.OwnsOne<TimedAscendingOptions>(e=>e.Options);
+            entity.HasMany(e => e.Bids).WithOne();
         });
         
         builder.Entity<BidEntity>(entity =>
         {
             entity.ToTable("Bids");
-            WithAuctionIdConversion( entity.Property(e=>e.AuctionId));
             WithUserId(entity.Property(o => o.User));
             entity.OwnsOne(e => e.Amount);
         });

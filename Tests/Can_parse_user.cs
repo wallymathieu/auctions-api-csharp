@@ -21,8 +21,7 @@ public class Can_parse_user
 public class Auction_bid
 {
     Bid ValidBid(Auction auction) => 
-        new(AuctionId: TestData.AuctionId,
-            User: Buyer,
+        new(User: Buyer,
             Amount: Amount.Parse("SEK10"),
             At: auction.StartsAt.AddHours(1.0));
 

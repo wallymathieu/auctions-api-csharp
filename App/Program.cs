@@ -13,6 +13,7 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<ITime, Time>();
 builder.Services.AddDbContext<AuctionDbContext>(e=>e.UseSqlServer());
 
 var app = builder.Build();
