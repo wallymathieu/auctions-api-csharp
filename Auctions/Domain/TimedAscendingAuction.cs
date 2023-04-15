@@ -3,7 +3,7 @@ namespace Auctions.Domain;
 public class TimedAscendingAuction : Auction, IState
 {
     public TimedAscendingOptions Options { get; init; } = new();
-    public IList<BidEntity> Bids { get; init; } = new List<BidEntity>();
+    public ICollection<BidEntity> Bids { get; init; } = new List<BidEntity>();
 
     private State GetState(DateTimeOffset time)
     {

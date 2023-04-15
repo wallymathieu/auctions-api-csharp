@@ -45,10 +45,17 @@ public class AuctionsController : ControllerBase
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId)
     {
-        var auction = await _dbContext.Auctions.Include(a=>a.Bids)
-            .FirstOrDefaultAsync(a=>a.AuctionId == auctionId);
+        var auction = await GetAuction(auctionId);
         return auction is null ? NotFound() : MapAuctionToModel(auction);
     }
+
+    private async Task<TimedAscendingAuction?> GetAuction(long auctionId)
+    {
+        var auction = await _dbContext.Auctions.FindAsync(auctionId);
+        if (auction is not null) await _dbContext.Entry(auction).Collection(p => p.Bids).LoadAsync();
+        return auction;
+    }
+
     [HttpPost(Name = "create_auction")]
     public async Task<ActionResult<AuctionModel>> Post(
         CreateAuctionModel model)
@@ -85,7 +92,7 @@ public class AuctionsController : ControllerBase
             return Unauthorized();
         }
 
-        var auction = await _dbContext.Auctions.FindAsync(auctionId);
+        var auction = await GetAuction(auctionId);
         if (auction is null) return NotFound();
         if (!Amount.TryParse(model.Amount, out var amount))
         {
