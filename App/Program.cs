@@ -4,6 +4,7 @@ using App.Data;
 using Auctions.Domain;
 using Auctions.Json;
 using Auctions.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -28,6 +29,21 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddSingleton<ITime, Time>();
 builder.Services.AddDbContext<AuctionDbContext>(e=>e.UseSqlServer());
+if (builder.Configuration["Authentication:Method"]?.Equals( "jwt", StringComparison.OrdinalIgnoreCase)??false)
+{
+    builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.Authority = builder.Configuration["Authentication:Authority"];
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters.ValidAudiences = new List<string>
+                {builder.Configuration["Authentication:ApiName"]!};
+        });
+}
 
 var app = builder.Build();
 
