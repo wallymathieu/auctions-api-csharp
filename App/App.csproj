@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
     <InternalsVisibleTo Include="Tests" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
