@@ -21,11 +21,8 @@ public class ApiSpec
 {
     public class ApiFixture:IDisposable
     {
-   
         TestServer Create()
         {
-            RemoveDbFile(db);
-
             var application = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder =>
                 {
@@ -34,7 +31,7 @@ public class ApiSpec
                         services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
                         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
                         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
-                        services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + db));
+                        services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + _db));
                         services.AddSingleton<ApiKeyAuthorizationFilter>();
                         services.AddSingleton<IApiKeyValidator, ApiKeyValidator>();
                         services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
@@ -48,13 +45,13 @@ public class ApiSpec
             return application.Server;
         }
 
-        private void RemoveDbFile(string db)
+        private void RemoveDbFile()
         {
-            if (File.Exists(db))
+            if (File.Exists(_db))
             {
                 try
                 {
-                    File.Delete(db);
+                    File.Delete(_db);
                 }
                 catch
                 {
@@ -64,18 +61,19 @@ public class ApiSpec
         }
 
         private readonly TestServer _testServer;
-        private readonly string db;
+        private readonly string _db;
 
         public ApiFixture(string db)
         {
-            this.db = db;
+            _db = db;
+            RemoveDbFile();
             _testServer = Create();
         }
 
         public void Dispose()
         {
             _testServer.Dispose();
-            RemoveDbFile(db);
+            RemoveDbFile();
         }
         public TestServer Server=>_testServer;
 
@@ -261,7 +259,7 @@ public interface IApiKeyValidator
 
 public class ApiKeyValidator:IApiKeyValidator
 {
-    private ILogger<ApiKeyValidator> _logger;
+    private readonly ILogger<ApiKeyValidator> _logger;
 
     public ApiKeyValidator(ILogger<ApiKeyValidator> logger)
     {

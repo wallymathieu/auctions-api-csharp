@@ -5,11 +5,7 @@ namespace Auctions.Domain;
 [Serializable]
 public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
 {
-    public static Amount zero(CurrencyCode c)
-    {
-        return new Amount(0L, c);
-    }
-
+    public static Amount Zero(CurrencyCode c) => new(0L, c);
 
     public override string ToString()
     {
