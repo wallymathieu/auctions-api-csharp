@@ -6,9 +6,10 @@ using System.Text.Json.Serialization;
 namespace App.Middleware.Auth;
 /// <summary>
 /// See https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities
+/// and https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
 /// </summary>
-public class ClaimsPrincipalParser:IClaimsPrincipalParser{
-
+public class ClaimsPrincipalParser:IClaimsPrincipalParser
+{
     private class ClientPrincipalClaim
     {
         [JsonPropertyName("typ")]
