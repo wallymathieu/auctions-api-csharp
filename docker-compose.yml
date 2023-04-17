@@ -2,9 +2,8 @@
 version: "3.4"
 services:
   app:
-    build:
-      context: .
-      dockerfile: App/Dockerfile
+    image: wallymathieu/auctions-api-csharp:1.0.0
+    
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:80
