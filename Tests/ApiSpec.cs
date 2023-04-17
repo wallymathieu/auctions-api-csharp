@@ -67,6 +67,31 @@ public abstract class ApiSpec<TAuth>
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
+    [Theory,
+     InlineData(@"{
+        ""startsAt"": ""2021-12-01T10:00:00.000Z"",
+        ""endsAt"": ""2022-12-18T10:00:00.000Z"",
+        ""title"": ""Some auction"",
+        ""currency"": ""VAC"",
+        ""timeFrame"": -1,
+        ""reservePrice"": null,
+        ""minRaise"":null
+    }",1),
+     InlineData(@"{
+        ""startsAt"": ""2021-12-01T10:00:00.000Z"",
+        ""endsAt"": ""2022-12-18T10:00:00.000Z"",
+        ""title"": ""Some auction"",
+    }",2),
+    ]
+    public async Task Fail_to_create_auction(string sample, int index)
+    {
+        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Fail_to_create_auction)+"_"+index+".db");
+        var response = await application.PostAuction(sample, AuthToken.Seller1);
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(HttpStatusCode.BadRequest,response.StatusCode);
+        });
+    }
     [Fact]
     public async Task Place_bid_as_buyer_on_auction_1()
     { 
