@@ -26,7 +26,10 @@ public class AuctionDbContext: DbContext
             entity.Property(o => o.AuctionId).UseIdentityColumn();
             WithUserId(entity.Property(o => o.User));
             entity.OwnsOne<TimedAscendingOptions>(e=>e.Options);
-            entity.HasMany(e => e.Bids).WithOne();
+            entity.Property(e => e.Currency).HasConversion(new EnumToStringConverter<CurrencyCode>());
+            entity.HasMany(e => e.Bids).WithOne()
+                .HasPrincipalKey(a=>a.AuctionId)
+                .HasForeignKey("AuctionId");
         });
         
         builder.Entity<BidEntity>(entity =>
