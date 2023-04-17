@@ -11,8 +11,13 @@ public class AuctionDbContext: DbContext
     {
     }
     public DbSet<TimedAscendingAuction> Auctions { get; set; }
-    private PropertyBuilder<T> WithAuctionIdConversion<T>(PropertyBuilder<T> self) => self.HasConversion(new ValueConverter<AuctionId, long>(v => v.Id, v => new AuctionId(v)));
-    private PropertyBuilder<T> WithUserId<T>(PropertyBuilder<T> self) => self.HasConversion(new ValueConverter<UserId, string>(v => v.Id, v => new UserId(v))).HasMaxLength(2000);
+    private PropertyBuilder<T> WithAuctionIdConversion<T>(PropertyBuilder<T> self) =>
+        self.HasConversion(new ValueConverter<AuctionId, long>(v => v.Id, v => new AuctionId(v)));
+    private PropertyBuilder<T> WithUserId<T>(PropertyBuilder<T> self) =>
+        self.HasConversion(new ValueConverter<UserId, string>(v => v.Id, v => new UserId(v))).HasMaxLength(2000);
+    private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
+        propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
+
     public AuctionDbContext(DbContextOptions options):base(options)
     {
     }
@@ -26,7 +31,7 @@ public class AuctionDbContext: DbContext
             entity.Property(o => o.AuctionId).UseIdentityColumn();
             WithUserId(entity.Property(o => o.User));
             entity.OwnsOne<TimedAscendingOptions>(e=>e.Options);
-            entity.Property(e => e.Currency).HasConversion(new EnumToStringConverter<CurrencyCode>());
+            HasCurrencyCodeConversion(entity.Property(e => e.Currency));
             entity.HasMany(e => e.Bids).WithOne()
                 .HasPrincipalKey(a=>a.AuctionId)
                 .HasForeignKey("AuctionId");
@@ -36,10 +41,12 @@ public class AuctionDbContext: DbContext
         {
             entity.ToTable("Bids");
             WithUserId(entity.Property(o => o.User));
-            entity.OwnsOne(e => e.Amount);
+            var amount = entity.OwnsOne(e => e.Amount);
+            HasCurrencyCodeConversion(amount.Property(e => e.Currency));
         });
         
        
         base.OnModelCreating(builder);
     }
+
 }
