@@ -1,0 +1,24 @@
+
+version: "3.4"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: App/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:80
+      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection} 
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+
+
+  db:
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD} 
+      ACCEPT_EULA: "Y"

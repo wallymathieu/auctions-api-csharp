@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 builder.Services.AddSingleton<ITime, Time>();
-builder.Services.AddDbContext<AuctionDbContext>(e=>e.UseSqlServer());
+builder.Services.AddDbContext<AuctionDbContext>(e=>e.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
