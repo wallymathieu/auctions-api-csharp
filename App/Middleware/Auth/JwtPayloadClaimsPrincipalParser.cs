@@ -1,15 +1,25 @@
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace Tests;
+namespace App.Middleware.Auth;
 
-public class ApiJwtDecodedValidator:IApiJwtDecodedValidator
+public class JwtPayloadClaimsPrincipalParser:IClaimsPrincipalParser
 {
-    private readonly ILogger<ApiJwtDecodedValidator> _logger;
+    internal class JwtPayload
+    {
+        [JsonPropertyName("sub")]
+        public string Sub { get; set; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        [JsonPropertyName("u_typ")]
+        public string UTyp { get; set; }
+    }
 
-    public ApiJwtDecodedValidator(ILogger<ApiJwtDecodedValidator> logger)
+    private readonly ILogger<JwtPayloadClaimsPrincipalParser> _logger;
+
+    public JwtPayloadClaimsPrincipalParser(ILogger<JwtPayloadClaimsPrincipalParser> logger)
     {
         _logger = logger;
     }
@@ -21,7 +31,7 @@ public class ApiJwtDecodedValidator:IApiJwtDecodedValidator
         try
         {
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(apiKey));
-            var deserialized = JsonConvert.DeserializeObject<JwtPayload>(json);
+            var deserialized = JsonSerializer.Deserialize<JwtPayload>(json);
             if (deserialized == null) return false;
             claimsIdentity = new ClaimsPrincipal(new []
             {

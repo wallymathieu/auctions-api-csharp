@@ -1,8 +1,8 @@
 using System.Security.Claims;
 
-namespace Tests;
+namespace App.Middleware.Auth;
 
-public interface IApiJwtDecodedValidator
+public interface IClaimsPrincipalParser
 {
     bool IsValid(string? apiKey, out ClaimsPrincipal? claimsIdentity);
 }

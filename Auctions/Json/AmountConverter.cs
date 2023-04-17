@@ -6,6 +6,7 @@ namespace Auctions.Json;
 
 public class AmountConverter: JsonConverter<Amount>
 {
+    public override bool HandleNull => true;
     public override Amount Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return Amount.Parse(reader.GetString());

@@ -34,3 +34,9 @@ dotnet ef database update
 
 dotnet run 
 ```
+
+## Auth
+
+The API assumes that you have auth middleware in front of the app.
+
+Either the decoded JWT in the `x-jwt-payload` header or specify an encoded claims principal by using configuration value in `PrincipalHeader`, such as `x-ms-client-principal`.

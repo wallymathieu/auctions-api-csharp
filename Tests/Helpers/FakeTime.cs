@@ -1,6 +1,6 @@
 using Auctions.Services;
 
-namespace Tests;
+namespace Tests.Helpers;
 
 internal class FakeTime : ITime
 {
@@ -11,5 +11,5 @@ internal class FakeTime : ITime
         _now = now;
     }
 
-    public DateTimeOffset Now => this._now;
+    public DateTimeOffset Now => _now;
 }

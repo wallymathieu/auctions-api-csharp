@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using App;
 using App.Data;
+using App.Middleware.Auth;
 using Auctions.Domain;
 using Auctions.Json;
 using Auctions.Services;
@@ -9,9 +10,8 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-builder.Services.AddControllers().AddJsonOptions(opts =>
+builder.Services.AddControllers(c => c.Filters.Add<DecodedHeaderAuthorizationFilter>()).AddJsonOptions(opts =>
 {
     opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     opts.JsonSerializerOptions.Converters.Add(new DateTimeOffsetConverter());
@@ -28,6 +28,15 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddSingleton<ITime, Time>();
 builder.Services.AddDbContext<AuctionDbContext>(e=>e.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
+if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
+{
+    builder.Services.AddSingleton<IClaimsPrincipalParser, ClaimsPrincipalParser>();
+}
+else
+{
+    builder.Services.AddSingleton<IClaimsPrincipalParser, JwtPayloadClaimsPrincipalParser>();
+}
 
 var app = builder.Build();
 
