@@ -1,21 +1,18 @@
-using App.Data;
+using Auctions.Data;
 using Auctions.Domain;
 using Auctions.Models;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Auctions.Services;
 
-public class CreateAuctionCommandHandler
+internal class CreateAuctionCommandHandler : ICreateAuctionCommandHandler
 {
     private readonly AuctionDbContext _dbContext;
     private readonly Mapper _mapper;
-    private readonly IDistributedCache _cache;
 
-    public CreateAuctionCommandHandler(AuctionDbContext dbContext, Mapper mapper, IDistributedCache cache)
+    public CreateAuctionCommandHandler(AuctionDbContext dbContext, Mapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _cache = cache;
     }
 
     public async Task<AuctionModel> Handle(UserId userId, CreateAuctionModel model)

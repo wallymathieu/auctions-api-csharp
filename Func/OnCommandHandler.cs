@@ -15,7 +15,7 @@ public static class OnCommandHandler
     public static async Task<AuctionModel> RunAuctionCommandAsync(
         [Microsoft.Azure.WebJobs.QueueTrigger(QueuesModule.AuctionCommandQueueName, Connection = "")] CreateAuctionCommand myQueueItem,
         ILogger log,
-        CreateAuctionCommandHandler createAuctionCommandHandler)
+        ICreateAuctionCommandHandler createAuctionCommandHandler)
     {
         log.LogInformation("Create auction received");
         var result = await createAuctionCommandHandler.Handle(myQueueItem.UserId, myQueueItem.Model);
@@ -25,9 +25,9 @@ public static class OnCommandHandler
     
     [QueueOutput(QueuesModule.BidResultQueueName)]
     [FunctionName("OnBidCommand")]
-    public static async Task<(CreateBidCommandHandler.Result Result, Errors Errors)> RunBidCommandAsync(
+    public static async Task<(CreateBidCommandResult Result, Errors Errors)> RunBidCommandAsync(
         [Microsoft.Azure.WebJobs.QueueTrigger(QueuesModule.BidCommandQueueName, Connection = "")] CreateBidCommand myQueueItem, ILogger log,
-        CreateBidCommandHandler createBidCommandHandler)
+        ICreateBidCommandHandler createBidCommandHandler)
     {
         log.LogInformation($"bid received");
         var res= await createBidCommandHandler.Handle(myQueueItem.AuctionId, myQueueItem.UserId, myQueueItem.Model);

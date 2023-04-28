@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using App.Data;
 using App.Middleware.Auth;
+using Auctions.Data;
 using Auctions.Domain;
 using Auctions.Json;
 using Auctions.Services;
@@ -26,16 +26,32 @@ builder.Services.AddSwaggerGen(options =>
         Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
     });
 });
-builder.Services.AddAuctionServices()
-    .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
-    .AddAuctionRedisCache(builder.Configuration.GetConnectionString(ConnectionStrings.Redis));
+if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
+{
+    builder.Services.AddAuctionRepositoryCached()
+        .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+        .AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
+            options.InstanceName = "auctions";
+        })
+        .AddAuctionServicesCached();
+}
+else
+{
+    builder.Services.AddAuctionRepositoryNoCache()
+        .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+        .AddAuctionServicesNoCache();
+ 
+}
+
 // Register Azure Clients
 builder.Services.AddAzureClients(azureClientsBuilder => {
-    string azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");    
+    var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");    
 
     azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions => {
         queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
-    });    
+    });
     
     azureClientsBuilder.UseCredential(new DefaultAzureCredential());
 });

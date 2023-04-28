@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
-using App.Data;
+using Auctions.Data;
 using Auctions.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

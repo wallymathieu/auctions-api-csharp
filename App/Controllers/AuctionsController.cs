@@ -1,4 +1,4 @@
-using App.Data;
+using Auctions.Data;
 using Auctions.Domain;
 using Auctions.Models;
 using Auctions.Services;
@@ -11,37 +11,32 @@ namespace App.Controllers;
 [Route("auctions")]
 public class AuctionsController : ControllerBase
 {
-    private readonly ILogger<AuctionsController> _logger;
-    private readonly AuctionDbContext _dbContext;
     private readonly Mapper _mapper;
-    private readonly CreateAuctionCommandHandler _createAuctionCommandHandler;
-    private readonly CreateBidCommandHandler _createBidCommandHandler;
+    private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
+    private readonly ICreateBidCommandHandler _createBidCommandHandler;
+    private readonly IAuctionRepository _auctionRepository;
 
-    public AuctionsController(ILogger<AuctionsController> logger, AuctionDbContext dbContext,
-        Mapper mapper, CreateAuctionCommandHandler createAuctionCommandHandler, CreateBidCommandHandler createBidCommandHandler)
+    public AuctionsController(Mapper mapper, ICreateAuctionCommandHandler createAuctionCommandHandler, ICreateBidCommandHandler createBidCommandHandler, IAuctionRepository auctionRepository)
     {
-        _logger = logger;
-        _dbContext = dbContext;
         _mapper = mapper;
         _createAuctionCommandHandler = createAuctionCommandHandler;
         _createBidCommandHandler = createBidCommandHandler;
+        _auctionRepository = auctionRepository;
     }
 
     [HttpGet(Name = "get_auctions")]
     public async Task<IEnumerable<AuctionModel>> Get()
     {
-        return (await _dbContext.Auctions.Include(a=>a.Bids).ToListAsync())
-            .Select(_mapper.MapAuctionToModel);
+        return from auction in await _auctionRepository.GetAuctionsAsync()
+            select _mapper.MapAuctionToModel(auction);
     }
 
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId)
     {
-        var auction = await _dbContext.GetAuction(auctionId);
+        var auction = await _auctionRepository.GetAuctionAsync(auctionId);
         return auction is null ? NotFound() : _mapper.MapAuctionToModel(auction);
     }
-
-
 
     [HttpPost(Name = "create_auction")]
     public async Task<ActionResult<AuctionModel>> Post(
@@ -69,10 +64,10 @@ public class AuctionsController : ControllerBase
             await _createBidCommandHandler.Handle(auctionId, new UserId(User.Identity.Name), model);
         switch (result)
         {
-            case CreateBidCommandHandler.Result.Ok: return Ok();
-            case CreateBidCommandHandler.Result.Error: return BadRequest(error);
+            case CreateBidCommandResult.Ok: return Ok();
+            case CreateBidCommandResult.Error: return BadRequest(error);
             default:
-            case CreateBidCommandHandler.Result.NotFound: return NotFound();
+            case CreateBidCommandResult.NotFound: return NotFound();
         }
     }
 }

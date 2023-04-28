@@ -1,27 +1,33 @@
+using Auctions.Services.Cache;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 namespace Auctions.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddAuctionServices(this IServiceCollection services)
+    private static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
     {
-        services.AddSingleton<ITime, Time>()
-            .AddSingleton<Mapper>()
-            .AddScoped<CreateAuctionCommandHandler>()
-            .AddScoped<CreateBidCommandHandler>();
+        services.TryAddSingleton<ITime, Time>();
+        services.TryAddSingleton<Mapper>();
+        services.TryAddScoped<CreateAuctionCommandHandler>();
+        services.TryAddScoped<CreateBidCommandHandler>();
         return services;
     }
 
-    public static IServiceCollection AddAuctionRedisCache(this IServiceCollection services, string? connectionString)
+    public static IServiceCollection AddAuctionServicesNoCache(this IServiceCollection services)
     {
-        return services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = connectionString;
-            options.InstanceName = "auctions";
-        });
+        return AddAuctionServicesImplementation(services)
+            .AddScoped<ICreateAuctionCommandHandler>(c => c.GetRequiredService<CreateAuctionCommandHandler>())
+            .AddScoped<ICreateBidCommandHandler>(c => c.GetRequiredService<CreateBidCommandHandler>());
     }
-}
 
-public static class CacheExtensions
-{
+    public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services)
+    {
+        return AddAuctionServicesImplementation(services)
+            .AddScoped<ICreateAuctionCommandHandler>(c=>new CacheAwareCreateAuctionCommandHandler(c.GetRequiredService<CreateAuctionCommandHandler>(), c.GetRequiredService<IDistributedCache>()))
+            .AddScoped<ICreateBidCommandHandler>(c=>new CacheAwareCreateBidCommandHandler(c.GetRequiredService<CreateBidCommandHandler>(), c.GetRequiredService<IDistributedCache>()))
+            ;
+    }
 }
