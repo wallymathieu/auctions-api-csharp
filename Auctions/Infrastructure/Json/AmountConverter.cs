@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Auctions.Domain;
 
-namespace Auctions.Json;
+namespace Auctions.Infrastructure.Json;
 
 public class AmountConverter: JsonConverter<Amount>
 {

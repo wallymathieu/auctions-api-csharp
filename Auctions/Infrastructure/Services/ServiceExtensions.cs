@@ -1,9 +1,10 @@
-using Auctions.Services.Cache;
+using Auctions.Infrastructure.Services.Cache;
+using Auctions.Services;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Auctions.Services;
-using Microsoft.Extensions.DependencyInjection;
+namespace Auctions.Infrastructure.Services;
 
 public static class ServiceExtensions
 {

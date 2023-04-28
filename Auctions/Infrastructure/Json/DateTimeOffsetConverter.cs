@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Auctions.Json;
+namespace Auctions.Infrastructure.Json;
 
 public class DateTimeOffsetConverter: JsonConverter<DateTimeOffset>
 {

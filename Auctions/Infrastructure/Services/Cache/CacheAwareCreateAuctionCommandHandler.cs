@@ -1,9 +1,10 @@
-using Auctions.Cache;
 using Auctions.Domain;
+using Auctions.Infrastructure.Cache;
 using Auctions.Models;
+using Auctions.Services;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Auctions.Services.Cache;
+namespace Auctions.Infrastructure.Services.Cache;
 
 internal class CacheAwareCreateAuctionCommandHandler:ICreateAuctionCommandHandler
 {
