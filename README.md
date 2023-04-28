@@ -15,6 +15,12 @@ To start the database run:
 docker compose up -d db
 ```
 
+To start azurite run:
+
+```bash
+docker compose up -d azurite
+```
+
 To build the app run:
 
 ```bash
@@ -25,7 +31,7 @@ dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer
 To migrate and run the app locally:
 
 ```bash
-export SA_PASSWORD=...
+SA_PASSWORD=...
 export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
 
 cd App
