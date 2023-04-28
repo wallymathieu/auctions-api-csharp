@@ -1,5 +1,7 @@
-using Auctions.Cache;
 using Auctions.Data;
+using Auctions.Infrastructure.Cache;
+using Auctions.Infrastructure.Data;
+using Auctions.Infrastructure.Services;
 using Auctions.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

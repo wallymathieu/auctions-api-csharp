@@ -1,4 +1,4 @@
-namespace Auctions.Cache;
+namespace Auctions.Infrastructure.Cache;
 
 public static class CacheKeys
 {

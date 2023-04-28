@@ -1,9 +1,10 @@
 using System.Text.Json;
-using Auctions.Cache;
+using Auctions.Data;
 using Auctions.Domain;
+using Auctions.Infrastructure.Cache;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Auctions.Data.Cache;
+namespace Auctions.Infrastructure.Data.Cache;
 
 /// <summary>
 /// https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside

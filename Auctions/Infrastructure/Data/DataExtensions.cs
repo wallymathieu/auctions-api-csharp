@@ -1,10 +1,11 @@
-using Auctions.Data.Cache;
+using Auctions.Data;
+using Auctions.Infrastructure.Data.Cache;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Auctions.Data;
+namespace Auctions.Infrastructure.Data;
 
 public static class DataExtensions
 {
