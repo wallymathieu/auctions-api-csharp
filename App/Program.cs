@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
 using App.Middleware.Auth;
-using Auctions.Cache;
-using Auctions.Data;
 using Auctions.Domain;
-using Auctions.Json;
-using Auctions.Services;
+using Auctions.Infrastructure.Cache;
+using Auctions.Infrastructure.Data;
+using Auctions.Infrastructure.Json;
+using Auctions.Infrastructure.Services;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
@@ -12,7 +12,12 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddControllers(c => c.Filters.Add<DecodedHeaderAuthorizationFilter>()).AddJsonOptions(opts =>
+builder.Services.AddControllers(c =>
+{
+    #if DEBUG
+    c.Filters.Add<DecodedHeaderAuthorizationFilter>();
+    #endif
+}).AddJsonOptions(opts =>
 {
     opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     opts.JsonSerializerOptions.Converters.Add(new DateTimeOffsetConverter());
@@ -46,16 +51,21 @@ else
  
 }
 
-// Register Azure Clients
-builder.Services.AddAzureClients(azureClientsBuilder => {
-    var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");    
+var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");
+if (azureStorageConnectionString != null)
+{
+    // Register Azure Clients
+    builder.Services.AddAzureClients(azureClientsBuilder =>
+    {
 
-    azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions => {
-        queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
+        azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions =>
+        {
+            queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
+        });
+
+        azureClientsBuilder.UseCredential(new DefaultAzureCredential());
     });
-    
-    azureClientsBuilder.UseCredential(new DefaultAzureCredential());
-});
+}
 #if DEBUG // Only for development since it otherwise assumes that the network is 100% secure 
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
 if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
