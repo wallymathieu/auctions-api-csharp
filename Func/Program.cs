@@ -1,3 +1,4 @@
+using Auctions.Cache;
 using Auctions.Data;
 using Auctions.Services;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,7 @@ var host = new HostBuilder()
             .AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
-                options.InstanceName = "auctions";
+                options.InstanceName = CacheKeys.Prefix;
             })
             .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
             .AddAuctionServicesCached();

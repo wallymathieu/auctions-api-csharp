@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using App.Middleware.Auth;
+using Auctions.Cache;
 using Auctions.Data;
 using Auctions.Domain;
 using Auctions.Json;
@@ -33,7 +34,7 @@ if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
         .AddStackExchangeRedisCache(options =>
         {
             options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
-            options.InstanceName = "auctions";
+            options.InstanceName = CacheKeys.Prefix;
         })
         .AddAuctionServicesCached();
 }
