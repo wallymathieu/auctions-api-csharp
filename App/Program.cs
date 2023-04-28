@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
-using App;
 using App.Data;
 using App.Middleware.Auth;
 using Auctions.Domain;
 using Auctions.Json;
 using Auctions.Services;
-using Microsoft.EntityFrameworkCore;
+using Azure.Identity;
+using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
@@ -26,8 +26,20 @@ builder.Services.AddSwaggerGen(options =>
         Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
     });
 });
-builder.Services.AddSingleton<ITime, Time>();
-builder.Services.AddDbContext<AuctionDbContext>(e=>e.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddAuctionServices()
+    .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+    .AddAuctionRedisCache(builder.Configuration.GetConnectionString(ConnectionStrings.Redis));
+// Register Azure Clients
+builder.Services.AddAzureClients(azureClientsBuilder => {
+    string azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");    
+
+    azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions => {
+        queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
+    });    
+    
+    azureClientsBuilder.UseCredential(new DefaultAzureCredential());
+});
+#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure 
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
 if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
 {
@@ -37,6 +49,9 @@ else
 {
     builder.Services.AddSingleton<IClaimsPrincipalParser, JwtPayloadClaimsPrincipalParser>();
 }
+#else
+// TODO: Register JWT based auth
+#endif
 
 var app = builder.Build();
 

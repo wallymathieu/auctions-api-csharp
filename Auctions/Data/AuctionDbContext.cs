@@ -17,7 +17,12 @@ public class AuctionDbContext: DbContext
         self.HasConversion(new ValueConverter<UserId, string>(v => v.Id, v => new UserId(v))).HasMaxLength(2000);
     private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
-
+    public async Task<TimedAscendingAuction?> GetAuction(long auctionId)
+    {
+        var auction = await Auctions.FindAsync(auctionId);
+        if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync();
+        return auction;
+    }
     public AuctionDbContext(DbContextOptions options):base(options)
     {
     }

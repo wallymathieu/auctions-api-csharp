@@ -1,6 +1,6 @@
 using App.Data;
-using App.Models;
 using Auctions.Domain;
+using Auctions.Models;
 using Auctions.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,48 +13,35 @@ public class AuctionsController : ControllerBase
 {
     private readonly ILogger<AuctionsController> _logger;
     private readonly AuctionDbContext _dbContext;
-    private readonly ITime _time;
+    private readonly Mapper _mapper;
+    private readonly CreateAuctionCommandHandler _createAuctionCommandHandler;
+    private readonly CreateBidCommandHandler _createBidCommandHandler;
 
-    public AuctionsController(ILogger<AuctionsController> logger, AuctionDbContext dbContext, ITime time)
+    public AuctionsController(ILogger<AuctionsController> logger, AuctionDbContext dbContext,
+        Mapper mapper, CreateAuctionCommandHandler createAuctionCommandHandler, CreateBidCommandHandler createBidCommandHandler)
     {
         _logger = logger;
         _dbContext = dbContext;
-        _time = time;
+        _mapper = mapper;
+        _createAuctionCommandHandler = createAuctionCommandHandler;
+        _createBidCommandHandler = createBidCommandHandler;
     }
 
     [HttpGet(Name = "get_auctions")]
     public async Task<IEnumerable<AuctionModel>> Get()
     {
         return (await _dbContext.Auctions.Include(a=>a.Bids).ToListAsync())
-            .Select(MapAuctionToModel);
-    }
-
-    private AuctionModel MapAuctionToModel(TimedAscendingAuction arg) =>
-        new(arg.Id.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency, 
-            arg.GetBids(_time.Now)?.Select(MapBidToModel).ToArray()??Array.Empty<BidModel>());
-
-    private static BidModel MapBidToModel(Bid arg)
-    {
-        return new BidModel
-        {
-            Amount = arg.Amount,
-            Bidder = arg.User.ToString()
-        };
+            .Select(_mapper.MapAuctionToModel);
     }
 
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId)
     {
-        var auction = await GetAuction(auctionId);
-        return auction is null ? NotFound() : MapAuctionToModel(auction);
+        var auction = await _dbContext.GetAuction(auctionId);
+        return auction is null ? NotFound() : _mapper.MapAuctionToModel(auction);
     }
 
-    private async Task<TimedAscendingAuction?> GetAuction(long auctionId)
-    {
-        var auction = await _dbContext.Auctions.FindAsync(auctionId);
-        if (auction is not null) await _dbContext.Entry(auction).Collection(p => p.Bids).LoadAsync();
-        return auction;
-    }
+
 
     [HttpPost(Name = "create_auction")]
     public async Task<ActionResult<AuctionModel>> Post(
@@ -64,45 +51,28 @@ public class AuctionsController : ControllerBase
         {
             return Unauthorized();
         }
-        var auction = new TimedAscendingAuction
-        {
-            Currency = model.Currency,
-            Expiry = model.EndsAt,
-            StartsAt = model.StartsAt,
-            Title = model.Title,
-            User = new UserId(this.User.Identity.Name),
-            Options =
-            {
-                MinRaise = model.MinRaise??0, 
-                ReservePrice = model.ReservePrice??0,
-                TimeFrame = model.TimeFrame?? TimeSpan.Zero,
-            }
-        };
-        _dbContext.Auctions.Add(auction);
-        await _dbContext.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },MapAuctionToModel(auction));
+
+        var auction = await _createAuctionCommandHandler.Handle(new UserId(this.User.Identity.Name), model);
+        return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
     }
 
     [HttpPost("{auctionId}/bids",Name = "add_bid")]
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model)
     {
-        if (this.User?.Identity?.Name == null)
+        if (User?.Identity?.Name == null)
         {
             return Unauthorized();
         }
 
-        var auction = await GetAuction(auctionId);
-        if (auction is null) return NotFound();
-        if (auction.TryAddBid(_time.Now, 
-                new Bid(new UserId(this.User.Identity.Name), model.Amount, _time.Now), out var error))
+        var (result, error) =
+            await _createBidCommandHandler.Handle(auctionId, new UserId(User.Identity.Name), model);
+        switch (result)
         {
-            await _dbContext.SaveChangesAsync();
-            return Ok();
-        }
-        else
-        {
-            return BadRequest(error);
+            case CreateBidCommandHandler.Result.Ok: return Ok();
+            case CreateBidCommandHandler.Result.Error: return BadRequest(error);
+            default:
+            case CreateBidCommandHandler.Result.NotFound: return NotFound();
         }
     }
 }

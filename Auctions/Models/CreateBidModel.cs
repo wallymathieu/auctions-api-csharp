@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Auctions.Domain;
 
-namespace App.Models;
+namespace Auctions.Models;
 
 public class CreateBidModel
 {

@@ -1,6 +1,6 @@
 using Auctions.Domain;
 
-namespace App.Models;
+namespace Auctions.Models;
 
 public record BidModel
 {

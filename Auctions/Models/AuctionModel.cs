@@ -1,7 +1,6 @@
-using App.Controllers;
 using Auctions.Domain;
 
-namespace App.Models;
+namespace Auctions.Models;
 
 public record AuctionModel(
     long Id,

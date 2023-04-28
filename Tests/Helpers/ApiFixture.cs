@@ -114,7 +114,7 @@ public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
                     services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
                     services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
                     services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
-                    services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + _db));
+                    services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + _db, conf=>conf.MigrationsAssembly("Auctions")));
                    
                     services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
                     services.AddSingleton<ITime>(new FakeTime(new DateTime(2022,8,4)));
