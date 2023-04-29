@@ -40,7 +40,7 @@ To migrate and run the app locally:
 SA_PASSWORD=...
 export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
 export ConnectionStrings__Redis="localhost" 
-
+export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
 cd src/Api
 
 dotnet ef database update
