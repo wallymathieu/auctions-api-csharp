@@ -6,7 +6,7 @@ using Wallymathieu.Auctions.Models;
 using Wallymathieu.Auctions.Queues;
 using Wallymathieu.Auctions.Services;
 
-namespace Auctions.Api.Controllers;
+namespace Wallymathieu.Auctions.Api.Controllers;
 
 [ApiController]
 [Route("auctions")]
