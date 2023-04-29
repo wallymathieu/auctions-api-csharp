@@ -1,6 +1,6 @@
-using Auctions.Domain;
+using Wallymathieu.Auctions.Domain;
 
-namespace Auctions.Models;
+namespace Wallymathieu.Auctions.Models;
 
 public record BidModel
 {

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Auctions.Domain;
+using Wallymathieu.Auctions.Domain;
 
-namespace Auctions.Models;
+namespace Wallymathieu.Auctions.Models;
 
 public class CreateAuctionModel
 {

@@ -1,7 +1,7 @@
-using Auctions.Domain;
-using Auctions.Models;
+using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.Models;
 
-namespace Auctions.Queues;
+namespace Wallymathieu.Auctions.Queues;
 
 public class CreateAuctionCommand
 {

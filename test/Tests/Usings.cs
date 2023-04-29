@@ -1,2 +1,2 @@
 global using Xunit;
-global using static Tests.TestData;
+global using static Wallymathieu.Auctions.Tests.TestData;

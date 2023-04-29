@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace App.Middleware.Auth;
+namespace Wallymathieu.Auctions.Api.Middleware.Auth;
 
 public class DecodedHeaderAuthorizationFilter:IAuthorizationFilter
 {

@@ -1,4 +1,4 @@
-namespace Auctions.Infrastructure.Services;
+namespace Wallymathieu.Auctions.Infrastructure.Services;
 
 public static class ConnectionStrings
 {

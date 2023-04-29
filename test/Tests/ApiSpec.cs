@@ -1,10 +1,9 @@
 using System.Net;
-using App;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Tests.Helpers;
+using Wallymathieu.Auctions.Tests.Helpers;
 
-namespace Tests;
+namespace Wallymathieu.Auctions.Tests;
 public class ApiSpecJwtToken:ApiSpec<JwtApiAuth>{} 
 public class ApiSpecMsClientPrincipal:ApiSpec<MsClientPrincipalApiAuth>{} 
 

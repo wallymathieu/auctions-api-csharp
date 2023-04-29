@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Auctions.Data;
-using Auctions.Domain;
-using Auctions.Infrastructure.Cache;
 using Microsoft.Extensions.Caching.Distributed;
+using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.Infrastructure.Cache;
 
-namespace Auctions.Infrastructure.Data.Cache;
+namespace Wallymathieu.Auctions.Infrastructure.Data.Cache;
 
 /// <summary>
 /// https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside

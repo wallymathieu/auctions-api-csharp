@@ -1,14 +1,14 @@
 using System.Net.Http.Headers;
 using System.Text;
-using Auctions.Data;
-using Auctions.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Services;
 
-namespace Tests.Helpers;
+namespace Wallymathieu.Auctions.Tests.Helpers;
 public enum AuthToken
 {
     None,

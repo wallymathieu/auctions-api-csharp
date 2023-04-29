@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
     <ContainerImageName>wallymathieu/auctions-api-csharp</ContainerImageName>
-    <RootNamespace>Auctions.App</RootNamespace>
+    <RootNamespace>Wallymathieu.Auctions.Api</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />

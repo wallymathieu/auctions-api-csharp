@@ -1,8 +1,8 @@
-using Auctions.Data;
-using Auctions.Domain;
-using Auctions.Models;
+using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.Models;
 
-namespace Auctions.Services;
+namespace Wallymathieu.Auctions.Services;
 
 internal class CreateAuctionCommandHandler : ICreateAuctionCommandHandler
 {

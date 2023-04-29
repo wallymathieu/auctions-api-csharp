@@ -1,9 +1,9 @@
-using Auctions.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Wallymathieu.Auctions.Domain;
 
-namespace Auctions.Data;
+namespace Wallymathieu.Auctions.Data;
 
 public class AuctionDbContext: DbContext
 {

@@ -21,10 +21,16 @@ To start azurite run:
 docker compose up -d azurite
 ```
 
+To start redis run:
+
+```bash
+docker compose up -d redis
+```
+
 To build the app run:
 
 ```bash
-cd App
+cd src/Api
 dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer
 ```
 
@@ -33,8 +39,9 @@ To migrate and run the app locally:
 ```bash
 SA_PASSWORD=...
 export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
+export ConnectionStrings__Redis="localhost" 
 
-cd App
+cd src/Api
 
 dotnet ef database update
 

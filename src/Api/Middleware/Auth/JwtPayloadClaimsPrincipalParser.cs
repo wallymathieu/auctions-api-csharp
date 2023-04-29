@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace App.Middleware.Auth;
+namespace Wallymathieu.Auctions.Api.Middleware.Auth;
 
 public class JwtPayloadClaimsPrincipalParser:IClaimsPrincipalParser
 {

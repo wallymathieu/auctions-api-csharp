@@ -1,10 +1,10 @@
-using Auctions.Domain;
-using Auctions.Infrastructure.Cache;
-using Auctions.Models;
-using Auctions.Services;
 using Microsoft.Extensions.Caching.Distributed;
+using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.Infrastructure.Cache;
+using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.Services;
 
-namespace Auctions.Infrastructure.Services.Cache;
+namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
 
 internal class CacheAwareCreateBidCommandHandler:ICreateBidCommandHandler
 {

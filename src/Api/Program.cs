@@ -1,14 +1,14 @@
 using System.Text.Json.Serialization;
-using App.Middleware.Auth;
-using Auctions.Domain;
-using Auctions.Infrastructure.Cache;
-using Auctions.Infrastructure.Data;
-using Auctions.Infrastructure.Json;
-using Auctions.Infrastructure.Services;
+using Wallymathieu.Auctions.Domain;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Wallymathieu.Auctions.Api.Middleware.Auth;
+using Wallymathieu.Auctions.Infrastructure.Cache;
+using Wallymathieu.Auctions.Infrastructure.Data;
+using Wallymathieu.Auctions.Infrastructure.Json;
+using Wallymathieu.Auctions.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.

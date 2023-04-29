@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Auctions.Domain;
+namespace Wallymathieu.Auctions.Domain;
 
 [Serializable]
 public record AuctionId(long Id)

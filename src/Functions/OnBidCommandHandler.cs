@@ -1,9 +1,9 @@
-using Auctions.Queues;
-using Auctions.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Wallymathieu.Auctions.Queues;
+using Wallymathieu.Auctions.Services;
 
-namespace Auctions.Functions;
+namespace Wallymathieu.Auctions.Functions;
 
 public class OnBidCommandHandler
 {

@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace App.Middleware.Auth;
+namespace Wallymathieu.Auctions.Api.Middleware.Auth;
 /// <summary>
 /// See https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities
 /// and https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth

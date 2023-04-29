@@ -1,6 +1,6 @@
-using Auctions.Domain;
+using Wallymathieu.Auctions.Domain;
 
-namespace Auctions.Data;
+namespace Wallymathieu.Auctions.Data;
 
 public interface IAuctionRepository
 {

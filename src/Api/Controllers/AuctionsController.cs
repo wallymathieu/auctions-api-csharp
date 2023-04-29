@@ -1,11 +1,10 @@
-using Auctions.Data;
-using Auctions.Domain;
-using Auctions.Models;
-using Auctions.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.Services;
 
-namespace App.Controllers;
+namespace Auctions.Api.Controllers;
 
 [ApiController]
 [Route("auctions")]

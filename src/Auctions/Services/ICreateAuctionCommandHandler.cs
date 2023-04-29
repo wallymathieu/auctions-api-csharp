@@ -1,7 +1,7 @@
-using Auctions.Domain;
-using Auctions.Models;
+using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.Models;
 
-namespace Auctions.Services;
+namespace Wallymathieu.Auctions.Services;
 
 public interface ICreateAuctionCommandHandler
 {

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Auctions.Domain;
+namespace Wallymathieu.Auctions.Domain;
 
 [Serializable]
 public abstract partial record User(UserId Id)

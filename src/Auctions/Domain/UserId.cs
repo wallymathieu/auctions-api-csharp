@@ -1,4 +1,4 @@
-namespace Auctions.Domain;
+namespace Wallymathieu.Auctions.Domain;
 
 [Serializable]
 public record UserId(string Id)

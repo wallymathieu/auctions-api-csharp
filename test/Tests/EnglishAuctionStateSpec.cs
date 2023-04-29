@@ -1,6 +1,6 @@
-using Auctions.Domain;
+using Wallymathieu.Auctions.Domain;
 
-namespace Tests;
+namespace Wallymathieu.Auctions.Tests;
 
 public class EnglishAuctionStateSpec
 {

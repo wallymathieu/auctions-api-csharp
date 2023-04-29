@@ -1,6 +1,6 @@
-using Auctions.Services;
+using Wallymathieu.Auctions.Services;
 
-namespace Tests.Helpers;
+namespace Wallymathieu.Auctions.Tests.Helpers;
 
 internal class FakeTime : ITime
 {

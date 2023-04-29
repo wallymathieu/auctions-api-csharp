@@ -1,4 +1,4 @@
-namespace Auctions.Services;
+namespace Wallymathieu.Auctions.Services;
 
 public class Time:ITime
 {
