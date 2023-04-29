@@ -18,6 +18,7 @@ var host = new HostBuilder()
             })
             .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
             .AddAuctionServicesCached();
+        
     })
     .Build();
 

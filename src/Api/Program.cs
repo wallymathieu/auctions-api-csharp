@@ -4,10 +4,12 @@ using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Wallymathieu.Auctions.Api.Infrastructure.Queues;
 using Wallymathieu.Auctions.Api.Middleware.Auth;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Json;
+using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,9 +21,7 @@ builder.Services.AddControllers(c =>
     #endif
 }).AddJsonOptions(opts =>
 {
-    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    opts.JsonSerializerOptions.Converters.Add(new DateTimeOffsetConverter());
-    opts.JsonSerializerOptions.Converters.Add(new AmountConverter());
+    opts.JsonSerializerOptions.AddAuctionConverters();
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -66,6 +66,8 @@ if (azureStorageConnectionString != null)
         azureClientsBuilder.UseCredential(new DefaultAzureCredential());
     });
 }
+builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>(); 
+
 #if DEBUG // Only for development since it otherwise assumes that the network is 100% secure 
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
 if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.Queues;
 using Wallymathieu.Auctions.Services;
 
 namespace Auctions.Api.Controllers;
@@ -14,13 +16,19 @@ public class AuctionsController : ControllerBase
     private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
     private readonly ICreateBidCommandHandler _createBidCommandHandler;
     private readonly IAuctionRepository _auctionRepository;
+    private readonly IMessageQueue _messageQueue;
 
-    public AuctionsController(Mapper mapper, ICreateAuctionCommandHandler createAuctionCommandHandler, ICreateBidCommandHandler createBidCommandHandler, IAuctionRepository auctionRepository)
+    public AuctionsController(Mapper mapper, 
+        ICreateAuctionCommandHandler createAuctionCommandHandler, 
+        ICreateBidCommandHandler createBidCommandHandler,
+        IAuctionRepository auctionRepository, 
+        IMessageQueue messageQueue)
     {
         _mapper = mapper;
         _createAuctionCommandHandler = createAuctionCommandHandler;
         _createBidCommandHandler = createBidCommandHandler;
         _auctionRepository = auctionRepository;
+        _messageQueue = messageQueue;
     }
 
     [HttpGet(Name = "get_auctions")]
@@ -38,7 +46,7 @@ public class AuctionsController : ControllerBase
     }
 
     [HttpPost(Name = "create_auction")]
-    public async Task<ActionResult<AuctionModel>> Post(
+    public async Task<ActionResult> Post(
         CreateAuctionModel model)
     {
         if (this.User?.Identity?.Name==null)
@@ -46,8 +54,19 @@ public class AuctionsController : ControllerBase
             return Unauthorized();
         }
 
-        var auction = await _createAuctionCommandHandler.Handle(new UserId(this.User.Identity.Name), model);
-        return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
+        var userId = new UserId(this.User.Identity.Name);
+
+        if (_messageQueue.Enabled)
+        {
+            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName,new CreateAuctionCommand(userId, model));
+         
+            return Accepted();
+        }
+        else
+        {
+            var auction = await _createAuctionCommandHandler.Handle(userId, model);
+            return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
+        }
     }
 
     [HttpPost("{auctionId}/bids",Name = "add_bid")]
@@ -59,14 +78,25 @@ public class AuctionsController : ControllerBase
             return Unauthorized();
         }
 
-        var (result, error) =
-            await _createBidCommandHandler.Handle(auctionId, new UserId(User.Identity.Name), model);
-        switch (result)
+        var userId = new UserId(this.User.Identity.Name);
+
+        if (_messageQueue.Enabled)
         {
-            case CreateBidCommandResult.Ok: return Ok();
-            case CreateBidCommandResult.Error: return BadRequest(error);
-            default:
-            case CreateBidCommandResult.NotFound: return NotFound();
+            await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName,new CreateBidCommand(auctionId, userId, model));
+            return Accepted();
         }
+        else
+        {
+            var (result, error) =
+                await _createBidCommandHandler.Handle(auctionId, userId, model);
+            switch (result)
+            {
+                case CreateBidCommandResult.Ok: return Ok();
+                case CreateBidCommandResult.Error: return BadRequest(error);
+                default:
+                case CreateBidCommandResult.NotFound: return NotFound();
+            } 
+        }
+       
     }
 }
