@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -7,6 +7,7 @@
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
     <ContainerImageName>wallymathieu/auctions-api-csharp</ContainerImageName>
     <RootNamespace>Wallymathieu.Auctions.Api</RootNamespace>
+    <UserSecretsId>f53f5151-d9ac-4eeb-a835-cb1ed85fd2d4</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
