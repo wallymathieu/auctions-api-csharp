@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Queues;
 using Wallymathieu.Auctions.Services;
 
@@ -13,12 +12,10 @@ public class OnBidCommandHandler
     private readonly ILogger _logger;
     private readonly JsonSerializerOptions _serializerOptions;
 
-    public OnBidCommandHandler(ILoggerFactory loggerFactory, ICreateBidCommandHandler createBidCommandHandler)
+    public OnBidCommandHandler(ILoggerFactory loggerFactory, ICreateBidCommandHandler createBidCommandHandler, JsonSerializerOptions serializerOptions)
     {
         _createBidCommandHandler = createBidCommandHandler;
-
-        _serializerOptions = new JsonSerializerOptions();
-        _serializerOptions.AddAuctionConverters();
+        _serializerOptions = serializerOptions;
         _logger = loggerFactory.CreateLogger<OnBidCommandHandler>();
     }
 
