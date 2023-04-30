@@ -1,11 +1,11 @@
 param location string = 'eastus'
-param vnetName string = 'myVnet'
-param subnetName string = 'mySubnet'
+//param vnetName string = 'myVnet'
+//param subnetName string = 'mySubnet'
 param environmentName string
 param databaseName string
 param containerImage string
 param containerAppName string
-resource myVnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
+/*resource myVnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
   name: vnetName
   location: location
   properties: {
@@ -21,7 +21,7 @@ resource myVnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
       }
     ]
   }
-}
+}*/
 param storageAccountName string = 'mystorageaccount'
 param containerName string = 'mycontainer'
 param sqlServerName string = 'mySqlServer'
