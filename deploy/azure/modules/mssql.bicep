@@ -183,7 +183,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-05-01' = {
 }*/
 param appname string
 param environmentName string 
-var sqlServerName= 'sql${appname}${environmentName}'
+var sqlServerName= 'sqldb-${appname}-${environmentName}'
 resource mySqlServer 'Microsoft.Sql/servers@2022-08-01-preview' = {
   name: sqlServerName
   location: location
@@ -192,6 +192,7 @@ resource mySqlServer 'Microsoft.Sql/servers@2022-08-01-preview' = {
     administratorLoginPassword: sqlAdminPassword
   }
 }
+/* TODO:
 resource firewallRules 'Microsoft.Sql/servers/firewallRules@2022-08-01-preview' = {
   parent: mySqlServer
   name: 'AllowAzureIPs'
@@ -202,9 +203,9 @@ resource firewallRules 'Microsoft.Sql/servers/firewallRules@2022-08-01-preview' 
     startIpAddress: '0.0.0.0'
     endIpAddress: '0.0.0.0'
   }
-}
+}*/
 
-var databaseName= 'db-${appname}-${environmentName}'
+var databaseName= '${sqlServerName}/db'
 
 resource myDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   name: databaseName
