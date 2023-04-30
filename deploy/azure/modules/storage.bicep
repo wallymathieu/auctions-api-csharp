@@ -458,8 +458,7 @@ param location string = resourceGroup().location
 param appname string
 param environmentName string = 'dev'
 resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  // TODO should be st instead of sto
-  name: 'sto${appname}${environmentName}'
+  name: 'st${appname}${environmentName}'
   location: location
   sku: {
     name: 'Standard_LRS'
