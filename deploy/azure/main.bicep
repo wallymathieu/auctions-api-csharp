@@ -81,6 +81,8 @@ module env 'modules/environment.bicep' = {
   }
   scope: resourceGroup
 }
+
+var connectionString = 'Database=${ msSql.outputs.fullyQualifiedDomainName};Data Source=${msSql.outputs.databaseName};User Id=${sqlAdminLogin}@${msSql.outputs.sqlServerName};Password=${sqlAdminPassword}'
 module app 'modules/app.bicep' = {
   name: 'app'
   params:{
@@ -88,7 +90,7 @@ module app 'modules/app.bicep' = {
     environmentName: environmentName 
     location:resourceGroup.location
     azureStorageConnectionString: storageAccount.outputs.connectionString
-    defaultConnection: msSql.outputs.connectionString
+    defaultConnection:connectionString
     redisConnection: redis.outputs.connectionString
     containerImage: containerImage
     managedEnvironmentId: env.outputs.environmentId

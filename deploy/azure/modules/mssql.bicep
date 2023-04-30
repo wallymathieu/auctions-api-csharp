@@ -223,4 +223,6 @@ resource myDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   ]
 }
 //TODO: Move to KeyVault
-output connectionString string = 'Database=${mySqlServer.properties.fullyQualifiedDomainName};Data Source=${databaseName};User Id=${sqlAdminLogin}@${mySqlServer.name};Password=${sqlAdminPassword}'
+output fullyQualifiedDomainName string = mySqlServer.properties.fullyQualifiedDomainName
+output databaseName string = databaseName
+output sqlServerName string = mySqlServer.name 
