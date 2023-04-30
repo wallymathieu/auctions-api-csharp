@@ -30,7 +30,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
     WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }
-
+param subnetId string
 resource environment 'Microsoft.App/managedEnvironments@2022-10-01' = {
   name: environmentName
   location: location
@@ -42,6 +42,9 @@ resource environment 'Microsoft.App/managedEnvironments@2022-10-01' = {
         customerId: logAnalyticsWorkspace.properties.customerId
         sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
       }
+    }
+    vnetConfiguration:{
+      infrastructureSubnetId:subnetId 
     }
   }
 }

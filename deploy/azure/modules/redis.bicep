@@ -3,7 +3,7 @@ param environmentName string
 var redisName = 'redis-${appname}-${environmentName}'
 @description('Location for all resources.')
 param location string = resourceGroup().location
-
+//param subnetId string
 
 resource myRedisCache 'Microsoft.Cache/redis@2022-06-01' = {
   name: redisName
@@ -15,6 +15,7 @@ resource myRedisCache 'Microsoft.Cache/redis@2022-06-01' = {
       capacity: 0
     }
     enableNonSslPort: true
+    // requires premium: subnetId: subnetId
   }
 }
 

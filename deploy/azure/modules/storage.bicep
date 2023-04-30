@@ -456,6 +456,7 @@ resource networkConfig 'Microsoft.Web/sites/networkConfig@2022-03-01' = {
 @description('Location for all resources.')
 param location string = resourceGroup().location
 param appname string
+param subnetId string
 param environmentName string = 'dev'
 resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: 'st${appname}${environmentName}'
@@ -464,6 +465,18 @@ resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     name: 'Standard_LRS'
   }
   kind: 'StorageV2'
+  properties: {
+    publicNetworkAccess:'Disabled'
+    networkAcls: {
+      defaultAction: 'Deny'
+      virtualNetworkRules: [
+        {
+          action: 'Allow'
+          id: subnetId
+        }
+      ]
+    }
+  }
 }
 
 //TODO: Move to KeyVault

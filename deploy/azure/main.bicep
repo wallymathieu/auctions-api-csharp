@@ -49,8 +49,12 @@ module storageAccount 'modules/storage.bicep' = {
     appname: appname
     environmentName: environmentName 
     location:resourceGroup.location
+    subnetId: vNet.outputs.subnetId
   }
   scope: resourceGroup
+  dependsOn:[
+    vNet
+  ]
 }
 module redis 'modules/redis.bicep' = {
   name: 'redis'
@@ -58,8 +62,12 @@ module redis 'modules/redis.bicep' = {
     appname: appname
     environmentName: environmentName 
     location:resourceGroup.location
+    //subnetId: vNet.outputs.subnetId
   }
   scope: resourceGroup
+  dependsOn:[
+    vNet
+  ]
 }
 module msSql 'modules/mssql.bicep' = {
   name: 'msSQL'
@@ -69,8 +77,12 @@ module msSql 'modules/mssql.bicep' = {
     location:resourceGroup.location
     sqlAdminLogin: sqlAdminLogin
     sqlAdminPassword: sqlAdminPassword
+    subnetId: vNet.outputs.subnetId
   }
   scope: resourceGroup
+  dependsOn:[
+    vNet
+  ]
 }
 module env 'modules/environment.bicep' = {
   name: 'environment'
@@ -78,9 +90,23 @@ module env 'modules/environment.bicep' = {
     appname:appname
     environmentName: environmentName 
     location:resourceGroup.location
+    subnetId: vNet.outputs.subnetId
+  }
+  scope: resourceGroup
+  dependsOn:[
+    vNet
+  ]
+}
+module vNet 'modules/vnet.bicep' = {
+  name: 'vnet'
+  params:{
+    appname:appname
+    environmentName: environmentName 
+    location:resourceGroup.location
   }
   scope: resourceGroup
 }
+
 
 var connectionString = 'Database=${ msSql.outputs.fullyQualifiedDomainName};Data Source=${msSql.outputs.databaseName};User Id=${sqlAdminLogin}@${msSql.outputs.sqlServerName};Password=${sqlAdminPassword}'
 module app 'modules/app.bicep' = {
@@ -96,4 +122,10 @@ module app 'modules/app.bicep' = {
     managedEnvironmentId: env.outputs.environmentId
   }
   scope: resourceGroup
+  dependsOn:[
+    msSql
+    redis
+    storageAccount
+    vNet
+  ]
 }
