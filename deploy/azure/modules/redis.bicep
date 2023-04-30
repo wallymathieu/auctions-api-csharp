@@ -1,7 +1,11 @@
-param redisName string
-param location string
+param appname string
+param environmentName string 
+var redisName = 'redis-${appname}-${environmentName}'
+@description('Location for all resources.')
+param location string = resourceGroup().location
 
-resource redis 'Microsoft.Cache/redis@2020-12-01' = {
+
+resource myRedisCache 'Microsoft.Cache/redis@2022-06-01' = {
   name: redisName
   location: location
   properties: {
@@ -14,4 +18,4 @@ resource redis 'Microsoft.Cache/redis@2020-12-01' = {
   }
 }
 
-output redisHost string = '${redis.properties.hostName}:${redis.properties.port},password=${redis.listKeys().primaryKey},ssl=False,abortConnect=False'
+output connectionString string = '${myRedisCache.properties.hostName}:${myRedisCache.properties.port},password=${myRedisCache.listKeys().primaryKey},ssl=False,abortConnect=False'

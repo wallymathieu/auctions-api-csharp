@@ -1,11 +1,13 @@
 
 @description('The administrator username of the SQL logical server')
-param sqlAdministratorLogin string
+param sqlAdminLogin string
 
 @description('The administrator password of the SQL logical server.')
 @secure()
-param sqlAdministratorLoginPassword string
-
+param sqlAdminPassword string
+@description('Location for all resources.')
+param location string = resourceGroup().location
+/*
 @description('Location for all resources.')
 param location string = resourceGroup().location
 @description('Name of SQL DB.')
@@ -178,4 +180,45 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-05-01' = {
   dependsOn: [
     vnet
   ]
+}*/
+param appname string
+param environmentName string 
+var sqlServerName= 'sql${appname}${environmentName}'
+resource mySqlServer 'Microsoft.Sql/servers@2022-08-01-preview' = {
+  name: sqlServerName
+  location: location
+  properties: {
+    administratorLogin: sqlAdminLogin
+    administratorLoginPassword: sqlAdminPassword
+  }
 }
+resource firewallRules 'Microsoft.Sql/servers/firewallRules@2022-08-01-preview' = {
+  parent: mySqlServer
+  name: 'AllowAzureIPs'
+  dependsOn: [
+    myDatabase
+  ]
+  properties: {
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '0.0.0.0'
+  }
+}
+
+var databaseName= 'db-${appname}-${environmentName}'
+
+resource myDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
+  name: databaseName
+  location: location
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+    capacity: 5
+  }
+  tags: {
+    displayName: databaseName
+  }
+  dependsOn: [
+    mySqlServer
+  ]
+}
+output connectionString string = 'Database=${mySqlServer.properties.fullyQualifiedDomainName};Data Source=${databaseName};User Id=${sqlAdminLogin}@${mySqlServer.name};Password=${sqlAdminPassword}'

@@ -1,4 +1,4 @@
-@description('The name of the Azure Function app.')
+/*@description('The name of the Azure Function app.')
 param functionAppName string = 'func-${uniqueString(resourceGroup().id)}'
 
 @description('The location into which the resources should be deployed.')
@@ -452,3 +452,17 @@ resource networkConfig 'Microsoft.Web/sites/networkConfig@2022-03-01' = {
     vnet
   ]
 }
+*/
+@description('Location for all resources.')
+param location string = resourceGroup().location
+param appname string
+param environmentName string = 'dev'
+resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: 'sto${appname}${environmentName}'
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+}
+output connectionString string = 'DefaultEndpointsProtocol=https;AccountName=${myStorageAccount.name};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${myStorageAccount.listKeys().keys[0].value}'
