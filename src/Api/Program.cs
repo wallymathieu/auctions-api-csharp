@@ -16,9 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers(c =>
 {
-    #if DEBUG
     c.Filters.Add<DecodedHeaderAuthorizationFilter>();
-    #endif
 }).AddJsonOptions(opts =>
 {
     opts.JsonSerializerOptions.AddAuctionConverters();
@@ -48,7 +46,6 @@ else
     builder.Services.AddAuctionRepositoryNoCache()
         .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
         .AddAuctionServicesNoCache();
- 
 }
 
 var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");
@@ -57,7 +54,6 @@ if (azureStorageConnectionString != null)
     // Register Azure Clients
     builder.Services.AddAzureClients(azureClientsBuilder =>
     {
-
         azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions =>
         {
             queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
@@ -68,7 +64,7 @@ if (azureStorageConnectionString != null)
 }
 builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>(); 
 
-#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure 
+//#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure 
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
 if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
 {
@@ -78,9 +74,9 @@ else
 {
     builder.Services.AddSingleton<IClaimsPrincipalParser, JwtPayloadClaimsPrincipalParser>();
 }
-#else
+//#else
 // TODO: Register JWT based auth
-#endif
+//#endif
 
 var app = builder.Build();
 
