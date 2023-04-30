@@ -119,14 +119,28 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
 */
 @description('Location for all resources.')
 param location string = resourceGroup().location
-param azureStorageConnectionString string
-param defaultConnection string
-param redisConnection string
 param appname string
 param environmentName string
 param managedEnvironmentId string
 param containerImage string = 'wallymathieu/auctions-api-csharp'
 var containerName = 'app-${appname}-${environmentName}'
+param keyVaultName string
+resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
+  name: keyVaultName
+}
+resource redisConnection 'Microsoft.KeyVault/vaults/secrets@2023-02-01' existing= {
+  parent: keyVault
+  name: 'ConnectionStrings__Redis'
+}
+resource msSQLConnection 'Microsoft.KeyVault/vaults/secrets@2023-02-01' existing= {
+  parent: keyVault
+  name: 'ConnectionStrings__DefaultConnection'
+}
+resource azureStorageConnection 'Microsoft.KeyVault/vaults/secrets@2023-02-01' existing= {
+  parent: keyVault
+  name: 'ConnectionStrings__AzureStorage'
+}
+
 resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
   name: containerName
   location: location
@@ -149,7 +163,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
           env: [
             {
               name: 'ConnectionStrings__AzureStorage'
-              value: azureStorageConnectionString 
+              secretRef: azureStorageConnection.id
             }
             {
               name: 'ASPNETCORE_URLS'
@@ -157,11 +171,11 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             }
             {
               name: 'ConnectionStrings__DefaultConnection'
-              value: defaultConnection
+              secretRef: msSQLConnection.id
             }
             {
               name: 'ConnectionStrings__Redis'
-              value: redisConnection
+              secretRef: redisConnection.id
             }
           ]
         }

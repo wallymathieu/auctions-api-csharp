@@ -457,15 +457,29 @@ resource networkConfig 'Microsoft.Web/sites/networkConfig@2022-03-01' = {
 param location string = resourceGroup().location
 param appname string
 param environmentName string = 'dev'
+param keyVaultName string
 resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  // TODO should be st instead of sto
-  name: 'sto${appname}${environmentName}'
+  name: 'st${appname}${environmentName}'
   location: location
   sku: {
     name: 'Standard_LRS'
   }
   kind: 'StorageV2'
 }
+resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
+  scope: resourceGroup()
+  name: keyVaultName
+}
+resource kvKey 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  parent: keyVault
+  name: 'ConnectionStrings__AzureStorage'
+  
+  properties: {
+    attributes: {
+      enabled: true
+    }
+    value:'DefaultEndpointsProtocol=https;AccountName=${myStorageAccount.name};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${myStorageAccount.listKeys().keys[0].value}'
+  }
+}
 
-//TODO: Move to KeyVault
-output connectionString string = 'DefaultEndpointsProtocol=https;AccountName=${myStorageAccount.name};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${myStorageAccount.listKeys().keys[0].value}'
+

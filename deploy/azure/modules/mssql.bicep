@@ -7,6 +7,7 @@ param sqlAdminLogin string
 param sqlAdminPassword string
 @description('Location for all resources.')
 param location string = resourceGroup().location
+param keyVaultName string
 /*
 @description('Location for all resources.')
 param location string = resourceGroup().location
@@ -222,5 +223,19 @@ resource myDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
     mySqlServer
   ]
 }
-//TODO: Move to KeyVault
-output connectionString string = 'Database=${mySqlServer.properties.fullyQualifiedDomainName};Data Source=${databaseName};User Id=${sqlAdminLogin}@${mySqlServer.name};Password=${sqlAdminPassword}'
+resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
+  scope: resourceGroup()
+  name: keyVaultName
+}
+resource kvKey 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  parent: keyVault
+  name: 'ConnectionStrings__DefaultConnection'
+  
+  properties: {
+    attributes: {
+      enabled: true
+    }
+    value:'Database=${mySqlServer.properties.fullyQualifiedDomainName};Data Source=${databaseName};User Id=${sqlAdminLogin}@${mySqlServer.name};Password=${sqlAdminPassword}'
+  }
+}
+

@@ -42,13 +42,22 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: 'rg-${appname}-${environmentName}'
   location: location
 }
-
+var keyVaultName= 'kv-${appname}-${environmentName}'
+module kv 'modules/keyvault.bicep' = {
+  name: keyVaultName
+  params:{
+    keyVaultName:keyVaultName
+    location:resourceGroup.location
+  }
+  scope: resourceGroup
+}
 module storageAccount 'modules/storage.bicep' = {
   name: 'storageAccount'
   params:{
     appname: appname
     environmentName: environmentName 
     location:resourceGroup.location
+    keyVaultName: keyVaultName
   }
   scope: resourceGroup
 }
@@ -58,6 +67,7 @@ module redis 'modules/redis.bicep' = {
     appname: appname
     environmentName: environmentName 
     location:resourceGroup.location
+    keyVaultName: keyVaultName
   }
   scope: resourceGroup
 }
@@ -69,6 +79,7 @@ module msSql 'modules/mssql.bicep' = {
     location:resourceGroup.location
     sqlAdminLogin: sqlAdminLogin
     sqlAdminPassword: sqlAdminPassword
+    keyVaultName: keyVaultName
   }
   scope: resourceGroup
 }
@@ -81,15 +92,14 @@ module env 'modules/environment.bicep' = {
   }
   scope: resourceGroup
 }
+
 module app 'modules/app.bicep' = {
   name: 'app'
   params:{
     appname: appname
     environmentName: environmentName 
     location:resourceGroup.location
-    azureStorageConnectionString: storageAccount.outputs.connectionString
-    defaultConnection: msSql.outputs.connectionString
-    redisConnection: redis.outputs.connectionString
+    keyVaultName: keyVaultName
     containerImage: containerImage
     managedEnvironmentId: env.outputs.environmentId
   }

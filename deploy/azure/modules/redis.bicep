@@ -1,9 +1,9 @@
 param appname string
-param environmentName string 
+param environmentName string
 var redisName = 'redis-${appname}-${environmentName}'
 @description('Location for all resources.')
 param location string = resourceGroup().location
-
+param keyVaultName string
 
 resource myRedisCache 'Microsoft.Cache/redis@2022-06-01' = {
   name: redisName
@@ -17,6 +17,18 @@ resource myRedisCache 'Microsoft.Cache/redis@2022-06-01' = {
     enableNonSslPort: true
   }
 }
+resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
+  scope: resourceGroup()
+  name: keyVaultName
+}
+resource kvKey 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  parent: keyVault
+  name: 'ConnectionStrings__Redis'
 
-//TODO: Move to KeyVault
-output connectionString string = '${myRedisCache.properties.hostName}:${myRedisCache.properties.port},password=${myRedisCache.listKeys().primaryKey},ssl=False,abortConnect=False'
+  properties: {
+    attributes: {
+      enabled: true
+    }
+    value: '${myRedisCache.properties.hostName}:${myRedisCache.properties.port},password=${myRedisCache.listKeys().primaryKey},ssl=False,abortConnect=False'
+  }
+}
