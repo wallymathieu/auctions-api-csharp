@@ -18,4 +18,5 @@ resource myRedisCache 'Microsoft.Cache/redis@2022-06-01' = {
   }
 }
 
+//TODO: Move to KeyVault
 output connectionString string = '${myRedisCache.properties.hostName}:${myRedisCache.properties.port},password=${myRedisCache.listKeys().primaryKey},ssl=False,abortConnect=False'

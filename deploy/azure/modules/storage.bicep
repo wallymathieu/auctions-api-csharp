@@ -458,6 +458,7 @@ param location string = resourceGroup().location
 param appname string
 param environmentName string = 'dev'
 resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  // TODO should be st instead of sto
   name: 'sto${appname}${environmentName}'
   location: location
   sku: {
@@ -465,4 +466,6 @@ resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   kind: 'StorageV2'
 }
+
+//TODO: Move to KeyVault
 output connectionString string = 'DefaultEndpointsProtocol=https;AccountName=${myStorageAccount.name};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${myStorageAccount.listKeys().keys[0].value}'

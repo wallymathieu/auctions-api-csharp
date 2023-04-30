@@ -2,7 +2,9 @@ param environmentName string
 //param appInsightsName string
 //param logAnalyticsWorkspaceName string
 param location string = resourceGroup().location
-/*
+param appname string
+var logAnalyticsWorkspaceName= 'logws-${appname}-${environmentName}'
+var appInsightsName = 'appinsight-${appname}-${environmentName}'
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
   name: logAnalyticsWorkspaceName
   location: location
@@ -25,11 +27,11 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   kind: 'web'
   properties: {
     Application_Type: 'web'
-    //WorkspaceResourceId: logAnalyticsWorkspace.id
+    WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }
-*/
-resource environment 'Microsoft.App/managedEnvironments@2022-01-01-preview' = {
+
+resource environment 'Microsoft.App/managedEnvironments@2022-10-01' = {
   name: environmentName
   location: location
   properties: {
@@ -37,8 +39,8 @@ resource environment 'Microsoft.App/managedEnvironments@2022-01-01-preview' = {
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        //customerId: logAnalyticsWorkspace.properties.customerId
-        //sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
+        customerId: logAnalyticsWorkspace.properties.customerId
+        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
       }
     }
   }

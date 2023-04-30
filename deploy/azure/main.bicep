@@ -75,6 +75,7 @@ module msSql 'modules/mssql.bicep' = {
 module env 'modules/environment.bicep' = {
   name: 'environment'
   params:{
+    appname:appname
     environmentName: environmentName 
     location:resourceGroup.location
   }
