@@ -29,20 +29,20 @@ var serviceEndpointsAll = [
   {
     service: 'Microsoft.Storage'
   }
-  // Microsoft.Storage, 
+  // Microsoft.Storage,
   //Microsoft.Sql, Microsoft.AzureActiveDirectory,
   // Microsoft.AzureCosmosDB,
   // Microsoft.Web,
   // Microsoft.NetworkServiceEndpointTest,
-  // Microsoft.KeyVault,
+  {
+    service: 'Microsoft.KeyVault'
+  }
   // Microsoft.EventHub,
   // Microsoft.ServiceBus, Microsoft.ContainerRegistry, Microsoft.CognitiveServices, Microsoft.Storage.Global
   {
     service: 'Microsoft.Sql'
   }
-  /*{
-    service: 'Microsoft.KeyVault'
-  }
+  /*
   {
     service: 'Microsoft.ContainerRegistry'
   }*/

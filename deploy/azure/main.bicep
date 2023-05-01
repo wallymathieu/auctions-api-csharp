@@ -13,23 +13,6 @@ param location string = 'eastus'
 param environmentName string = 'dev'
 param containerImage string = 'wallymathieu/auctions-api-csharp'
 param appname string = 'auctions'
-/*resource myVnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
-  name: vnetName
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [ '10.0.0.0/16' ]
-    }
-    subnets: [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: '10.0.0.0/24'
-        }
-      }
-    ]
-  }
-}*/
 
 @description('The administrator username of the SQL logical server')
 param sqlAdminLogin string = 'auctionadmin'
@@ -43,11 +26,14 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   location: location
 }
 
+//TODO:
+var keyVaultName='kv-${appname}-${environmentName}'
+
 module storageAccount 'modules/storage.bicep' = {
   name: 'storageAccount'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     subnetId: vNet.outputs.subnetId
   }
@@ -60,7 +46,7 @@ module redis 'modules/redis.bicep' = {
   name: 'redis'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     //subnetId: vNet.outputs.subnetId
   }
@@ -73,7 +59,7 @@ module msSql 'modules/mssql.bicep' = {
   name: 'msSQL'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     sqlAdminLogin: sqlAdminLogin
     sqlAdminPassword: sqlAdminPassword
@@ -88,7 +74,7 @@ module env 'modules/environment.bicep' = {
   name: 'environment'
   params:{
     appname:appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     subnetId: vNet.outputs.subnetId
   }
@@ -101,7 +87,7 @@ module vNet 'modules/vnet.bicep' = {
   name: 'vnet'
   params:{
     appname:appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
   }
   scope: resourceGroup
@@ -113,11 +99,11 @@ module app 'modules/app.bicep' = {
   name: 'app'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     azureStorageConnectionString: storageAccount.outputs.connectionString
-    defaultConnection:connectionString
-    redisConnection: redis.outputs.connectionString
+    msSqlConnectionString:connectionString
+    redisConnectionString: redis.outputs.connectionString
     containerImage: containerImage
     managedEnvironmentId: env.outputs.environmentId
   }
