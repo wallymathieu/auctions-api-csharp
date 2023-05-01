@@ -37,15 +37,15 @@ dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer
 To migrate and run the app locally:
 
 ```bash
-SA_PASSWORD=...
+source .env
 export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
-export ConnectionStrings__Redis="localhost" 
+export ConnectionStrings__Redis="localhost"
 export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
 cd src/Api
 
 dotnet ef database update
 
-dotnet run 
+dotnet run
 ```
 
 ## Auth
