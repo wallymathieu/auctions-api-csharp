@@ -1,0 +1,419 @@
+{
+	"info": {
+		"_postman_id": "7836cd07-10a9-4007-904b-e7bce1ce6c74",
+		"name": "AuctionSite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "558955"
+	},
+	"item": [
+		{
+			"name": "v2",
+			"item": [
+				{
+					"name": "Create auction v2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function (){",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const now = new Date()",
+									"const h = 2",
+									"const hourInMillis = 60*60*1000",
+									"const endsAt = new Date(now.getTime()+ (h*hourInMillis))",
+									"pm.globals.set(\"startsAt\", now.toISOString());",
+									"pm.globals.set(\"endsAt\", endsAt.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "13123213",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-jwt-payload",
+								"value": "{{seller}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"startsAt\": \"{{startsAt}}\",\n    \"endsAt\": \"{{endsAt}}\",\n    \"title\": \"Some auction\",\n    \"currency\": \"VAC\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/auctions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create auction v2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-jwt-payload",
+										"value": "{{seller}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 1,\n    \"startsAt\": \"{{startsAt}}\",\n    \"endsAt\": \"{{endsAt}}\",\n    \"title\": \"Some auction\",\n    \"currency\": \"VAC\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auctions",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auctions"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 29 Apr 2023 05:21:33 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Location",
+									"value": "http://127.0.0.1:8083/auctions/2"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"startsAt\": \"2023-04-29T05:21:33Z\",\n    \"title\": \"Some auction\",\n    \"expiry\": \"2023-04-29T07:21:33Z\",\n    \"user\": \"Test\",\n    \"currency\": \"VAC\",\n    \"bids\": []\n}"
+						},
+						{
+							"name": "Create auction v2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-jwt-payload",
+										"value": "{{seller}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 1,\n    \"startsAt\": \"{{startsAt}}\",\n    \"endsAt\": \"{{endsAt}}\",\n    \"title\": \"Some auction\",\n    \"currency\": \"VAC\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auctions",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auctions"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 May 2023 15:21:28 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Place bid as buyer on auction 1 (v2)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-jwt-payload",
+								"value": "{{buyer}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"auction\":\"1\",\"amount\":\"VAC11\" }"
+						},
+						"url": {
+							"raw": "{{url}}/auctions/1/bids",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auctions",
+								"1",
+								"bids"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Place bid as buyer on auction 1 (v2)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-jwt-payload",
+										"value": "{{buyer}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"auction\":\"1\",\"amount\":\"VAC11\" }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auctions/1/bids",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auctions",
+										"1",
+										"bids"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 29 Apr 2023 05:24:54 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Place bid as buyer on auction 1 (v2)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-jwt-payload",
+										"value": "{{buyer}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \"auction\":\"1\",\"amount\":\"VAC11\" }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auctions/1/bids",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auctions",
+										"1",
+										"bids"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 May 2023 15:22:38 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "auctions [auth]",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-jwt-payload",
+								"value": "{{buyer}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/auctions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auctions [auth]",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-jwt-payload",
+										"value": "{{buyer}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/auctions",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auctions"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 29 Apr 2023 05:26:16 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"startsAt\": \"2023-04-29T05:21:07Z\",\n        \"title\": \"Some auction\",\n        \"expiry\": \"2023-04-29T07:21:07Z\",\n        \"user\": \"Test\",\n        \"currency\": \"VAC\",\n        \"bids\": [\n            {\n                \"amount\": \"VAC11\",\n                \"bidder\": \"Buyer\"\n            }\n        ]\n    },\n    {\n        \"id\": 2,\n        \"startsAt\": \"2023-04-29T05:21:33Z\",\n        \"title\": \"Some auction\",\n        \"expiry\": \"2023-04-29T07:21:33Z\",\n        \"user\": \"Test\",\n        \"currency\": \"VAC\",\n        \"bids\": []\n    }\n]"
+						}
+					]
+				}
+			]
+		}
+	]
+}

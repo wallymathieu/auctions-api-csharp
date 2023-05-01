@@ -352,3 +352,4 @@ MigrationBackup/
 
 .env
 *.DotSettings
+.DS_Store
