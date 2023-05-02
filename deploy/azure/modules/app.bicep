@@ -13,7 +13,8 @@ param appname string
 param environmentName string
 param managedEnvironmentId string
 param containerImage string = 'wallymathieu/auctions-api-csharp'
-var containerName = 'app-${appname}-${environmentName}'
+var containerName = 'capp-${appname}-${environmentName}'
+
 resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
     name: containerName
     location: location
@@ -64,3 +65,46 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
 }
 
 output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
+
+var appName = 'capp-${appname}-${environmentName}'
+
+param serverFarmId string
+
+resource site 'Microsoft.Web/sites@2021-02-01' = {
+  name: appName
+  location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    siteConfig: {
+      linuxFxVersion: 'DOCKER|${containerImage}'
+      minTlsVersion: '1.2'
+      scmMinTlsVersion: '1.2'
+      connectionStrings: [
+        {
+            name: 'AzureStorage'
+            connectionString: azureStorageConnectionString
+        }
+        {
+            name: 'DefaultConnection'
+            connectionString: defaultConnection
+        }
+        {
+            name: 'Redis'
+            connectionString: redisConnection
+        }
+      ]
+      appSettings:[
+        {
+            name: 'ASPNETCORE_URLS'
+            value: 'http://0.0.0.0:80'
+        }
+      ]
+    }
+
+
+    serverFarmId: serverFarmId
+    httpsOnly: true
+  }
+}

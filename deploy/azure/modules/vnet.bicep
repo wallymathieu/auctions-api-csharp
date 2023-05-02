@@ -23,6 +23,15 @@ resource vNet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
     }
     enableDdosProtection: false
     enableVmProtection: false
+    subnets:[
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: subnetPrefix
+          serviceEndpoints: serviceEndpointsAll
+        }
+      }
+    ]
   }
 }
 var serviceEndpointsAll = [
@@ -47,12 +56,5 @@ var serviceEndpointsAll = [
     service: 'Microsoft.ContainerRegistry'
   }*/
 ]
-resource vNetSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-05-01' = {
-  parent: vNet
-  name: subnetName
-  properties: {
-    addressPrefix: subnetPrefix
-    serviceEndpoints: serviceEndpointsAll
-  }
-}
-output subnetId string = vNetSubnet.id
+
+output subnetId string = vNet.properties.subnets[0].id

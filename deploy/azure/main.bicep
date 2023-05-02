@@ -47,7 +47,7 @@ module storageAccount 'modules/storage.bicep' = {
   name: 'storageAccount'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     subnetId: vNet.outputs.subnetId
   }
@@ -60,7 +60,7 @@ module redis 'modules/redis.bicep' = {
   name: 'redis'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     //subnetId: vNet.outputs.subnetId
   }
@@ -73,7 +73,7 @@ module msSql 'modules/mssql.bicep' = {
   name: 'msSQL'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     sqlAdminLogin: sqlAdminLogin
     sqlAdminPassword: sqlAdminPassword
@@ -88,7 +88,7 @@ module env 'modules/environment.bicep' = {
   name: 'environment'
   params:{
     appname:appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     subnetId: vNet.outputs.subnetId
   }
@@ -101,25 +101,25 @@ module vNet 'modules/vnet.bicep' = {
   name: 'vnet'
   params:{
     appname:appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
   }
   scope: resourceGroup
 }
-
 
 var connectionString = 'Database=${ msSql.outputs.fullyQualifiedDomainName};Data Source=${msSql.outputs.databaseName};User Id=${sqlAdminLogin}@${msSql.outputs.sqlServerName};Password=${sqlAdminPassword}'
 module app 'modules/app.bicep' = {
   name: 'app'
   params:{
     appname: appname
-    environmentName: environmentName 
+    environmentName: environmentName
     location:resourceGroup.location
     azureStorageConnectionString: storageAccount.outputs.connectionString
     defaultConnection:connectionString
     redisConnection: redis.outputs.connectionString
     containerImage: containerImage
     managedEnvironmentId: env.outputs.environmentId
+    serverFarmId: env.outputs.aspId
   }
   scope: resourceGroup
   dependsOn:[

@@ -49,5 +49,19 @@ resource environment 'Microsoft.App/managedEnvironments@2022-10-01' = {
         }
     }
 }
+var hostingPlanName = 'asp-${appname}-${environmentName}'
+resource hostingPlan 'Microsoft.Web/serverfarms@2020-06-01' = {
+    name: hostingPlanName
+    location: location
+    sku: {
+      tier: 'Standard'
+      name: 'S1'
+    }
+    kind: 'linux'
+    properties: {
+      reserved: true
+    }
+  }
 
 output environmentId string = environment.id
+output aspId string = hostingPlan.id
