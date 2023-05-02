@@ -1,7 +1,5 @@
 targetScope = 'subscription'
 param location string = 'eastus'
-//param vnetName string = 'myVnet'
-//param subnetName string = 'mySubnet'
 @description('The stage of the development lifecycle for the workload that the resource supports.')
 @allowed([
   'prod'
@@ -13,23 +11,6 @@ param location string = 'eastus'
 param environmentName string = 'dev'
 param containerImage string = 'wallymathieu/auctions-api-csharp'
 param appname string = 'auctions'
-/*resource myVnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
-  name: vnetName
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [ '10.0.0.0/16' ]
-    }
-    subnets: [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: '10.0.0.0/24'
-        }
-      }
-    ]
-  }
-}*/
 
 @description('The administrator username of the SQL logical server')
 param sqlAdminLogin string = 'auctionadmin'
