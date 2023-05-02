@@ -29,7 +29,16 @@ resource vNet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
         properties: {
           addressPrefix: subnetPrefix
           serviceEndpoints: serviceEndpointsAll
+          delegations: [
+            {
+              name: 'App'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
         }
+
       }
     ]
   }
@@ -41,7 +50,10 @@ var serviceEndpointsAll = [
   // Microsoft.Storage,
   //Microsoft.Sql, Microsoft.AzureActiveDirectory,
   // Microsoft.AzureCosmosDB,
-  // Microsoft.Web,
+  {
+    service: 'Microsoft.Web'
+  }
+
   // Microsoft.NetworkServiceEndpointTest,
   // Microsoft.KeyVault,
   // Microsoft.EventHub,

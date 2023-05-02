@@ -120,6 +120,7 @@ module app 'modules/app.bicep' = {
     containerImage: containerImage
     managedEnvironmentId: env.outputs.environmentId
     serverFarmId: env.outputs.aspId
+    subnetId: vNet.outputs.subnetId
   }
   scope: resourceGroup
   dependsOn:[

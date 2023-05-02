@@ -3,9 +3,11 @@ param environmentName string
 //param logAnalyticsWorkspaceName string
 param location string = resourceGroup().location
 param appname string
+param subnetId string
+param enableContainerApp bool = false
+
 var logAnalyticsWorkspaceName = 'logws-${appname}-${environmentName}'
-var appInsightsName = 'appinsight-${appname}-${environmentName}'
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = if (enableContainerApp) {
     name: logAnalyticsWorkspaceName
     location: location
     properties: any({
@@ -21,7 +23,8 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08
     })
 }
 
-resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+var appInsightsName = 'appinsight-${appname}-${environmentName}'
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = if (enableContainerApp) {
     name: appInsightsName
     location: location
     kind: 'web'
@@ -30,9 +33,9 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
         WorkspaceResourceId: logAnalyticsWorkspace.id
     }
 }
-param subnetId string
+
 var appEnvName = 'appenv-${appname}-${environmentName}'
-resource environment 'Microsoft.App/managedEnvironments@2022-10-01' = {
+resource environment 'Microsoft.App/managedEnvironments@2022-10-01' = if (enableContainerApp) {
     name: appEnvName
     location: location
     properties: {
@@ -50,18 +53,18 @@ resource environment 'Microsoft.App/managedEnvironments@2022-10-01' = {
     }
 }
 var hostingPlanName = 'asp-${appname}-${environmentName}'
-resource hostingPlan 'Microsoft.Web/serverfarms@2020-06-01' = {
+resource hostingPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
     name: hostingPlanName
     location: location
     sku: {
-      tier: 'Standard'
-      name: 'S1'
+        tier: 'Standard'
+        name: 'S1'
     }
     kind: 'linux'
     properties: {
-      reserved: true
+        reserved: true
     }
-  }
+}
 
-output environmentId string = environment.id
+output environmentId string = enableContainerApp ? environment.id : ''
 output aspId string = hostingPlan.id

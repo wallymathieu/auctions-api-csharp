@@ -10,12 +10,13 @@ param defaultConnection string
 @secure()
 param redisConnection string
 param appname string
+param enableContainerApp bool = false
 param environmentName string
 param managedEnvironmentId string
 param containerImage string = 'wallymathieu/auctions-api-csharp'
 var containerName = 'capp-${appname}-${environmentName}'
 
-resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
+resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = if (enableContainerApp) {
     name: containerName
     location: location
     properties: {
@@ -64,47 +65,57 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
     }
 }
 
-output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
+//output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
 
-var appName = 'capp-${appname}-${environmentName}'
+var appName = 'app-${appname}-${environmentName}'
 
 param serverFarmId string
+param subnetId string
 
-resource site 'Microsoft.Web/sites@2021-02-01' = {
-  name: appName
-  location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    siteConfig: {
-      linuxFxVersion: 'DOCKER|${containerImage}'
-      minTlsVersion: '1.2'
-      scmMinTlsVersion: '1.2'
-      connectionStrings: [
-        {
-            name: 'AzureStorage'
-            connectionString: azureStorageConnectionString
-        }
-        {
-            name: 'DefaultConnection'
-            connectionString: defaultConnection
-        }
-        {
-            name: 'Redis'
-            connectionString: redisConnection
-        }
-      ]
-      appSettings:[
-        {
-            name: 'ASPNETCORE_URLS'
-            value: 'http://0.0.0.0:80'
-        }
-      ]
+resource app 'Microsoft.Web/sites@2022-09-01' = {
+    name: appName
+    location: location
+    identity: {
+        type: 'SystemAssigned'
     }
+    properties: {
+        siteConfig: {
+            vnetRouteAllEnabled: true
+            linuxFxVersion: 'DOCKER|${containerImage}'
+            minTlsVersion: '1.2'
+            scmMinTlsVersion: '1.2'
+            connectionStrings: [
+                {
+                    name: 'AzureStorage'
+                    connectionString: azureStorageConnectionString
+                }
+                {
+                    name: 'DefaultConnection'
+                    connectionString: defaultConnection
+                }
+                {
+                    name: 'Redis'
+                    connectionString: redisConnection
+                }
+            ]
+            appSettings: [
+                {
+                    name: 'ASPNETCORE_URLS'
+                    value: 'http://0.0.0.0:80'
+                }
+            ]
+        }
+        virtualNetworkSubnetId: subnetId
+        //managedEnvironmentId:
 
-
-    serverFarmId: serverFarmId
-    httpsOnly: true
-  }
+        serverFarmId: serverFarmId
+        httpsOnly: true
+    }
+}
+resource appVNetIntegration 'Microsoft.Web/sites/networkConfig@2022-03-01' = {
+    name: 'virtualNetwork'
+    parent: app
+    properties: {
+        subnetResourceId: subnetId
+    }
 }
