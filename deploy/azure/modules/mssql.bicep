@@ -43,5 +43,5 @@ resource firewallRule 'Microsoft.Sql/servers/firewallRules@2022-08-01-preview' =
 }
 
 output fullyQualifiedDomainName string = mySqlServer.properties.fullyQualifiedDomainName
-output databaseName string = databaseName
+output databaseName string = 'db'
 output sqlServerName string = mySqlServer.name

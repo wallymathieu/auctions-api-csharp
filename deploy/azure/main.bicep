@@ -65,8 +65,7 @@ module env 'modules/environment.bicep' = {
 
 }
 
-
-var connectionString = 'Database=${ msSql.outputs.fullyQualifiedDomainName};Data Source=${msSql.outputs.databaseName};User Id=${sqlAdminLogin}@${msSql.outputs.sqlServerName};Password=${sqlAdminPassword}'
+var connectionString = 'Server=${msSql.outputs.fullyQualifiedDomainName};MultipleActiveResultSets=true;Database=${msSql.outputs.databaseName};User Id=${sqlAdminLogin};Password=${sqlAdminPassword}'
 module app 'modules/app.bicep' = {
   name: 'app'
   params:{
