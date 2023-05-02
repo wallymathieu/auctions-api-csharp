@@ -111,11 +111,10 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
         serverFarmId: serverFarmId
         httpsOnly: true
     }
-}
-resource appVNetIntegration 'Microsoft.Web/sites/networkConfig@2022-03-01' = {
-    name: 'virtualNetwork'
-    parent: app
-    properties: {
-        subnetResourceId: subnetId
+    resource appVNetIntegration 'networkConfig@2022-09-01' = {
+        name: 'virtualNetwork'
+        properties: {
+            subnetResourceId: subnetId
+        }
     }
 }
