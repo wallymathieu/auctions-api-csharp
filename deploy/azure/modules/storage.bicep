@@ -11,6 +11,12 @@ resource myStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   kind: 'StorageV2'
   properties: {
     publicNetworkAccess:'Enabled'
+    minimumTlsVersion:'TLS1_2'
+    networkAcls:{
+      bypass:'AzureServices'
+      defaultAction:'Allow'
+    }
+    supportsHttpsTrafficOnly:true
   }
 }
 
