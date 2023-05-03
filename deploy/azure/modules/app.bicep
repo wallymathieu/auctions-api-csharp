@@ -14,6 +14,33 @@ param environmentName string
 param containerImage string = 'wallymathieu/auctions-api-csharp:latest'
 
 var appName = 'app-${appname}-${environmentName}'
+var logAnalyticsWorkspaceName = 'logws-${appname}-${environmentName}'
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
+    name: logAnalyticsWorkspaceName
+    location: location
+    properties: any({
+        sku: {
+            name: 'PerGB2018'
+        }
+        retentionInDays: 30
+        features: {
+            searchVersion: 1
+            legacy: 0
+            enableLogAccessUsingOnlyResourcePermissions: true
+        }
+    })
+}
+
+var appInsightsName = 'appinsight-app-${appname}-${environmentName}'
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+    name: appInsightsName
+    location: location
+    kind: 'web'
+    properties: {
+        Application_Type: 'web'
+        WorkspaceResourceId: logAnalyticsWorkspace.id
+    }
+}
 
 param serverFarmId string
 
@@ -51,16 +78,34 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
                     name: 'ASPNETCORE_URLS'
                     value: 'http://0.0.0.0:80'
                 }
+                {
+                    name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+                    value: appInsights.properties.InstrumentationKey
+                }
+                {
+                    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+                    value: 'InstrumentationKey=${appInsights.properties.InstrumentationKey}'
+                }
             ]
         }
-
         serverFarmId: serverFarmId
         httpsOnly: true
     }
-
 }
+
+var funcAppInsightsName = 'appinsight-func-${appname}-${environmentName}'
+resource funcAppInsights 'Microsoft.Insights/components@2020-02-02' = {
+    name: funcAppInsightsName
+    location: location
+    kind: 'web'
+    properties: {
+        Application_Type: 'web'
+        WorkspaceResourceId: logAnalyticsWorkspace.id
+    }
+}
+
 var funcName = 'func-${appname}-${environmentName}'
-param funcContainerImage string='wallymathieu/auctions-api-functions:latest'
+param funcContainerImage string = 'wallymathieu/auctions-api-functions:latest'
 resource function 'Microsoft.Web/sites@2022-09-01' = {
     name: funcName
     location: location
@@ -70,6 +115,7 @@ resource function 'Microsoft.Web/sites@2022-09-01' = {
     }
     properties: {
         siteConfig: {
+            alwaysOn: true
             vnetRouteAllEnabled: true
             linuxFxVersion: 'DOCKER|${funcContainerImage}'
             minTlsVersion: '1.2'
@@ -104,11 +150,17 @@ resource function 'Microsoft.Web/sites@2022-09-01' = {
                     name: 'FUNCTIONS_WORKER_RUNTIME'
                     value: 'dotnet-isolated'
                 }
+                {
+                    name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+                    value: funcAppInsights.properties.InstrumentationKey
+                }
+                {
+                    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+                    value: 'InstrumentationKey=${funcAppInsights.properties.InstrumentationKey}'
+                }
             ]
         }
-
         serverFarmId: serverFarmId
         httpsOnly: true
     }
-
 }
