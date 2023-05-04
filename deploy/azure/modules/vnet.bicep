@@ -70,3 +70,4 @@ var serviceEndpointsAll = [
 ]
 
 output subnetId string = vNet.properties.subnets[0].id
+output subnetPrefix string = vNet.properties.subnets[0].properties.addressPrefix
