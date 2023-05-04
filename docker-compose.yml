@@ -1,20 +1,5 @@
 version: "3.4"
 services:
-  app:
-    image: wallymathieu/auctions-api-csharp:1.0.0
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://0.0.0.0:80
-      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
-      ConnectionStrings__Redis: ${ConnectionStrings__Redis}
-      ConnectionStrings__AzureStorage: ${ConnectionStrings__AzureStorage}
-    ports:
-      - "8083:80"
-    depends_on:
-      - db
-      - azurite
-      - redis
-
   db:
     image: mcr.microsoft.com/mssql/server
     ports:
@@ -42,19 +27,6 @@ services:
     volumes:
       - 'redis_data:/bitnami/redis/data'
 
-  functions:
-    image: wallymathieu/auctions-api-functions:latest
-    build:
-      context: .
-      dockerfile: ./src/Functions/Dockerfile
-    ports:
-      - 8084:80
-    environment:
-      AzureWebJobsStorage: ${ConnectionStrings__AzureStorage}
-      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
-      ConnectionStrings__Redis: ${ConnectionStrings__Redis}
-    depends_on:
-      - azurite
 volumes:
   redis_data:
     driver: local
