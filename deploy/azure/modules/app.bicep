@@ -84,7 +84,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
                 }
                 {
                     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-                    value: 'InstrumentationKey=${appInsights.properties.InstrumentationKey}'
+                    value: appInsights.properties.ConnectionString
                 }
             ]
         }
@@ -138,10 +138,10 @@ resource function 'Microsoft.Web/sites@2022-09-01' = {
                 }
             ]
             appSettings: [
-                {
+                /*{
                     name: 'AzureWebJobsDisableHomepage' // This hides the default Azure Functions homepage, which means that Front Door health probe traffic is significantly reduced.
                     value: 'true'
-                }
+                }*/
                 {
                     name: 'AzureWebJobsStorage'
                     value: azureStorageConnectionString
@@ -156,7 +156,19 @@ resource function 'Microsoft.Web/sites@2022-09-01' = {
                 }
                 {
                     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-                    value: 'InstrumentationKey=${funcAppInsights.properties.InstrumentationKey}'
+                    value: funcAppInsights.properties.ConnectionString
+                }
+                {
+                    name: 'FUNCTIONS_EXTENSION_VERSION'
+                    value: '~4'
+                }
+                {
+                    name: 'DOCKER_REGISTRY_SERVER_URL'
+                    value: 'https://index.docker.io/v1'
+                }
+                {
+                    name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+                    value: 'false'
                 }
             ]
         }
