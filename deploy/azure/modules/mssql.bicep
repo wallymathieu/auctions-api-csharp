@@ -1,4 +1,3 @@
-
 @description('The administrator username of the SQL logical server')
 param sqlAdminLogin string
 
@@ -8,8 +7,11 @@ param sqlAdminPassword string
 @description('Location for all resources.')
 param location string = resourceGroup().location
 param appname string
-param environmentName string 
-var sqlServerName= 'sqldb-${appname}-${environmentName}'
+param environmentName string
+var sqlServerName = 'sqldb-${appname}-${environmentName}'
+var databaseName = '${sqlServerName}/db'
+param subnetId string
+var vNetRuleName = '${sqlServerName}/subnet'
 resource mySqlServer 'Microsoft.Sql/servers@2022-08-01-preview' = {
   name: sqlServerName
   location: location
@@ -18,19 +20,15 @@ resource mySqlServer 'Microsoft.Sql/servers@2022-08-01-preview' = {
     administratorLoginPassword: sqlAdminPassword
     publicNetworkAccess: 'Enabled'
   }
-}
-param subnetId string
-var vNetRuleName = '${sqlServerName}/subnet'
-resource vNetRules 'Microsoft.Sql/servers/virtualNetworkRules@2022-08-01-preview' = {
-  name:vNetRuleName
-  properties:{
-    virtualNetworkSubnetId:subnetId
+  resource vNetRules 'virtualNetworkRules@2022-08-01-preview' = {
+    name:vNetRuleName
+    properties:{
+      virtualNetworkSubnetId:subnetId
+    }
   }
 }
 
-var databaseName= '${sqlServerName}/db'
-
-resource myDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
+resource myDatabase 'Microsoft.Sql/servers/databases@2022-08-01-preview' = {
   name: databaseName
   location: location
   sku: {
@@ -41,10 +39,18 @@ resource myDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   tags: {
     displayName: databaseName
   }
-  dependsOn: [
-    mySqlServer
-  ]
 }
+// TODO: Adjust to be only for subnet
+resource firewallRule 'Microsoft.Sql/servers/firewallRules@2022-08-01-preview' = {
+  parent:mySqlServer
+  name:'AllowAllWindowsAzureIps'
+  properties: {
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '0.0.0.0'
+  }
+}
+
+
 output fullyQualifiedDomainName string = mySqlServer.properties.fullyQualifiedDomainName
-output databaseName string = databaseName
-output sqlServerName string = mySqlServer.name 
+output databaseName string = 'db'
+output sqlServerName string = mySqlServer.name

@@ -10,67 +10,39 @@ param defaultConnection string
 @secure()
 param redisConnection string
 param appname string
-param enableContainerApp bool = false
 param environmentName string
-param managedEnvironmentId string
-param containerImage string = 'wallymathieu/auctions-api-csharp'
-var containerName = 'capp-${appname}-${environmentName}'
-
-resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = if (enableContainerApp) {
-    name: containerName
+param containerImage string = 'wallymathieu/auctions-api-csharp:latest'
+param subnetId string
+var appName = 'app-${appname}-${environmentName}'
+var logAnalyticsWorkspaceName = 'logws-${appname}-${environmentName}'
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
+    name: logAnalyticsWorkspaceName
     location: location
+    properties: any({
+        sku: {
+            name: 'PerGB2018'
+        }
+        retentionInDays: 30
+        features: {
+            searchVersion: 1
+            legacy: 0
+            enableLogAccessUsingOnlyResourcePermissions: true
+        }
+    })
+}
+
+var appInsightsName = 'appinsight-app-${appname}-${environmentName}'
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+    name: appInsightsName
+    location: location
+    kind: 'web'
     properties: {
-        managedEnvironmentId: managedEnvironmentId
-        configuration: {
-            // secrets: []
-            registries: null
-            //TODO:
-            ingress: {
-                targetPort: 80
-                transport: 'auto'
-            }
-
-        }
-
-        template: {
-            containers: [
-                {
-                    image: containerImage
-                    name: containerName
-                    env: [
-                        {
-                            name: 'ASPNETCORE_URLS'
-                            value: 'http://0.0.0.0:80'
-                        }
-                        {
-                            name: 'ConnectionStrings__AzureStorage'
-                            value: azureStorageConnectionString
-                        }
-                        {
-                            name: 'ConnectionStrings__DefaultConnection'
-                            value: defaultConnection
-                        }
-                        {
-                            name: 'ConnectionStrings__Redis'
-                            value: redisConnection
-                        }
-                    ]
-                }
-            ]
-            scale: {
-                minReplicas: 1
-                maxReplicas: 1
-            }
-        }
+        Application_Type: 'web'
+        WorkspaceResourceId: logAnalyticsWorkspace.id
     }
 }
 
-//output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
-
-var appName = 'app-${appname}-${environmentName}'
-
 param serverFarmId string
-param subnetId string
 
 resource app 'Microsoft.Web/sites@2022-09-01' = {
     name: appName
@@ -88,14 +60,17 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
                 {
                     name: 'AzureStorage'
                     connectionString: azureStorageConnectionString
+                    type: 'Custom'
                 }
                 {
                     name: 'DefaultConnection'
                     connectionString: defaultConnection
+                    type: 'SQLAzure'
                 }
                 {
                     name: 'Redis'
                     connectionString: redisConnection
+                    type: 'Custom'
                 }
             ]
             appSettings: [
@@ -103,18 +78,108 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
                     name: 'ASPNETCORE_URLS'
                     value: 'http://0.0.0.0:80'
                 }
+                {
+                    name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+                    value: appInsights.properties.InstrumentationKey
+                }
+                {
+                    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+                    value: appInsights.properties.ConnectionString
+                }
             ]
         }
-        virtualNetworkSubnetId: subnetId
-        //managedEnvironmentId:
-
         serverFarmId: serverFarmId
         httpsOnly: true
+        virtualNetworkSubnetId: subnetId
     }
     resource appVNetIntegration 'networkConfig@2022-09-01' = {
         name: 'virtualNetwork'
         properties: {
             subnetResourceId: subnetId
         }
+    }
+}
+
+var funcAppInsightsName = 'appinsight-func-${appname}-${environmentName}'
+resource funcAppInsights 'Microsoft.Insights/components@2020-02-02' = {
+    name: funcAppInsightsName
+    location: location
+    kind: 'web'
+    properties: {
+        Application_Type: 'web'
+        WorkspaceResourceId: logAnalyticsWorkspace.id
+    }
+}
+
+var funcName = 'func-${appname}-${environmentName}'
+param funcContainerImage string = 'wallymathieu/auctions-api-functions:latest'
+resource function 'Microsoft.Web/sites@2022-09-01' = {
+    name: funcName
+    location: location
+    kind: 'functionapp'
+    identity: {
+        type: 'SystemAssigned'
+    }
+    properties: {
+        siteConfig: {
+            alwaysOn: true
+            vnetRouteAllEnabled: true
+            linuxFxVersion: 'DOCKER|${funcContainerImage}'
+            minTlsVersion: '1.2'
+            scmMinTlsVersion: '1.2'
+            connectionStrings: [
+                {
+                    name: 'AzureStorage'
+                    connectionString: azureStorageConnectionString
+                    type: 'Custom'
+                }
+                {
+                    name: 'DefaultConnection'
+                    connectionString: defaultConnection
+                    type: 'SQLAzure'
+                }
+                {
+                    name: 'Redis'
+                    connectionString: redisConnection
+                    type: 'Custom'
+                }
+            ]
+            appSettings: [
+                /*{
+                    name: 'AzureWebJobsDisableHomepage' // This hides the default Azure Functions homepage, which means that Front Door health probe traffic is significantly reduced.
+                    value: 'true'
+                }*/
+                {
+                    name: 'AzureWebJobsStorage'
+                    value: azureStorageConnectionString
+                }
+                {
+                    name: 'FUNCTIONS_WORKER_RUNTIME'
+                    value: 'dotnet-isolated'
+                }
+                {
+                    name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+                    value: funcAppInsights.properties.InstrumentationKey
+                }
+                {
+                    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+                    value: funcAppInsights.properties.ConnectionString
+                }
+                {
+                    name: 'FUNCTIONS_EXTENSION_VERSION'
+                    value: '~4'
+                }
+                {
+                    name: 'DOCKER_REGISTRY_SERVER_URL'
+                    value: 'https://index.docker.io/v1'
+                }
+                {
+                    name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+                    value: 'false'
+                }
+            ]
+        }
+        serverFarmId: serverFarmId
+        httpsOnly: true
     }
 }

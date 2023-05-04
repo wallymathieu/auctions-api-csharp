@@ -1,7 +1,5 @@
 targetScope = 'subscription'
 param location string = 'eastus'
-//param vnetName string = 'myVnet'
-//param subnetName string = 'mySubnet'
 @description('The stage of the development lifecycle for the workload that the resource supports.')
 @allowed([
   'prod'
@@ -13,23 +11,6 @@ param location string = 'eastus'
 param environmentName string = 'dev'
 param containerImage string = 'wallymathieu/auctions-api-csharp'
 param appname string = 'auctions'
-/*resource myVnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
-  name: vnetName
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [ '10.0.0.0/16' ]
-    }
-    subnets: [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: '10.0.0.0/24'
-        }
-      }
-    ]
-  }
-}*/
 
 @description('The administrator username of the SQL logical server')
 param sqlAdminLogin string = 'auctionadmin'
@@ -42,6 +23,15 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: 'rg-${appname}-${environmentName}'
   location: location
 }
+module vNet 'modules/vnet.bicep' = {
+  name: 'vnet'
+  params:{
+    appname:appname
+    environmentName: environmentName
+    location:resourceGroup.location
+  }
+  scope: resourceGroup
+}
 
 module storageAccount 'modules/storage.bicep' = {
   name: 'storageAccount'
@@ -49,12 +39,10 @@ module storageAccount 'modules/storage.bicep' = {
     appname: appname
     environmentName: environmentName
     location:resourceGroup.location
-    subnetId: vNet.outputs.subnetId
+    subnetId:vNet.outputs.subnetId
   }
   scope: resourceGroup
-  dependsOn:[
-    vNet
-  ]
+  dependsOn:[vNet]
 }
 module redis 'modules/redis.bicep' = {
   name: 'redis'
@@ -65,9 +53,6 @@ module redis 'modules/redis.bicep' = {
     //subnetId: vNet.outputs.subnetId
   }
   scope: resourceGroup
-  dependsOn:[
-    vNet
-  ]
 }
 module msSql 'modules/mssql.bicep' = {
   name: 'msSQL'
@@ -80,9 +65,7 @@ module msSql 'modules/mssql.bicep' = {
     subnetId: vNet.outputs.subnetId
   }
   scope: resourceGroup
-  dependsOn:[
-    vNet
-  ]
+  dependsOn:[vNet]
 }
 module env 'modules/environment.bicep' = {
   name: 'environment'
@@ -90,24 +73,12 @@ module env 'modules/environment.bicep' = {
     appname:appname
     environmentName: environmentName
     location:resourceGroup.location
-    subnetId: vNet.outputs.subnetId
   }
   scope: resourceGroup
-  dependsOn:[
-    vNet
-  ]
-}
-module vNet 'modules/vnet.bicep' = {
-  name: 'vnet'
-  params:{
-    appname:appname
-    environmentName: environmentName
-    location:resourceGroup.location
-  }
-  scope: resourceGroup
+
 }
 
-var connectionString = 'Database=${ msSql.outputs.fullyQualifiedDomainName};Data Source=${msSql.outputs.databaseName};User Id=${sqlAdminLogin}@${msSql.outputs.sqlServerName};Password=${sqlAdminPassword}'
+var connectionString = 'Server=${msSql.outputs.fullyQualifiedDomainName};MultipleActiveResultSets=true;Database=${msSql.outputs.databaseName};User Id=${sqlAdminLogin};Password=${sqlAdminPassword}'
 module app 'modules/app.bicep' = {
   name: 'app'
   params:{
@@ -118,7 +89,6 @@ module app 'modules/app.bicep' = {
     defaultConnection:connectionString
     redisConnection: redis.outputs.connectionString
     containerImage: containerImage
-    managedEnvironmentId: env.outputs.environmentId
     serverFarmId: env.outputs.aspId
     subnetId: vNet.outputs.subnetId
   }
