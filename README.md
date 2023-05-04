@@ -43,13 +43,21 @@ export ConnectionStrings__Redis="localhost"
 export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
 ```
 
+If you want to run inside dev containers then the setup will be slightly different:
+
+```bash
+source .env
+export ConnectionStrings__DefaultConnection="Server=db;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
+export ConnectionStrings__Redis="redis"
+export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azurite"
+```
+
 To run migrations and api using above environment:
 
 ```bash
+dotnet tool restore
 cd src/Api
-
 dotnet ef database update
-
 dotnet run
 ```
 
@@ -57,7 +65,6 @@ To run functions locally using above environment:
 
 ```bash
 cd src/Functions
-
 func start
 ```
 
