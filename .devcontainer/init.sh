@@ -9,3 +9,4 @@ then
 else
     echo "There is already an .env file, not doing anything"
 fi
+npm install -g azure-functions-core-tools@4 --unsafe-perm true
