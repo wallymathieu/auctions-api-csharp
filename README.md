@@ -46,10 +46,7 @@ export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
 If you want to run inside dev containers then the setup will be slightly different (since it should be the same environment as you have if you the apps through docker compose):
 
 ```bash
-source .env
-export ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
-export ConnectionStrings__Redis=${ConnectionStrings__Redis}
-export ConnectionStrings__AzureStorage=${ConnectionStrings__AzureStorage}
+. ./.devcontainer/env.sh
 ```
 
 To run migrations and api using above environment:
