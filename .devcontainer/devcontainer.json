@@ -31,7 +31,11 @@
   "features": {
     "ghcr.io/devcontainers/features/node:1":{
       "version":"latest"
+    },
+    "ghcr.io/devcontainers-contrib/features/autoenv:1": {
+      "version":"latest"
     }
+
   },
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [

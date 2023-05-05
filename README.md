@@ -43,11 +43,7 @@ export ConnectionStrings__Redis="localhost"
 export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
 ```
 
-If you want to run inside dev containers then the setup will be slightly different (since it should be the same environment as you have if you the apps through docker compose):
-
-```bash
-. ./.devcontainer/env.sh
-```
+If you want to run inside dev containers then the setup will be slightly different (since it should be the same environment as you have if you the apps through docker compose). Note that we use the auto env extension (instead of the above script).
 
 To run migrations and api using above environment:
 
