@@ -31,9 +31,6 @@
   "features": {
     "ghcr.io/devcontainers/features/node:1":{
       "version":"latest"
-    },
-    "ghcr.io/devcontainers-contrib/features/autoenv:1": {
-      "version":"latest"
     }
 
   },
