@@ -3,7 +3,6 @@ using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Models;
-using Wallymathieu.Auctions.Queues;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers;

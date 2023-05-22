@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Queues;
+namespace Wallymathieu.Auctions.Infrastructure.Queues;
 
 public class QueuesModule
 {

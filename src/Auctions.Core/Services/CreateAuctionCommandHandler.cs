@@ -6,10 +6,10 @@ namespace Wallymathieu.Auctions.Services;
 
 internal class CreateAuctionCommandHandler : ICreateAuctionCommandHandler
 {
-    private readonly AuctionDbContext _dbContext;
+    private readonly IAuctionDbContext _dbContext;
     private readonly Mapper _mapper;
 
-    public CreateAuctionCommandHandler(AuctionDbContext dbContext, Mapper mapper)
+    public CreateAuctionCommandHandler(IAuctionDbContext dbContext, Mapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -26,12 +26,12 @@ internal class CreateAuctionCommandHandler : ICreateAuctionCommandHandler
             User = userId,
             Options =
             {
-                MinRaise = model.MinRaise??0, 
+                MinRaise = model.MinRaise??0,
                 ReservePrice = model.ReservePrice??0,
                 TimeFrame = model.TimeFrame?? TimeSpan.Zero,
             }
         };
-        _dbContext.Auctions.Add(auction);
+        _dbContext.AddAuction(auction);
         await _dbContext.SaveChangesAsync();
         return _mapper.MapAuctionToModel(auction);
     }

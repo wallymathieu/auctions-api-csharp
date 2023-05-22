@@ -6,5 +6,6 @@
     "azureFunctions.preDeployTask": "publish (functions)",
     "cSpell.words": [
         "Wallymathieu"
-    ]
+    ],
+    "azureFunctions.projectSubpath": "src/Functions"
 }

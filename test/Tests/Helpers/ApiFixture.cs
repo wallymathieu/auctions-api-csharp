@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
