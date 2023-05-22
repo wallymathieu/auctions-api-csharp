@@ -1,5 +1,3 @@
-using Wallymathieu.Auctions.Queues;
-
 namespace Wallymathieu.Auctions.Infrastructure.Queues;
 
 public interface IMessageQueue
