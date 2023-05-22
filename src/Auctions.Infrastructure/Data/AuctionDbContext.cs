@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.Domain;
 
-namespace Wallymathieu.Auctions.Data;
+namespace Wallymathieu.Auctions.Infrastructure.Data;
 
-public class AuctionDbContext: DbContext
+public class AuctionDbContext: DbContext, IAuctionDbContext
 {
     public AuctionDbContext()
     {
@@ -17,12 +18,23 @@ public class AuctionDbContext: DbContext
         self.HasConversion(new ValueConverter<UserId, string>(v => v.Id, v => new UserId(v))).HasMaxLength(2000);
     private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
+
+    async Task<IReadOnlyCollection<TimedAscendingAuction>> IAuctionDbContext.GetAuctionsAsync()
+    {
+        return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync();
+    }
+
     public async Task<TimedAscendingAuction?> GetAuction(long auctionId)
     {
         var auction = await Auctions.FindAsync(auctionId);
         if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync();
         return auction;
     }
+
+    void IAuctionDbContext.AddAuction(TimedAscendingAuction auction) => Auctions.Add(auction);
+
+    async Task IAuctionDbContext.SaveChangesAsync() => await SaveChangesAsync();
+
     public AuctionDbContext(DbContextOptions options):base(options)
     {
     }
@@ -41,7 +53,7 @@ public class AuctionDbContext: DbContext
                 .HasPrincipalKey(a=>a.AuctionId)
                 .HasForeignKey("AuctionId");
         });
-        
+
         builder.Entity<BidEntity>(entity =>
         {
             entity.ToTable("Bids");
@@ -49,8 +61,8 @@ public class AuctionDbContext: DbContext
             var amount = entity.OwnsOne(e => e.Amount);
             HasCurrencyCodeConversion(amount.Property(e => e.Currency));
         });
-        
-       
+
+
         base.OnModelCreating(builder);
     }
 

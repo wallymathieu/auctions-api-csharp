@@ -6,14 +6,15 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Infrastructure.Data;
 
 #nullable disable
 
 namespace App.Migrations
 {
     [DbContext(typeof(AuctionDbContext))]
-    [Migration("20230417060316_InitialDb")]
-    partial class InitialDb
+    [Migration("20230417163507_AdjustCurrencyConversion")]
+    partial class AdjustCurrencyConversion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +37,7 @@ namespace App.Migrations
                     b.Property<DateTimeOffset>("At")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<long?>("TimedAscendingAuctionAuctionId")
+                    b.Property<long?>("AuctionId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("User")
@@ -46,7 +47,7 @@ namespace App.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TimedAscendingAuctionAuctionId");
+                    b.HasIndex("AuctionId");
 
                     b.ToTable("Bids", (string)null);
                 });
@@ -59,8 +60,9 @@ namespace App.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AuctionId"));
 
-                    b.Property<int>("Currency")
-                        .HasColumnType("int");
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("EndsAt")
                         .HasColumnType("datetimeoffset");
@@ -90,7 +92,7 @@ namespace App.Migrations
                 {
                     b.HasOne("Auctions.Domain.TimedAscendingAuction", null)
                         .WithMany("Bids")
-                        .HasForeignKey("TimedAscendingAuctionAuctionId");
+                        .HasForeignKey("AuctionId");
 
                     b.OwnsOne("Auctions.Domain.Amount", "Amount", b1 =>
                         {
