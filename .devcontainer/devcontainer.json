@@ -14,7 +14,7 @@
   // The optional 'workspaceFolder' property is the path VS Code should open by default when
   // connected. This is typically a file mount in .devcontainer/docker-compose.yml
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  	// Configure tool-specific properties.
+  // Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
@@ -22,9 +22,24 @@
 			"extensions": [
 				"ms-dotnettools.csharp",
 				"ms-mssql.mssql",
-				"formulahendry.dotnet-test-explorer",
 				"EditorConfig.EditorConfig"
-			]
+			],
+      			// Set *default* container specific settings.json values on container create.
+			"settings": {
+				"mssql.connections": [
+					{
+						"server": "db",
+						"database": "",
+						"authenticationType": "SqlLogin",
+						"user": "sa",
+						"password": "Auction_PASSWORD123",
+						"emptyPasswordInput": false,
+						"savePassword": true,
+						"profileName": "mssql-container",
+            "trustServerCertificate": true
+					}
+				]
+			}
     }
   },
   // Features to add to the dev container. More info: https://containers.dev/features.
@@ -43,13 +58,11 @@
     10002
   ],
   // Uncomment the next line if you want start specific services in your Docker Compose config.
-  // "runServices": [],
+  "runServices": ["db","azurite","redis"],
   // Uncomment the next line if you want to keep your containers running after VS Code shuts down.
   // "shutdownAction": "none",
   // Uncomment the next line to run commands after the container is created.
-  "postCreateCommand": ". .devcontainer/init.sh"
-  // Configure tool-specific properties.
-  // "customizations": {},
+  "postCreateCommand": ". .devcontainer/init.sh && dotnet restore"
   // Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
   // "remoteUser": "devcontainer"
 }

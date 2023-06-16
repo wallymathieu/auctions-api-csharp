@@ -2,7 +2,7 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "clean (functions)",
+			"label": "clean",
 			"command": "dotnet",
 			"args": [
 				"clean",
@@ -12,11 +12,11 @@
 			"type": "process",
 			"problemMatcher": "$msCompile",
 			"options": {
-				"cwd": "${workspaceFolder}/Functions"
+				"cwd": "${workspaceFolder}"
 			}
 		},
 		{
-			"label": "build (functions)",
+			"label": "build",
 			"command": "dotnet",
 			"args": [
 				"build",
@@ -24,14 +24,14 @@
 				"/consoleloggerparameters:NoSummary"
 			],
 			"type": "process",
-			"dependsOn": "clean (functions)",
+			"dependsOn": "clean",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
 			"problemMatcher": "$msCompile",
 			"options": {
-				"cwd": "${workspaceFolder}/Functions"
+				"cwd": "${workspaceFolder}"
 			}
 		},
 		{
@@ -47,7 +47,7 @@
 			"type": "process",
 			"problemMatcher": "$msCompile",
 			"options": {
-				"cwd": "${workspaceFolder}/Functions"
+				"cwd": "${workspaceFolder}/src/Functions"
 			}
 		},
 		{
@@ -64,14 +64,14 @@
 			"dependsOn": "clean release (functions)",
 			"problemMatcher": "$msCompile",
 			"options": {
-				"cwd": "${workspaceFolder}/Functions"
+				"cwd": "${workspaceFolder}/src/Functions"
 			}
 		},
 		{
 			"type": "func",
 			"dependsOn": "build (functions)",
 			"options": {
-				"cwd": "${workspaceFolder}/Functions/bin/Debug/net7.0"
+				"cwd": "${workspaceFolder}/src/Functions/bin/Debug/net7.0"
 			},
 			"command": "host start",
 			"isBackground": true,
