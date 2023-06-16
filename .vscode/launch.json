@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Api (Dev Container)",
+      "name": "Api (Development)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
