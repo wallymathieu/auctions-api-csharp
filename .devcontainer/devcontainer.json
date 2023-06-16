@@ -22,7 +22,8 @@
 			"extensions": [
 				"ms-dotnettools.csharp",
 				"ms-mssql.mssql",
-				"EditorConfig.EditorConfig"
+				"EditorConfig.EditorConfig",
+				"ms-azuretools.vscode-azurefunctions"
 			],
       			// Set *default* container specific settings.json values on container create.
 			"settings": {
