@@ -22,10 +22,14 @@ public static class ServiceExtensions
     public static IServiceCollection AddAuctionServicesNoCache(this IServiceCollection services) =>
         AddAuctionServicesImplementation(services);
 
-    public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services)
-    {
-        return AddAuctionServicesImplementation(services)
-            .AddScoped<ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>>(c=>new CacheAwareCreateAuctionCommandHandler(c.GetRequiredService<ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>>(), c.GetRequiredService<IDistributedCache>()))
-            .AddScoped<ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>>(c=>new CacheAwareCreateBidCommandHandler(c.GetRequiredService<ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>>(), c.GetRequiredService<IDistributedCache>()));
-    }
+    public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
+        AddAuctionServicesImplementation(services)
+            .AddScoped<ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>>(c=>
+                new CacheAwareCreateAuctionCommandHandler(
+                    c.GetRequiredService<ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>>(),
+                    c.GetRequiredService<IDistributedCache>()))
+            .AddScoped<ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>>(c=>
+                new CacheAwareCreateBidCommandHandler(
+                    c.GetRequiredService<ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>>(),
+                    c.GetRequiredService<IDistributedCache>()));
 }
