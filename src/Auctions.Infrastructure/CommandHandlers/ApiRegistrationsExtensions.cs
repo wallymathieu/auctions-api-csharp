@@ -1,56 +1,12 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+// ReSharper disable InconsistentNaming
 
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
 public static partial class ApiRegistrationsExtensions
 {
-
-
-    public class TypedAggregateRegistrationBuilder<TEntity> where TEntity : IEntity
-    {
-        private readonly IServiceCollection _services;
-
-        public TypedAggregateRegistrationBuilder(IServiceCollection services) => _services = services;
-
-        public TypedAggregateRegistrationBuilder<TEntity> UpdateCommandOnEntity<TCommand, TResponse>(
-            Func<TEntity, TCommand, IServiceProvider, TResponse> func)
-            where TCommand : ICommand<TResponse>
-        {
-            _services.AddScoped<ICommandHandler<TCommand, TResponse>>(di =>
-                new FuncMutateCommandHandler<TEntity, TCommand, TResponse>(func, di));
-            return this;
-        }
-
-        public TypedAggregateRegistrationBuilder<TEntity> CreateCommandOnEntity<TCommand>(
-            Func<TCommand, IServiceProvider, TEntity> func)
-            where TCommand : ICommand<TEntity>
-        {
-            _services.AddScoped<ICommandHandler<TCommand, TEntity>>(di =>
-                new FuncCreateCommandHandler<TEntity, TCommand>(func, di));
-            return this;
-        }
-
-        public TypedAggregateRegistrationBuilder<TEntity> CreateCommandOnEntity<TCommand, TReturnValue>(
-            Func<TCommand, IServiceProvider, (TEntity?, TReturnValue)> func)
-            where TCommand : ICommand<TReturnValue>
-        {
-            _services.AddScoped<ICommandHandler<TCommand, TReturnValue>>(di =>
-                new FuncCreateCommandHandler<TEntity, TCommand, TReturnValue>(func, di));
-            return this;
-        }
-    }
-
-}
-
-public static partial class ApiRegistrationsExtensions
-{
-    public static TypedAggregateRegistrationBuilder<T> RegisterHandlersFor<T>(this IServiceCollection services) where T : IEntity
-    {
-        return new TypedAggregateRegistrationBuilder<T>(services);
-    }
-
     public static IServiceCollection RegisterAttributesForType<T>(this IServiceCollection services) where T :IEntity
     {
         return RegisterAttributesForType(services, typeof(T));
@@ -58,7 +14,7 @@ public static partial class ApiRegistrationsExtensions
     public static IServiceCollection RegisterAttributesForType(this IServiceCollection services, Type t)
     {
         foreach (var method in
-                 from m in t.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                 from m in t.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public| BindingFlags.NonPublic)
                  let attr = m.GetCustomAttribute<CommandHandlerAttribute>()
                  where attr != null
                  select m)
@@ -126,7 +82,7 @@ public static partial class ApiRegistrationsExtensions
             Func<IServiceProvider, object> lambda = Expression.Lambda<Func<IServiceProvider, object>>(
                 Expression.New( // new
                     implType.GetConstructors()[0], // FuncCreateCommandHandler<TEntity,TCommand>
-                    Expression.Constant(Delegate.CreateDelegate(funcType, methodInfo)), //
+                    Expression.Constant(Delegate.CreateDelegate(funcType, methodInfo)),
                     parameter_Svc
                 ),
                 parameter_Svc).Compile();
@@ -135,11 +91,11 @@ public static partial class ApiRegistrationsExtensions
         static bool RegisterServiceCreateCommandHandler(IServiceCollection services, Type t, MethodInfo method)
         {
             var parameters = method.GetParameters();
-            var restParameters = parameters.Skip(1).ToArray();
+            var restParameters = parameters.Skip(1).ToList();
             switch (parameters.Length)
             {
                 case >= 1
-                    when restParameters.All(p => p.ParameterType != typeof(IServiceProvider)):
+                    when restParameters.TrueForAll(p => p.ParameterType != typeof(IServiceProvider)):
                 {
                     var commandType = parameters[0].ParameterType;
                     var serviceParameters = restParameters.Select(p=>p.ParameterType).ToArray();
@@ -200,11 +156,11 @@ public static partial class ApiRegistrationsExtensions
         static bool RegisterFuncMutateServices(IServiceCollection services, Type t, MethodInfo method)
         {
             var parameters = method.GetParameters();
-            var restParameters = parameters.Skip(1).ToArray();
+            var restParameters = parameters.Skip(1).ToList();
             switch (parameters.Length)
             {
                 case >= 1
-                    when restParameters.All(p => p.ParameterType != typeof(IServiceProvider)):
+                    when restParameters.TrueForAll(p => p.ParameterType != typeof(IServiceProvider)):
                 {
                     var commandType = parameters[0].ParameterType;
                     var serviceParameters = restParameters
@@ -228,11 +184,11 @@ public static partial class ApiRegistrationsExtensions
         */
         static Func<IServiceProvider, object> CreateFuncMutateServicesFactory(Type t, MethodInfo methodInfo, Type commandType, Type[] serviceParameters, Type returnType)
         {
-            Type funcMutateCommandHandlerTT =
+            var funcMutateCommandHandlerTT =
                 (returnType.IsAssignableTo(typeof(IResult)), returnType == typeof(Unit)) switch
                 {
                     (true, _) => typeof(FuncResultMutateCommandHandler<,,>).MakeGenericType(t, commandType, returnType),
-                    (_, true) => typeof(FuncMutateCommandHandler<,>).MakeGenericType(t, commandType),
+                    (_, true) => typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, typeof(object)),
                     _ => typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, returnType)
                 };
 
@@ -252,7 +208,8 @@ public static partial class ApiRegistrationsExtensions
                     Expression.New( // new
                         funcMutateCommandHandlerTT.GetConstructors()[0], // FuncMutateCommandHandler<TEntity,TCommand,TReturntype>
                     Expression.Lambda( // (entity, cmd, svcProvider) =>
-                        Expression.Call(parameter_Entity, methodInfo, new Expression[]{ parameter_Cmd }.Union( parameters).ToArray()), // entity.`MethodInfo`(cmd, svc.GetRequiredService<T>() ... ) , i.e. entity.HandleTheCommand(cmd,svc)
+                        // entity.`MethodInfo`(cmd, svc.GetRequiredService<T>() ... ) , i.e. entity.HandleTheCommand(cmd,svc)
+                        Expression.Call(parameter_Entity, methodInfo, new Expression[]{ parameter_Cmd }.Union( parameters).ToArray()),
                         parameter_Entity, parameter_Cmd, parameter_Svc),
                     parameter_Svc
                 ),
@@ -287,7 +244,7 @@ public static partial class ApiRegistrationsExtensions
         static Func<IServiceProvider, object> CreateFuncMutateOnlyServiceProviderFactory(Type t, MethodInfo methodInfo, Type commandType, Type returnType)
         {
             var funcMutateCommandHandlerTT = returnType == typeof(Unit)
-                ? typeof(FuncMutateCommandHandler<,>).MakeGenericType(t, commandType)
+                ? typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, typeof(object))
                 : typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, returnType);
             var parameter_Entity = Expression.Parameter(t, "entity");
             var parameter_Cmd = Expression.Parameter(commandType, "cmd");
