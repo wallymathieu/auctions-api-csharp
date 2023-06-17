@@ -10,4 +10,5 @@ public record CreateAuctionModel(
     [Required] DateTimeOffset EndsAt,
     long? MinRaise,
     long? ReservePrice,
-    TimeSpan? TimeFrame);
+    TimeSpan? TimeFrame,
+    SingleSealedBidOptions? SingleSealedBidOptions);

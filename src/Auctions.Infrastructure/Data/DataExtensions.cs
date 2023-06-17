@@ -21,7 +21,7 @@ public static class DataExtensions
             .AddScoped<IAuctionRepository>(c=>new CachedAuctionRepository(
             c.GetRequiredService<IDistributedCache>(),
             c.GetRequiredService<AuctionDbContext>()))
-            .AddScoped<IRepository<TimedAscendingAuction>>(c=>c.GetRequiredService<IAuctionRepository>());
+            .AddScoped<IRepository<Auction>>(c=>c.GetRequiredService<IAuctionRepository>());
     }
 
     public static IServiceCollection AddAuctionRepositoryNoCache(this IServiceCollection services)
@@ -29,7 +29,7 @@ public static class DataExtensions
         return AddAuctionRepositoryImplementation(services)
             .AddScoped<IAuctionRepository>(c=>
                 c.GetRequiredService<AuctionRepository>())
-            .AddScoped<IRepository<TimedAscendingAuction>>(c=>c.GetRequiredService<IAuctionRepository>());
+            .AddScoped<IRepository<Auction>>(c=>c.GetRequiredService<IAuctionRepository>());
     }
 
     public static IServiceCollection AddAuctionDbContextSqlServer(this IServiceCollection services, string? connection)

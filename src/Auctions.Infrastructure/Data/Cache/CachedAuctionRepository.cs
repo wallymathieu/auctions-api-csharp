@@ -17,13 +17,13 @@ public class CachedAuctionRepository:AuctionRepository
         _cache = cache;
     }
 
-    public override async Task<IReadOnlyCollection<TimedAscendingAuction>> GetAuctionsAsync()
+    public override async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync()
     {
         var auctionsJson = await _cache.GetStringAsync(CacheKeys.Auctions);
         if (auctionsJson != null)
         {
             // We have cached data, deserialize the JSON data.
-            return JsonSerializer.Deserialize<List<TimedAscendingAuction>>(auctionsJson);
+            return JsonSerializer.Deserialize<List<Auction>>(auctionsJson);
         }
         else
         {

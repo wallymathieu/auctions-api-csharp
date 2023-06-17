@@ -5,7 +5,7 @@ using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 namespace Wallymathieu.Auctions.Functions;
-using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>;
+using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, Auction>;
 public class OnAuctionCommandHandler
 {
     private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;

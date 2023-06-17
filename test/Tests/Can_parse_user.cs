@@ -32,26 +32,26 @@ public class Auction_bid
     [Fact]
     public void valid_bid()
     {
-        var auction = GetAuction();
+        var auction = GetEnglishAuction();
         Assert.Equal(Errors.None, ValidBid(auction).Validate(auction));
     }
     
     [Fact]
     public void seller_bidding_on_auction()
     {
-        var auction = GetAuction();
+        var auction = GetEnglishAuction();
         Assert.Equal(Errors.SellerCannotPlaceBids, BidWithSameUser(auction).Validate(auction));
     }
     [Fact]
     public void bid_after_auction_has_ended()
     {
-        var auction = GetAuction();
+        var auction = GetEnglishAuction();
         Assert.Equal(Errors.AuctionHasEnded, BidAfterAuctionEnded(auction).Validate(auction));
     }
     [Fact]
     public void bid_before_auction_has_started()
     {
-        var auction = GetAuction();
+        var auction = GetEnglishAuction();
         Assert.Equal(Errors.AuctionHasNotStarted, BidBeforeAuctionStarted(auction).Validate(auction));
     }
 }

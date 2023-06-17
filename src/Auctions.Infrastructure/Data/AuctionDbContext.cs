@@ -11,7 +11,11 @@ public class AuctionDbContext: DbContext, IAuctionDbContext
     public AuctionDbContext()
     {
     }
-    public DbSet<TimedAscendingAuction> Auctions { get; set; }
+
+    public AuctionDbContext(DbContextOptions<AuctionDbContext> options):base(options)
+    {
+    }
+    public DbSet<Auction> Auctions { get; set; }
     private PropertyBuilder<T> WithAuctionIdConversion<T>(PropertyBuilder<T> self) =>
         self.HasConversion(new ValueConverter<AuctionId, long>(v => v.Id, v => new AuctionId(v)));
     private PropertyBuilder<T> WithUserId<T>(PropertyBuilder<T> self) =>
@@ -19,39 +23,46 @@ public class AuctionDbContext: DbContext, IAuctionDbContext
     private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
 
-    async Task<IReadOnlyCollection<TimedAscendingAuction>> IAuctionDbContext.GetAuctionsAsync()
+    async Task<IReadOnlyCollection<Auction>> IAuctionDbContext.GetAuctionsAsync()
     {
         return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync();
     }
 
-    public async Task<TimedAscendingAuction?> GetAuction(long auctionId)
+    public async Task<Auction?> GetAuction(long auctionId)
     {
         var auction = await Auctions.FindAsync(auctionId);
         if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync();
         return auction;
     }
 
-    async ValueTask IAuctionDbContext.AddAuctionAsync(TimedAscendingAuction auction) => await Auctions.AddAsync(auction);
+    async ValueTask IAuctionDbContext.AddAuctionAsync(Auction auction) => await Auctions.AddAsync(auction);
 
     async Task IAuctionDbContext.SaveChangesAsync() => await SaveChangesAsync();
 
-    public AuctionDbContext(DbContextOptions options):base(options)
-    {
-    }
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Auction>(entity =>
+            {
+                entity.HasDiscriminator(b => b.AuctionType).IsComplete(false);
+                entity.ToTable("Auctions");
+                entity.HasKey(e => e.AuctionId);
+                entity.Property(e => e.Title).HasMaxLength(200);
+                entity.Property(o => o.AuctionId).UseIdentityColumn();
+                WithUserId(entity.Property(o => o.User));
+                HasCurrencyCodeConversion(entity.Property(e => e.Currency));
+                entity.HasMany(e => e.Bids).WithOne()
+                    .HasPrincipalKey(a=>a.AuctionId)
+                    .HasForeignKey("AuctionId");
+            });
         builder.Entity<TimedAscendingAuction>(entity =>
         {
-            entity.ToTable("Auctions");
-            entity.HasKey(e => e.AuctionId);
-            entity.Property(e => e.Title).HasMaxLength(200);
-            entity.Property(o => o.AuctionId).UseIdentityColumn();
-            WithUserId(entity.Property(o => o.User));
+            entity.HasDiscriminator(b => b.AuctionType).HasValue(AuctionType.TimedAscendingAuction);
             entity.OwnsOne<TimedAscendingOptions>(e=>e.Options);
-            HasCurrencyCodeConversion(entity.Property(e => e.Currency));
-            entity.HasMany(e => e.Bids).WithOne()
-                .HasPrincipalKey(a=>a.AuctionId)
-                .HasForeignKey("AuctionId");
+        });
+        builder.Entity<SingleSealedBidAuction>(entity =>
+        {
+            entity.HasDiscriminator(b => b.AuctionType).HasValue(AuctionType.SingleSealedBidAuction);
+            entity.Property(e=>e.Options);
         });
 
         builder.Entity<BidEntity>(entity =>

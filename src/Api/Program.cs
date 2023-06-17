@@ -64,7 +64,6 @@ if (azureStorageConnectionString != null)
     });
 }
 builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
-builder.Services.RegisterAttributesForType<TimedAscendingAuction>();
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
 if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))

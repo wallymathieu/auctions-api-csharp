@@ -2,8 +2,8 @@ using Wallymathieu.Auctions.Domain;
 
 namespace Wallymathieu.Auctions.Data;
 
-public interface IAuctionRepository: IRepository<TimedAscendingAuction>
+public interface IAuctionRepository: IRepository<Auction>
 {
-    Task<TimedAscendingAuction?> GetAuctionAsync(long auctionId);
-    Task<IReadOnlyCollection<TimedAscendingAuction>> GetAuctionsAsync();
+    Task<Auction?> GetAuctionAsync(long auctionId);
+    Task<IReadOnlyCollection<Auction>> GetAuctionsAsync();
 }

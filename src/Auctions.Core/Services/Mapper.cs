@@ -12,7 +12,7 @@ public class Mapper
         _time = time;
     }
 
-    public AuctionModel MapAuctionToModel(TimedAscendingAuction arg) =>
+    public AuctionModel MapAuctionToModel(Auction arg) =>
         new(arg.Id.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency,
             arg.GetBids(_time.Now)?.Select(MapBidToModel).ToArray()??Array.Empty<BidModel>());
 

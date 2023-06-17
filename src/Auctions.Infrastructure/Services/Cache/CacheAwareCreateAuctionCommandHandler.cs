@@ -3,8 +3,8 @@ using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
-using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>;
-internal class CacheAwareCreateAuctionCommandHandler: ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>
+using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, Auction>;
+internal class CacheAwareCreateAuctionCommandHandler: ICommandHandler<CreateAuctionCommand, Auction>
 {
     private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
     private readonly IDistributedCache _cache;
@@ -14,7 +14,7 @@ internal class CacheAwareCreateAuctionCommandHandler: ICommandHandler<CreateAuct
         _cache = cache;
     }
 
-    public async Task<TimedAscendingAuction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken)
+    public async Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken)
     {
         var res = await _createAuctionCommandHandler.Handle(model, cancellationToken);
         await _cache.RemoveAsync(CacheKeys.Auctions, cancellationToken);

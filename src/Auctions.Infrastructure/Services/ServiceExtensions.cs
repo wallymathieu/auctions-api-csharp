@@ -14,7 +14,7 @@ public static class ServiceExtensions
     {
         services.TryAddSingleton<ITime, Time>();
         services.TryAddSingleton<Mapper>();
-        services.RegisterAttributesForType<TimedAscendingAuction>();
+        services.RegisterAttributesForType<Auction>();
         services.AddSingleton(typeof(IKeyValueFactory<>), typeof(KeyValueFactory<>));
         return services;
     }
@@ -24,9 +24,9 @@ public static class ServiceExtensions
 
     public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
         AddAuctionServicesImplementation(services)
-            .AddScoped<ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>>(c=>
+            .AddScoped<ICommandHandler<CreateAuctionCommand, Auction>>(c=>
                 new CacheAwareCreateAuctionCommandHandler(
-                    c.GetRequiredService<ICommandHandler<CreateAuctionCommand, TimedAscendingAuction>>(),
+                    c.GetRequiredService<ICommandHandler<CreateAuctionCommand, Auction>>(),
                     c.GetRequiredService<IDistributedCache>()))
             .AddScoped<ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>>(c=>
                 new CacheAwareCreateBidCommandHandler(

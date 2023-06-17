@@ -1,12 +1,12 @@
-using Wallymathieu.Auctions.Commands;
-using Wallymathieu.Auctions.Services;
-
 namespace Wallymathieu.Auctions.Domain;
 
-public class TimedAscendingAuction : Auction, IState, IEntity
+public class TimedAscendingAuction : Auction, IState
 {
+    public TimedAscendingAuction()
+    {
+        AuctionType = AuctionType.TimedAscendingAuction;
+    }
     public TimedAscendingOptions Options { get; init; } = new();
-    public ICollection<BidEntity> Bids { get; init; } = new List<BidEntity>();
 
     private State GetState(DateTimeOffset time)
     {
@@ -25,7 +25,7 @@ public class TimedAscendingAuction : Auction, IState, IEntity
         HasEnded,
     }
 
-    public bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
+    public override bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
     {
         switch (GetState(time))
         {
@@ -71,7 +71,7 @@ public class TimedAscendingAuction : Auction, IState, IEntity
 
     public DateTimeOffset? EndsAt { get; set; }
 
-    public IEnumerable<Bid> GetBids(DateTimeOffset time)
+    public override IEnumerable<Bid> GetBids(DateTimeOffset time)
     {
         switch (GetState(time))
         {
@@ -107,32 +107,5 @@ public class TimedAscendingAuction : Auction, IState, IEntity
             _ => false
         };
     }
-    [CommandHandler]
-    public static TimedAscendingAuction Create(CreateAuctionCommand cmd)
-    {
-        var model = cmd.Model;
-        var auction = new TimedAscendingAuction
-        {
-            Currency = model.Currency,
-            Expiry = model.EndsAt,
-            StartsAt = model.StartsAt,
-            Title = model.Title,
-            User = cmd.UserId,
-            Options =
-            {
-                MinRaise = model.MinRaise ?? 0,
-                ReservePrice = model.ReservePrice ?? 0,
-                TimeFrame = model.TimeFrame ?? TimeSpan.Zero,
-            }
-        };
-        return auction;
-    }
-    [CommandHandler]
-    public IResult<Bid,Errors> Handle(CreateBidCommand model, ITime time)
-    {
-        var bid = new Bid(model.UserId, model.Model.Amount, time.Now);
-        return TryAddBid(time.Now, bid, out var error)
-            ? new Ok<Bid, Errors>(bid)
-            : new Error<Bid, Errors>(error);
-    }
+
 }
