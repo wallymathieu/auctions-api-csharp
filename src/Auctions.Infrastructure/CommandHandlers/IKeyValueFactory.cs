@@ -1,6 +1,6 @@
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
-public interface IKeyValueFactory<T>
+public interface IKeyValueFactory<in TEntity>
 {
-    object? Key(T obj);
+    object? Key(TEntity obj);
 }
