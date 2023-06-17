@@ -7,7 +7,8 @@ using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 using Wallymathieu.Auctions.Infrastructure.Services.Cache;
 using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
-
+using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, Auction>;
+using ICreateBidCommandHandler= ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>;
 public static class ServiceExtensions
 {
     private static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
@@ -24,12 +25,12 @@ public static class ServiceExtensions
 
     public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
         AddAuctionServicesImplementation(services)
-            .AddScoped<ICommandHandler<CreateAuctionCommand, Auction>>(c=>
+            .AddScoped<ICreateAuctionCommandHandler>(c=>
                 new CacheAwareCreateAuctionCommandHandler(
-                    c.GetRequiredService<ICommandHandler<CreateAuctionCommand, Auction>>(),
+                    c.GetRequiredService<ICreateAuctionCommandHandler>(),
                     c.GetRequiredService<IDistributedCache>()))
-            .AddScoped<ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>>(c=>
+            .AddScoped<ICreateBidCommandHandler>(c=>
                 new CacheAwareCreateBidCommandHandler(
-                    c.GetRequiredService<ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>>(),
+                    c.GetRequiredService<ICreateBidCommandHandler>(),
                     c.GetRequiredService<IDistributedCache>()));
 }

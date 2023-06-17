@@ -2,7 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Data;
 
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
-
+/// <summary>
+/// An infrastructure command handler intended to be used together with a result type.
+/// Note that the TryX( Raw raw, out T result ) is not possible to use due to <see cref="System.Linq.Expressions.Expression"/>
+/// instead we we use a result type as seen in F#, Rust et.c.
+/// </summary>
 class FuncResultMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
     where TCommand : ICommand<TResponse> where TEntity : IEntity
     where TResponse : IResult

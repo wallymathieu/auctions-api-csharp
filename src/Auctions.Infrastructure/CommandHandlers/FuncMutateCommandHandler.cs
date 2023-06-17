@@ -2,7 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Data;
 
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
-
+/// <summary>
+/// An infrastructure command handler. Used in order to be able to implement mutation command handlers.
+/// Intention is to have a class that accepts a compiled lambda.
+/// </summary>
 class FuncMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
     where TCommand : ICommand<TResponse> where TEntity : IEntity
 {

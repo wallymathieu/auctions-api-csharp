@@ -4,7 +4,7 @@ using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
 using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, Auction>;
-internal class CacheAwareCreateAuctionCommandHandler: ICommandHandler<CreateAuctionCommand, Auction>
+internal class CacheAwareCreateAuctionCommandHandler: ICreateAuctionCommandHandler
 {
     private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
     private readonly IDistributedCache _cache;
