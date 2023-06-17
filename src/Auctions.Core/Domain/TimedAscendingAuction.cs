@@ -1,6 +1,9 @@
+using Wallymathieu.Auctions.Commands;
+using Wallymathieu.Auctions.Services;
+
 namespace Wallymathieu.Auctions.Domain;
 
-public class TimedAscendingAuction : Auction, IState
+public class TimedAscendingAuction : Auction, IState, IEntity
 {
     public TimedAscendingOptions Options { get; init; } = new();
     public ICollection<BidEntity> Bids { get; init; } = new List<BidEntity>();
@@ -29,7 +32,7 @@ public class TimedAscendingAuction : Auction, IState
             case State.OnGoing:
             {
                 errors = bid.Validate(this);
-                
+
                 if (Bids.Any())
                 {
                     var maxBid = Bids.Max(b => b.Amount)!;
@@ -46,7 +49,7 @@ public class TimedAscendingAuction : Auction, IState
                 }
 
                 if (errors != Errors.None) return false;
-                
+
                 EndsAt = new[] { EndsAt, Expiry, time + Options.TimeFrame }.Where(v=>v!=null).Max();
                 Bids.Add(new BidEntity(0,bid.User,bid.Amount,bid.At));
                 return true;
@@ -103,5 +106,33 @@ public class TimedAscendingAuction : Auction, IState
             State.HasEnded => true,
             _ => false
         };
+    }
+    [CommandHandler]
+    public static TimedAscendingAuction Create(CreateAuctionCommand cmd)
+    {
+        var model = cmd.Model;
+        var auction = new TimedAscendingAuction
+        {
+            Currency = model.Currency,
+            Expiry = model.EndsAt,
+            StartsAt = model.StartsAt,
+            Title = model.Title,
+            User = cmd.UserId,
+            Options =
+            {
+                MinRaise = model.MinRaise ?? 0,
+                ReservePrice = model.ReservePrice ?? 0,
+                TimeFrame = model.TimeFrame ?? TimeSpan.Zero,
+            }
+        };
+        return auction;
+    }
+    [CommandHandler]
+    public IResult<Bid,Errors> Handle(CreateBidCommand model, ITime time)
+    {
+        var bid = new Bid(model.UserId, model.Model.Amount, time.Now);
+        return TryAddBid(time.Now, bid, out var error)
+            ? new Ok<Bid, Errors>(bid)
+            : new Error<Bid, Errors>(error);
     }
 }

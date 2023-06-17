@@ -11,6 +11,7 @@ using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Infrastructure.Services;
+using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -62,9 +63,9 @@ if (azureStorageConnectionString != null)
         azureClientsBuilder.UseCredential(new DefaultAzureCredential());
     });
 }
-builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>(); 
-
-//#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure 
+builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
+builder.Services.RegisterAttributesForType<TimedAscendingAuction>();
+//#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
 if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
 {

@@ -6,7 +6,7 @@ public class Auction
     protected Auction()
 #pragma warning restore CS8618
     {
-        
+
     }
 
     public AuctionId Id => new(AuctionId);
@@ -21,4 +21,5 @@ public class Auction
 
     public UserId User { get; init; }
     public CurrencyCode Currency { get; init; }
+
 }

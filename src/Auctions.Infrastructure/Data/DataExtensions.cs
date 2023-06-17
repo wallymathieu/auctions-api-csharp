@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Data.Cache;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
@@ -19,14 +20,16 @@ public static class DataExtensions
         return AddAuctionRepositoryImplementation(services)
             .AddScoped<IAuctionRepository>(c=>new CachedAuctionRepository(
             c.GetRequiredService<IDistributedCache>(),
-            c.GetRequiredService<AuctionRepository>()));
+            c.GetRequiredService<AuctionDbContext>()))
+            .AddScoped<IRepository<TimedAscendingAuction>>(c=>c.GetRequiredService<IAuctionRepository>());
     }
 
     public static IServiceCollection AddAuctionRepositoryNoCache(this IServiceCollection services)
     {
         return AddAuctionRepositoryImplementation(services)
             .AddScoped<IAuctionRepository>(c=>
-                c.GetRequiredService<AuctionRepository>());
+                c.GetRequiredService<AuctionRepository>())
+            .AddScoped<IRepository<TimedAscendingAuction>>(c=>c.GetRequiredService<IAuctionRepository>());
     }
 
     public static IServiceCollection AddAuctionDbContextSqlServer(this IServiceCollection services, string? connection)

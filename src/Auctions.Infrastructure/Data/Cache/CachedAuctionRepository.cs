@@ -9,19 +9,15 @@ namespace Wallymathieu.Auctions.Infrastructure.Data.Cache;
 /// <summary>
 /// https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside
 /// </summary>
-public class CachedAuctionRepository:IAuctionRepository
+public class CachedAuctionRepository:AuctionRepository
 {
     private readonly IDistributedCache _cache;
-    private readonly AuctionRepository _auctionRepository;
-    public CachedAuctionRepository(IDistributedCache cache, AuctionRepository auctionRepository)
+    public CachedAuctionRepository(IDistributedCache cache, IAuctionDbContext dbContext): base(dbContext)
     {
         _cache = cache;
-        _auctionRepository = auctionRepository;
     }
 
-    public Task<TimedAscendingAuction?> GetAuctionAsync(long auctionId) => _auctionRepository.GetAuctionAsync(auctionId);
-
-    public async Task<IReadOnlyCollection<TimedAscendingAuction>> GetAuctionsAsync()
+    public override async Task<IReadOnlyCollection<TimedAscendingAuction>> GetAuctionsAsync()
     {
         var auctionsJson = await _cache.GetStringAsync(CacheKeys.Auctions);
         if (auctionsJson != null)
@@ -32,7 +28,7 @@ public class CachedAuctionRepository:IAuctionRepository
         else
         {
             // There's nothing in the cache, retrieve data from the repository and cache it for one hour.
-            var auctions = await _auctionRepository.GetAuctionsAsync();
+            var auctions = await base.GetAuctionsAsync();
             auctionsJson = JsonSerializer.Serialize(auctions);
             var cacheOptions = new DistributedCacheEntryOptions
             {

@@ -31,7 +31,7 @@ public class AuctionDbContext: DbContext, IAuctionDbContext
         return auction;
     }
 
-    void IAuctionDbContext.AddAuction(TimedAscendingAuction auction) => Auctions.Add(auction);
+    async ValueTask IAuctionDbContext.AddAuctionAsync(TimedAscendingAuction auction) => await Auctions.AddAsync(auction);
 
     async Task IAuctionDbContext.SaveChangesAsync() => await SaveChangesAsync();
 

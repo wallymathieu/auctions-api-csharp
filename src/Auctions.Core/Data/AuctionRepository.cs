@@ -6,22 +6,25 @@ public class AuctionRepository : IAuctionRepository
 {
     private readonly IAuctionDbContext _dbContext;
 
-    public AuctionRepository(IAuctionDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public AuctionRepository(IAuctionDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<TimedAscendingAuction?> GetAuctionAsync(long auctionId) =>
+    public virtual async Task<TimedAscendingAuction?> GetAuctionAsync(long auctionId) =>
         await _dbContext.GetAuction(auctionId);
 
-    public async Task<IReadOnlyCollection<TimedAscendingAuction>> GetAuctionsAsync() =>
+    public virtual async Task<IReadOnlyCollection<TimedAscendingAuction>> GetAuctionsAsync() =>
         await _dbContext.GetAuctionsAsync();
+
+    public ValueTask AddAsync(TimedAscendingAuction entity, CancellationToken cancellationToken) =>
+        _dbContext.AddAuctionAsync(entity);
+
+    public async Task<TimedAscendingAuction?> FindAsync(object identifier, CancellationToken cancellationToken) =>
+        await GetAuctionAsync((long)identifier);
 }
 
 public interface IAuctionDbContext
 {
     Task<IReadOnlyCollection<TimedAscendingAuction>> GetAuctionsAsync();
     Task<TimedAscendingAuction?> GetAuction(long auctionId);
-    void AddAuction(TimedAscendingAuction auction);
+    ValueTask AddAuctionAsync(TimedAscendingAuction auction);
     Task SaveChangesAsync();
 }
