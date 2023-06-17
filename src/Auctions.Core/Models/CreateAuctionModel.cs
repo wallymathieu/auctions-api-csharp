@@ -3,13 +3,11 @@ using Wallymathieu.Auctions.Domain;
 
 namespace Wallymathieu.Auctions.Models;
 
-public class CreateAuctionModel
-{
-    [Required] public CurrencyCode Currency { get; set; }
-    [Required] public DateTimeOffset StartsAt { get; set; }
-    [Required] public DateTimeOffset EndsAt { get; set; }
-    [Required] public string Title { get; set; }
-    public long? MinRaise { get; set; }
-    public long? ReservePrice { get; set; }
-    public TimeSpan? TimeFrame { get; set; }
-}
+public record CreateAuctionModel(
+    [Required] string Title,
+    [Required] CurrencyCode Currency,
+    [Required] DateTimeOffset StartsAt,
+    [Required] DateTimeOffset EndsAt,
+    long? MinRaise,
+    long? ReservePrice,
+    TimeSpan? TimeFrame);

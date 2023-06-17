@@ -5,6 +5,12 @@ namespace Wallymathieu.Auctions.Commands;
 
 public class CreateAuctionCommand: ICommand<TimedAscendingAuction>
 {
-    public UserId UserId { get; set; }
-    public CreateAuctionModel Model { get; set; }
+    public CreateAuctionCommand(UserId userId, CreateAuctionModel model)
+    {
+        UserId = userId;
+        Model = model;
+    }
+
+    public UserId UserId { get; }
+    public CreateAuctionModel Model { get; }
 }

@@ -13,7 +13,7 @@ public class CreateBidCommand: ICommand<IResult<Bid,Errors>>
         Model = model;
     }
     [Key]
-    public long AuctionId { get; set; }
-    public UserId UserId { get; set; }
-    public CreateBidModel Model { get; set; }
+    public long AuctionId { get; }
+    public UserId UserId { get; }
+    public CreateBidModel Model { get; }
 }

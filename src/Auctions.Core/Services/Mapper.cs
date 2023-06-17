@@ -13,15 +13,11 @@ public class Mapper
     }
 
     public AuctionModel MapAuctionToModel(TimedAscendingAuction arg) =>
-        new(arg.Id.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency, 
+        new(arg.Id.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency,
             arg.GetBids(_time.Now)?.Select(MapBidToModel).ToArray()??Array.Empty<BidModel>());
 
     public  BidModel MapBidToModel(Bid arg)
     {
-        return new BidModel
-        {
-            Amount = arg.Amount,
-            Bidder = arg.User.ToString()
-        };
+        return new BidModel(arg.Amount, arg.User.ToString());
     }
 }

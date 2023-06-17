@@ -54,15 +54,15 @@ public class AuctionsController : ControllerBase
         }
 
         var userId = new UserId(User.Identity.Name);
-        var cmd = new CreateAuctionCommand{ UserId = userId, Model = model };
+        var command = new CreateAuctionCommand(userId, model);
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, cmd, token);
+            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, command, token);
             return Accepted();
         }
         else
         {
-            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(cmd,token));
+            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(command,token));
             return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
         }
     }
@@ -76,7 +76,7 @@ public class AuctionsController : ControllerBase
             return Unauthorized();
         }
 
-        var userId = new UserId(this.User.Identity.Name);
+        var userId = new UserId(User.Identity.Name);
         var cmd = new CreateBidCommand(auctionId, userId, model);
         if (_messageQueue.Enabled)
         {

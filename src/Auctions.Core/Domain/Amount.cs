@@ -90,7 +90,7 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
     {
         if (TryParse(s, out var amount))
         {
-            return amount;
+            return amount!;
         }
 
         throw new ArgumentException();
