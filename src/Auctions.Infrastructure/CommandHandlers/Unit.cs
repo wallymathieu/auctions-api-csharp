@@ -1,6 +1,5 @@
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
-public record Unit
+public class Unit
 {
-    public static readonly Unit Value = new();
 }

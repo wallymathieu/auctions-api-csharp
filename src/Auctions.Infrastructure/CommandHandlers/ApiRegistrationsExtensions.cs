@@ -7,11 +7,10 @@ namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
 public static partial class ApiRegistrationsExtensions
 {
-    public static IServiceCollection RegisterAttributesForType<T>(this IServiceCollection services) where T :IEntity
-    {
-        return RegisterAttributesForType(services, typeof(T));
-    }
-    public static IServiceCollection RegisterAttributesForType(this IServiceCollection services, Type t)
+    public static IServiceCollection RegisterAttributesForType<T>(this IServiceCollection services) where T :IEntity =>
+        RegisterAttributesForType(services, typeof(T));
+
+    private static IServiceCollection RegisterAttributesForType(this IServiceCollection services, Type t)
     {
         foreach (var method in
                  from m in t.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public| BindingFlags.NonPublic)
@@ -68,7 +67,7 @@ public static partial class ApiRegistrationsExtensions
             return false;
         }
 
-        /* This method turns the methodinfo into the following lambda method that returns an instance of FuncCreateCommandHandler
+        /* This method turns the methodInfo into the following lambda method that returns an instance of FuncCreateCommandHandler
                 new FuncCreateCommandHandler<TEntity,TCommand>((entity, cmd, svcProvider) =>
                     `EntityType`.`MethodInfo`(cmd, svcProvider), outerSvcProvider)
         */
@@ -109,7 +108,7 @@ public static partial class ApiRegistrationsExtensions
                     return false;
             }
         }
-        /* This method turns the methodinfo into the following lambda method that returns an instance of FuncCreateCommandHandler
+        /* This method turns the methodInfo into the following lambda method that returns an instance of FuncCreateCommandHandler
                 new FuncCreateCommandHandler<TEntity,TCommand>((entity, cmd, svcProvider) =>
                     `EntityType`.`MethodInfo`(cmd, svcProvider.GetRequiredService<TService>() ..), outerSvcProvider)
         */
@@ -176,11 +175,11 @@ public static partial class ApiRegistrationsExtensions
                     return false;
             }
         }
-        /* This method turns the methodinfo into the following lambda method that returns an instance of FuncMutateCommandHandler
-                new FuncMutateCommandHandler<TEntity,TCommand, TReturntype>((entity, cmd, svcProvider) => entity.`MethodInfo`(cmd,
+        /* This method turns the methodInfo into the following lambda method that returns an instance of FuncMutateCommandHandler
+                new FuncMutateCommandHandler<TEntity,TCommand, TReturnType>((entity, cmd, svcProvider) => entity.`MethodInfo`(cmd,
                     svcProvider.GetRequiredService<IService1>(),
                     svcProvider.GetRequiredService<IService2>()
-                    ), outersvcProvider)
+                    ), outerSvcProvider)
         */
         static Func<IServiceProvider, object> CreateFuncMutateServicesFactory(Type t, MethodInfo methodInfo, Type commandType, Type[] serviceParameters, Type returnType)
         {
@@ -206,7 +205,7 @@ public static partial class ApiRegistrationsExtensions
             // (entity, cmd, svcProvider) => entity.`MethodInfo`(cmd, svcProvider)
             Func<IServiceProvider, object> lambda = Expression.Lambda<Func<IServiceProvider, object>>(
                     Expression.New( // new
-                        funcMutateCommandHandlerTT.GetConstructors()[0], // FuncMutateCommandHandler<TEntity,TCommand,TReturntype>
+                        funcMutateCommandHandlerTT.GetConstructors()[0], // FuncMutateCommandHandler<TEntity,TCommand,TReturnType>
                     Expression.Lambda( // (entity, cmd, svcProvider) =>
                         // entity.`MethodInfo`(cmd, svc.GetRequiredService<T>() ... ) , i.e. entity.HandleTheCommand(cmd,svc)
                         Expression.Call(parameter_Entity, methodInfo, new Expression[]{ parameter_Cmd }.Union( parameters).ToArray()),
@@ -237,8 +236,8 @@ public static partial class ApiRegistrationsExtensions
             }
         }
 
-        /* This method turns the methodinfo into the following lambda method that returns an instance of FuncMutateCommandHandler
-                new FuncMutateCommandHandler<TEntity,TCommand,TReturntype>((entity, cmd, svcProvider) =>
+        /* This method turns the methodInfo into the following lambda method that returns an instance of FuncMutateCommandHandler
+                new FuncMutateCommandHandler<TEntity,TCommand,TReturnType>((entity, cmd, svcProvider) =>
                     entity.`MethodInfo`(cmd, svcProvider), outerSvdProvider)
         */
         static Func<IServiceProvider, object> CreateFuncMutateOnlyServiceProviderFactory(Type t, MethodInfo methodInfo, Type commandType, Type returnType)
@@ -252,9 +251,10 @@ public static partial class ApiRegistrationsExtensions
             // (entity, cmd, svcProvider) => entity.`MethodInfo`(cmd, svcProvider)
             Func<IServiceProvider, object> lambda = Expression.Lambda<Func<IServiceProvider, object>>(
                     Expression.New( // new
-                        funcMutateCommandHandlerTT.GetConstructors()[0], // FuncMutateCommandHandler<TEntity,TCommand,TReturntype>
+                        funcMutateCommandHandlerTT.GetConstructors()[0], // FuncMutateCommandHandler<TEntity,TCommand,TReturnType>
                     Expression.Lambda( // (entity, cmd, svcProvider) =>
-                        Expression.Call(parameter_Entity, methodInfo, parameter_Cmd, parameter_Svc), // entity.`MethodInfo`(cmd, svcProvider) , i.e. entity.HandleTheCommand(cmd,svcProvider)
+                        // entity.`MethodInfo`(cmd, svcProvider) , i.e. entity.HandleTheCommand(cmd,svcProvider)
+                        Expression.Call(parameter_Entity, methodInfo, parameter_Cmd, parameter_Svc),
                         parameter_Entity, parameter_Cmd, parameter_Svc),
                     parameter_Svc
                 ),
