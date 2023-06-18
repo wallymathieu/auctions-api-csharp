@@ -19,5 +19,5 @@ public class Mapper
             arg.GetBids(_time.Now)?.Select(MapBidToModel).ToArray()??Array.Empty<BidModel>());
 
     public BidModel MapBidToModel(Bid arg) =>
-        new(arg.Amount, arg.User.ToString(), arg.At);
+        new(arg.Amount, arg.User.ToString());
 }
