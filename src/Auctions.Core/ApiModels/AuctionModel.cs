@@ -1,6 +1,6 @@
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 
-namespace Wallymathieu.Auctions.Models;
+namespace Wallymathieu.Auctions.ApiModels;
 
 public record AuctionModel(
     long Id,

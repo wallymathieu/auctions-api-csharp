@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
-using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data.Cache;
@@ -11,7 +11,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Data.Cache;
 public class CachedAuctionRepository:AuctionRepository
 {
     private readonly IDistributedCache _cache;
-    public CachedAuctionRepository(IDistributedCache cache, IAuctionDbContext dbContext): base(dbContext)
+    public CachedAuctionRepository(IDistributedCache cache, AuctionDbContext dbContext): base(dbContext)
     {
         _cache = cache;
     }

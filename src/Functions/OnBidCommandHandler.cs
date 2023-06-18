@@ -1,6 +1,9 @@
 using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Wallymathieu.Auctions.ApiModels;
+using Wallymathieu.Auctions.Commands;
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 namespace Wallymathieu.Auctions.Functions;
 public class OnBidCommandHandler
@@ -19,12 +22,12 @@ public class OnBidCommandHandler
     [Function("OnBidCommand")]
     public async Task Run(
         [QueueTrigger(QueuesModule.BidCommandQueueName, Connection = "AzureWebJobsStorage")]
-        string commandString, CancellationToken token)
+        string commandString, CancellationToken cancellationToken)
     {
         var command = JsonSerializer.Deserialize<CreateBidCommand>(commandString, _serializerOptions);
         _logger.LogInformation($"bid received");
         if (command == null) throw new NullReferenceException(nameof(command));
-        var result = await _createBidCommandHandler.Handle(command, token);
+        var result = await _createBidCommandHandler.Handle(command, cancellationToken);
         switch (result)
         {
             case Ok<Bid,Errors> ok:

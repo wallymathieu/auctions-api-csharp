@@ -1,4 +1,4 @@
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Tests;
 

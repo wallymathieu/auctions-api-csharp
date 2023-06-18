@@ -4,8 +4,8 @@ using Newtonsoft.Json.Linq;
 using Wallymathieu.Auctions.Tests.Helpers;
 
 namespace Wallymathieu.Auctions.Tests;
-public class ApiSpecJwtToken:ApiSpec<JwtApiAuth>{} 
-public class ApiSpecMsClientPrincipal:ApiSpec<MsClientPrincipalApiAuth>{} 
+public class ApiSpecJwtToken:ApiSpec<JwtApiAuth>{}
+public class ApiSpecMsClientPrincipal:ApiSpec<MsClientPrincipalApiAuth>{}
 
 public abstract class ApiSpec<TAuth>
     where TAuth:IApiAuth, new()
@@ -19,7 +19,7 @@ public abstract class ApiSpec<TAuth>
 
     [Fact]
     public async Task Create_auction_1()
-    { 
+    {
         using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Create_auction_1)+".db");
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var stringContent = await response.Content.ReadAsStringAsync();
@@ -34,7 +34,7 @@ public abstract class ApiSpec<TAuth>
                 ""user"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
                 ""bids"": []
-        }").ToString(Formatting.Indented), 
+        }").ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
@@ -47,7 +47,7 @@ public abstract class ApiSpec<TAuth>
 }";
     [Fact]
     public async Task Create_auction_2()
-    { 
+    {
         using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Create_auction_2)+".db");
         var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
         var stringContent = await response.Content.ReadAsStringAsync();
@@ -62,7 +62,7 @@ public abstract class ApiSpec<TAuth>
                 ""user"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
                 ""bids"": []
-        }").ToString(Formatting.Indented), 
+        }").ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
@@ -93,7 +93,7 @@ public abstract class ApiSpec<TAuth>
     }
     [Fact]
     public async Task Place_bid_as_buyer_on_auction_1()
-    { 
+    {
         using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Place_bid_as_buyer_on_auction_1)+".db");
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
@@ -115,9 +115,10 @@ public abstract class ApiSpec<TAuth>
                 ""currency"": ""VAC"",
                 ""bids"": [{
                     ""amount"": ""VAC11"",
-                    ""bidder"": ""buyer1@hotmail.com""
-                }]}").ToString(Formatting.Indented), 
+                    ""bidder"": ""buyer1@hotmail.com"",
+                    ""at"": ""2022-08-03T22:00:00Z""
+                }]}").ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
-    } 
+    }
 }

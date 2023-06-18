@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Wallymathieu.Auctions.Domain;
+namespace Wallymathieu.Auctions.DomainModels;
 
 [Serializable]
 public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
@@ -19,7 +19,7 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
         {
             var currencyString = match.Groups["currency"].Value;
             var v = match.Groups["value"].Value;
-            if (global::Wallymathieu.Auctions.Domain.Currency.TryParse(currencyString, out var currency) && currency != null)
+            if (global::Wallymathieu.Auctions.DomainModels.Currency.TryParse(currencyString, out var currency) && currency != null)
             {
                 value = new Amount(long.Parse(v), currency);
                 return true;

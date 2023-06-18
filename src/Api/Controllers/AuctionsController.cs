@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Wallymathieu.Auctions.ApiModels;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Queues;
-using Wallymathieu.Auctions.Models;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers;
@@ -45,23 +45,21 @@ public class AuctionsController : ControllerBase
 
     [HttpPost(Name = "create_auction")]
     public async Task<ActionResult> Post(
-        CreateAuctionModel model, CancellationToken cancellationToken)
+        CreateAuctionCommand model, CancellationToken cancellationToken)
     {
-        if (User?.Identity?.Name==null)
+        if (User?.Identity?.Name==null) // TODO use Authorize
         {
             return Unauthorized();
         }
 
-        var userId = new UserId(User.Identity.Name);
-        var command = new CreateAuctionCommand(userId, model);
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, command, cancellationToken);
+            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, model, cancellationToken);
             return Accepted();
         }
         else
         {
-            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(command,cancellationToken));
+            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(model,cancellationToken));
             return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
         }
     }
@@ -70,13 +68,12 @@ public class AuctionsController : ControllerBase
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
-        if (User?.Identity?.Name == null)
+        if (User?.Identity?.Name == null) // TODO use Authorize
         {
             return Unauthorized();
         }
 
-        var userId = new UserId(User.Identity.Name);
-        var cmd = new CreateBidCommand(auctionId, userId, model);
+        var cmd =  new CreateBidCommand(model.Amount, auctionId);
         if (_messageQueue.Enabled)
         {
             await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName, cmd, cancellationToken);

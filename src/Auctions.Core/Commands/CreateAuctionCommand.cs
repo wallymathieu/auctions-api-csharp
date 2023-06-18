@@ -1,16 +1,14 @@
-using Wallymathieu.Auctions.Domain;
-using Wallymathieu.Auctions.Models;
+using System.ComponentModel.DataAnnotations;
+using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Commands;
 
-public class CreateAuctionCommand: ICommand<Auction>
-{
-    public CreateAuctionCommand(UserId userId, CreateAuctionModel model)
-    {
-        UserId = userId;
-        Model = model;
-    }
-
-    public UserId UserId { get; }
-    public CreateAuctionModel Model { get; }
-}
+public record CreateAuctionCommand(
+    [Required] string Title,
+    [Required] CurrencyCode Currency,
+    [Required] DateTimeOffset StartsAt,
+    [Required] DateTimeOffset EndsAt,
+    long? MinRaise,
+    long? ReservePrice,
+    TimeSpan? TimeFrame,
+    SingleSealedBidOptions? SingleSealedBidOptions): ICommand<Auction>;

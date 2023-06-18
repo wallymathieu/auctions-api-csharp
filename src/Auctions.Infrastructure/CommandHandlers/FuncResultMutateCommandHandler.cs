@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Data;
+using Wallymathieu.Auctions.Infrastructure.Data;
+
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 /// <summary>
 /// An infrastructure command handler intended to be used together with a result type.
@@ -13,7 +15,7 @@ class FuncResultMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHan
     private readonly Func<TEntity, TCommand, IServiceProvider, TResponse> _func;
     private readonly IServiceProvider _serviceProvider;
     private readonly IRepository<TEntity> _repository;
-    private readonly IAuctionDbContext _db;
+    private readonly AuctionDbContext _db;
 
     public FuncResultMutateCommandHandler(Func<TEntity, TCommand, IServiceProvider, TResponse> func,
         IServiceProvider serviceProvider)
@@ -21,7 +23,7 @@ class FuncResultMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHan
         _func = func;
         _serviceProvider = serviceProvider;
         _repository = _serviceProvider.GetRequiredService<IRepository<TEntity>>();
-        _db = serviceProvider.GetRequiredService<IAuctionDbContext>();
+        _db = serviceProvider.GetRequiredService<AuctionDbContext>();
     }
 
     public async Task<TResponse> Handle(TCommand cmd, CancellationToken cancellationToken)

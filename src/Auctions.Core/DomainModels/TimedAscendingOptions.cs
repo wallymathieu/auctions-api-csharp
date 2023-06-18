@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Domain;
+namespace Wallymathieu.Auctions.DomainModels;
 
 public class TimedAscendingOptions
 {

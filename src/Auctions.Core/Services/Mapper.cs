@@ -1,8 +1,10 @@
-using Wallymathieu.Auctions.Domain;
-using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.ApiModels;
+using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Services;
-
+/// <summary>
+/// Map to API models from domain models. We could use such a library as AutoMapper instead.
+/// </summary>
 public class Mapper
 {
     private readonly ITime _time;
@@ -16,8 +18,6 @@ public class Mapper
         new(arg.Id.Id, arg.StartsAt, arg.Title, arg.Expiry, arg.User.ToString(), arg.Currency,
             arg.GetBids(_time.Now)?.Select(MapBidToModel).ToArray()??Array.Empty<BidModel>());
 
-    public  BidModel MapBidToModel(Bid arg)
-    {
-        return new BidModel(arg.Amount, arg.User.ToString());
-    }
+    public BidModel MapBidToModel(Bid arg) =>
+        new(arg.Amount, arg.User.ToString(), arg.At);
 }

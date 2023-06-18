@@ -1,7 +1,8 @@
+using Wallymathieu.Auctions.ApiModels;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Services;
 
-namespace Wallymathieu.Auctions.Domain;
+namespace Wallymathieu.Auctions.DomainModels;
 
 public abstract class Auction : IEntity
 {
@@ -28,38 +29,37 @@ public abstract class Auction : IEntity
     public AuctionType AuctionType { get; set; }
 
     [CommandHandler]
-    public static Auction Create(CreateAuctionCommand cmd)
+    public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
-        var model = cmd.Model;
-        return model.SingleSealedBidOptions!=null
+        return cmd.SingleSealedBidOptions!=null
             ? new SingleSealedBidAuction
                 {
-                    Currency = model.Currency,
-                    Expiry = model.EndsAt,
-                    StartsAt = model.StartsAt,
-                    Title = model.Title,
-                    User = cmd.UserId,
-                    Options = model.SingleSealedBidOptions.Value
+                    Currency = cmd.Currency,
+                    Expiry = cmd.EndsAt,
+                    StartsAt = cmd.StartsAt,
+                    Title = cmd.Title,
+                    User = userContext.UserId,
+                    Options = cmd.SingleSealedBidOptions.Value
                 }
             : new TimedAscendingAuction
                 {
-                    Currency = model.Currency,
-                    Expiry = model.EndsAt,
-                    StartsAt = model.StartsAt,
-                    Title = model.Title,
-                    User = cmd.UserId,
+                    Currency = cmd.Currency,
+                    Expiry = cmd.EndsAt,
+                    StartsAt = cmd.StartsAt,
+                    Title = cmd.Title,
+                    User = userContext.UserId,
                     Options =
                     {
-                        MinRaise = model.MinRaise ?? 0,
-                        ReservePrice = model.ReservePrice ?? 0,
-                        TimeFrame = model.TimeFrame ?? TimeSpan.Zero,
+                        MinRaise = cmd.MinRaise ?? 0,
+                        ReservePrice = cmd.ReservePrice ?? 0,
+                        TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
                     }
                 };
     }
     [CommandHandler]
-    public IResult<Bid,Errors> Handle(CreateBidCommand model, ITime time)
+    public IResult<Bid,Errors> Handle(CreateBidCommand model, IUserContext userContext, ITime time)
     {
-        var bid = new Bid(model.UserId, model.Model.Amount, time.Now);
+        var bid = new Bid(userContext.UserId, model.Amount, time.Now);
         return TryAddBid(time.Now, bid, out var error)
             ? new Ok<Bid, Errors>(bid)
             : new Error<Bid, Errors>(error);

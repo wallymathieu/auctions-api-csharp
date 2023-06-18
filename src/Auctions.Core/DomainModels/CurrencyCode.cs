@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Domain;
+namespace Wallymathieu.Auctions.DomainModels;
 
 [Serializable]
 public enum CurrencyCode

@@ -1,7 +1,7 @@
-namespace Wallymathieu.Auctions;
+namespace Wallymathieu.Auctions.Data;
 
 /// <summary>
-/// Note that this repository class is needed by the infrastructure logic
+/// Note that this repository class is needed by the infrastructure logic.
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public interface IRepository<TEntity>
