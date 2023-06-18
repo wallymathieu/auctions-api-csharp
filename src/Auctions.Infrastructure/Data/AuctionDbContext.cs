@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 

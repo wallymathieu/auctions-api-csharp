@@ -5,3 +5,6 @@ global using ICreateBidCommandHandler= Wallymathieu.Auctions.Infrastructure.Comm
 global using ICreateAuctionCommandHandler= Wallymathieu.Auctions.Infrastructure.CommandHandlers.ICommandHandler<
     Wallymathieu.Auctions.Commands.CreateAuctionCommand,
     Wallymathieu.Auctions.DomainModels.Auction>;
+global using Wallymathieu.Auctions.Commands;
+global using Wallymathieu.Auctions.DomainModels;
+global using Wallymathieu.Auctions.Data;

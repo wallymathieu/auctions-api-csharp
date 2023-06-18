@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;

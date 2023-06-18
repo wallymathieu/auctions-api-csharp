@@ -3,7 +3,7 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.DomainModels;
 
-public abstract class Auction : IEntity
+public abstract class Auction: IEntity
 {
 #pragma warning disable CS8618
     protected Auction()

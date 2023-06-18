@@ -4,7 +4,6 @@ using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Queues;
-using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers;
 

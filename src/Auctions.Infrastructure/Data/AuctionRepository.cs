@@ -1,6 +1,3 @@
-using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.DomainModels;
-
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 /// <summary>
 /// Since <see cref="AuctionRepository"/> is implemented purely in terms of <see cref="AuctionDbContext"/> it can be seen

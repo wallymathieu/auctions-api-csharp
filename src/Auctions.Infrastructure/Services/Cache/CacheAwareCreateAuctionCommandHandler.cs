@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Caching.Distributed;
-using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
