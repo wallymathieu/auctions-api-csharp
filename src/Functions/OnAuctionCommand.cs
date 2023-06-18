@@ -25,4 +25,22 @@ public class OnAuctionCommandHandler
         var result = await _createAuctionCommandHandler.Handle(command, cancellationToken);
         _logger.LogInformation("Create auction command processed {AuctionId}", result.Id);
     }
+
+    [Function("OnAuctionCommandKafka")]
+    public async Task RunKafka(
+        [KafkaTrigger("BrokerList",
+            QueuesModule.AuctionCommandQueueName,
+            Username = "KAFKA_USERNAME",
+            Password = "KAFKA_PASSWORD",
+            Protocol = BrokerProtocol.SaslSsl,
+            AuthenticationMode = BrokerAuthenticationMode.Plain,
+            ConsumerGroup = "$Default")] string commandString,
+        CancellationToken cancellationToken)
+    {
+        var command = JsonSerializer.Deserialize<CreateAuctionCommand>(commandString, _serializerOptions);
+        _logger.LogInformation("Create auction command received");
+        if (command == null) throw new NullReferenceException(nameof(command));
+        var result = await _createAuctionCommandHandler.Handle(command, cancellationToken);
+        _logger.LogInformation("Create auction command processed {AuctionId}", result.Id);
+    }
 }

@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Confluent.Kafka;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -63,7 +64,17 @@ if (azureStorageConnectionString != null)
         azureClientsBuilder.UseCredential(new DefaultAzureCredential());
     });
 }
-builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
+
+var kafkaConfig = builder.Configuration.GetSection("Kafka");
+if (kafkaConfig.Exists())
+{
+    builder.Services.AddScoped<IMessageQueue>(_=>new KafkaMessageQueue(kafkaConfig.Get<ProducerConfig>() ?? throw new InvalidOperationException()));
+}
+else
+{
+    builder.Services.AddScoped<IMessageQueue, AzureMessageQueue>();
+}
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<Mapper>();
 builder.Services.AddScoped<IUserContext, UserContext>();

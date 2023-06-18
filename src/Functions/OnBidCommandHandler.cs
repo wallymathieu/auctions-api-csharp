@@ -31,4 +31,28 @@ public class OnBidCommandHandler
                 break;
         }
     }
+    [Function("OnBidCommandKafka")]
+    public async Task RunKafka(
+        [KafkaTrigger("BrokerList",
+            QueuesModule.BidCommandQueueName,
+            Username = "KAFKA_USERNAME",
+            Password = "KAFKA_PASSWORD",
+            Protocol = BrokerProtocol.SaslSsl,
+            AuthenticationMode = BrokerAuthenticationMode.Plain,
+            ConsumerGroup = "$Default")] string commandString, CancellationToken cancellationToken)
+    {
+        var command = JsonSerializer.Deserialize<CreateBidCommand>(commandString, _serializerOptions);
+        _logger.LogInformation($"bid received");
+        if (command == null) throw new NullReferenceException(nameof(command));
+        var result = await _createBidCommandHandler.Handle(command, cancellationToken);
+        switch (result)
+        {
+            case Ok<Bid,Errors> ok:
+                _logger.LogInformation("bid processed successfully {Result}", ok);
+                break;
+            case Error<Bid,Errors> error:
+                _logger.LogInformation("bid processed {Error}", error);
+                break;
+        }
+    }
 }
