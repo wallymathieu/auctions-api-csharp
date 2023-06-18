@@ -18,11 +18,11 @@ public class AzureMessageQueue:IMessageQueue
     }
 
     public bool Enabled => _queueServiceClient != null;
-    public async Task SendMessageAsync(string queueName, object command)
+    public async Task SendMessageAsync(string queueName, object command, CancellationToken cancellationToken)
     {
         if (_queueServiceClient == null) throw new InvalidOperationException("Message queue is not enabled");
         var commandsQueue = _queueServiceClient.GetQueueClient(queueName);
-        await commandsQueue.CreateIfNotExistsAsync();
-        await commandsQueue.SendMessageAsync(JsonSerializer.Serialize(command, _serializerOptions));
+        await commandsQueue.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        await commandsQueue.SendMessageAsync(JsonSerializer.Serialize(command, _serializerOptions), cancellationToken);
     }
 }

@@ -1,11 +1,4 @@
-using System.Text.Json;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
-using Wallymathieu.Auctions.Infrastructure.Queues;
-using Wallymathieu.Auctions.Services;
-
 namespace Wallymathieu.Auctions.Functions;
-
 public class OnBidCommandHandler
 {
     private readonly ICreateBidCommandHandler _createBidCommandHandler;
@@ -22,12 +15,20 @@ public class OnBidCommandHandler
     [Function("OnBidCommand")]
     public async Task Run(
         [QueueTrigger(QueuesModule.BidCommandQueueName, Connection = "AzureWebJobsStorage")]
-        string commandString)
+        string commandString, CancellationToken cancellationToken)
     {
         var command = JsonSerializer.Deserialize<CreateBidCommand>(commandString, _serializerOptions);
         _logger.LogInformation($"bid received");
         if (command == null) throw new NullReferenceException(nameof(command));
-        var (res,err) = await _createBidCommandHandler.Handle(command.AuctionId, command.UserId, command.Model);
-        _logger.LogInformation("bid processed {Result} {Error}", res, err);
+        var result = await _createBidCommandHandler.Handle(command, cancellationToken);
+        switch (result)
+        {
+            case Ok<Bid,Errors> ok:
+                _logger.LogInformation("bid processed successfully {Result}", ok);
+                break;
+            case Error<Bid,Errors> error:
+                _logger.LogInformation("bid processed {Error}", error);
+                break;
+        }
     }
 }

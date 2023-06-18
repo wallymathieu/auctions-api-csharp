@@ -1,16 +1,17 @@
-using System.Text.Json.Serialization;
-using Wallymathieu.Auctions.Domain;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Api.Infrastructure.Queues;
 using Wallymathieu.Auctions.Api.Middleware.Auth;
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Infrastructure.Services;
+using Wallymathieu.Auctions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -62,9 +63,11 @@ if (azureStorageConnectionString != null)
         azureClientsBuilder.UseCredential(new DefaultAzureCredential());
     });
 }
-builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>(); 
-
-//#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure 
+builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<Mapper>();
+builder.Services.AddScoped<IUserContext, UserContext>();
+//#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
 if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
 {

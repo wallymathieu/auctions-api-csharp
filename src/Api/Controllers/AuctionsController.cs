@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Wallymathieu.Auctions.Api.Models;
+using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Queues;
-using Wallymathieu.Auctions.Models;
-using Wallymathieu.Auctions.Services;
+using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers;
 
@@ -17,10 +18,10 @@ public class AuctionsController : ControllerBase
     private readonly IAuctionRepository _auctionRepository;
     private readonly IMessageQueue _messageQueue;
 
-    public AuctionsController(Mapper mapper, 
-        ICreateAuctionCommandHandler createAuctionCommandHandler, 
+    public AuctionsController(Mapper mapper,
+        ICreateAuctionCommandHandler createAuctionCommandHandler,
         ICreateBidCommandHandler createBidCommandHandler,
-        IAuctionRepository auctionRepository, 
+        IAuctionRepository auctionRepository,
         IMessageQueue messageQueue)
     {
         _mapper = mapper;
@@ -31,71 +32,63 @@ public class AuctionsController : ControllerBase
     }
 
     [HttpGet(Name = "get_auctions")]
-    public async Task<IEnumerable<AuctionModel>> Get()
-    {
-        return from auction in await _auctionRepository.GetAuctionsAsync()
-            select _mapper.MapAuctionToModel(auction);
-    }
+    public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
+        from auction in await _auctionRepository.GetAuctionsAsync(cancellationToken)
+        select _mapper.MapAuctionToModel(auction);
 
     [HttpGet("{auctionId}", Name = "get_auction")]
-    public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId)
+    public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
     {
-        var auction = await _auctionRepository.GetAuctionAsync(auctionId);
+        var auction = await _auctionRepository.GetAuctionAsync(auctionId, cancellationToken);
         return auction is null ? NotFound() : _mapper.MapAuctionToModel(auction);
     }
 
     [HttpPost(Name = "create_auction")]
     public async Task<ActionResult> Post(
-        CreateAuctionModel model)
+        CreateAuctionCommand model, CancellationToken cancellationToken)
     {
-        if (this.User?.Identity?.Name==null)
+        if (User?.Identity?.Name==null) // TODO use Authorize
         {
             return Unauthorized();
         }
 
-        var userId = new UserId(this.User.Identity.Name);
-
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName,new CreateAuctionCommand(userId, model));
-         
+            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, model, cancellationToken);
             return Accepted();
         }
         else
         {
-            var auction = await _createAuctionCommandHandler.Handle(userId, model);
+            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(model,cancellationToken));
             return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
         }
     }
 
     [HttpPost("{auctionId}/bids",Name = "add_bid")]
     public async Task<ActionResult> PostBid(long auctionId,
-        CreateBidModel model)
+        CreateBidModel model, CancellationToken cancellationToken)
     {
-        if (User?.Identity?.Name == null)
+        if (User?.Identity?.Name == null) // TODO use Authorize
         {
             return Unauthorized();
         }
 
-        var userId = new UserId(this.User.Identity.Name);
-
+        var cmd =  new CreateBidCommand(model.Amount, auctionId);
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName,new CreateBidCommand(auctionId, userId, model));
+            await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName, cmd, cancellationToken);
             return Accepted();
         }
         else
         {
-            var (result, error) =
-                await _createBidCommandHandler.Handle(auctionId, userId, model);
-            switch (result)
+            var result=
+                await _createBidCommandHandler.Handle(cmd, cancellationToken);
+            return result switch
             {
-                case CreateBidCommandResult.Ok: return Ok();
-                case CreateBidCommandResult.Error: return BadRequest(error);
-                default:
-                case CreateBidCommandResult.NotFound: return NotFound();
-            } 
+                Ok<Bid, Errors> => Ok(),
+                Error<Bid, Errors> err => err.Value != Errors.UnknownAuction ? NotFound() : BadRequest(err.Value),
+                _ => NotFound()
+            };
         }
-       
     }
 }

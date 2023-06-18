@@ -1,26 +1,23 @@
 using Microsoft.Extensions.Caching.Distributed;
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Cache;
-using Wallymathieu.Auctions.Models;
-using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
-
-internal class CacheAwareCreateBidCommandHandler:ICreateBidCommandHandler
+internal class CacheAwareCreateBidCommandHandler: ICreateBidCommandHandler
 {
-    private readonly CreateBidCommandHandler _createBidCommandHandler;
+    private readonly ICreateBidCommandHandler _createBidCommandHandler;
     private readonly IDistributedCache _cache;
 
-    public CacheAwareCreateBidCommandHandler(CreateBidCommandHandler createBidCommandHandler, IDistributedCache cache)
+    public CacheAwareCreateBidCommandHandler(ICreateBidCommandHandler createBidCommandHandler, IDistributedCache cache)
     {
         _createBidCommandHandler = createBidCommandHandler;
         _cache = cache;
     }
 
-    public async Task<(CreateBidCommandResult Result, Errors Errors)> Handle(long auctionId, UserId userId, CreateBidModel model)
+    public async Task<IResult<Bid,Errors>> Handle(CreateBidCommand model, CancellationToken cancellationToken)
     {
-        var res = await _createBidCommandHandler.Handle(auctionId, userId, model);
-        await _cache.RemoveAsync(CacheKeys.Auctions); 
+        var res = await _createBidCommandHandler.Handle(model, cancellationToken);
+        await _cache.RemoveAsync(CacheKeys.Auctions, cancellationToken);
         return res;
     }
 }
