@@ -79,3 +79,23 @@ but can be tested quite easily by using a mock object and has some similarity to
 Most programmers would argue to use the CleanClass rather than a pure function in this case since the common idioms
 are to let [Tasks](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/task-parallel-library-tpl) and
 impure invocations bleed into the code.
+
+Since we have a simple domain we have instead opted for the approach of having the infrastructure execute methods on the
+domain model objects in order to be a bit more object oriented in the sense that the domain objects actually receive the
+commands and interpret them. A natural step would be to allow `Task<>` as a return type of command handler (but that can be
+left as an exercise to the reader).
+
+```csharp
+public abstract class Auction : IEntity
+{
+    //...
+    [CommandHandler]
+    public IResult<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
+    {
+       //...
+    }
+}
+```
+
+Note that we do not try to make the try add bid method be pure (IUserContext and ITime are both impure),
+but we do make it easy to test.

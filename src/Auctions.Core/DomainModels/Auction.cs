@@ -57,7 +57,7 @@ public abstract class Auction : IEntity
                 };
     }
     [CommandHandler]
-    public IResult<Bid,Errors> Handle(CreateBidCommand model, IUserContext userContext, ITime time)
+    public IResult<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
     {
         var bid = new Bid(userContext.UserId, model.Amount, time.Now);
         return TryAddBid(time.Now, bid, out var error)
