@@ -115,8 +115,7 @@ public abstract class ApiSpec<TAuth>
                 ""currency"": ""VAC"",
                 ""bids"": [{
                     ""amount"": ""VAC11"",
-                    ""bidder"": ""buyer1@hotmail.com"",
-                    ""at"": ""2022-08-03T22:00:00Z""
+                    ""bidder"": ""buyer1@hotmail.com""
                 }]}").ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
