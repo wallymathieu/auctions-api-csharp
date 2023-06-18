@@ -3,7 +3,7 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.DomainModels;
 
-public abstract class Auction
+public abstract class Auction: IEntity
 {
 #pragma warning disable CS8618
     protected Auction()
@@ -27,6 +27,7 @@ public abstract class Auction
     public CurrencyCode Currency { get; init; }
     public AuctionType AuctionType { get; set; }
 
+    [CommandHandler]
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
         return cmd.SingleSealedBidOptions!=null
@@ -54,6 +55,7 @@ public abstract class Auction
                     }
                 };
     }
+    [CommandHandler]
     public IResult<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
     {
         var bid = new Bid(userContext.UserId, model.Amount, time.Now);

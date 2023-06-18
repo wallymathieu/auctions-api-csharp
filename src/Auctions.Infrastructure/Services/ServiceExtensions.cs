@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wallymathieu.Auctions.DomainModels;
+using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 using Wallymathieu.Auctions.Infrastructure.Services.Cache;
 using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
@@ -9,8 +11,8 @@ public static class ServiceExtensions
     private static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
     {
         services.TryAddSingleton<ITime, Time>();
-        services.TryAddScoped<ICreateAuctionCommandHandler, CreateAuctionCommandHandler>();
-        services.TryAddScoped<ICreateBidCommandHandler, CreateBidCommandHandler>();
+        services.RegisterAttributesForType<Auction>();
+        services.AddSingleton(typeof(IKeyValueFactory<>), typeof(KeyValueFactory<>));
         return services;
     }
 
