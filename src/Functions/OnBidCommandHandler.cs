@@ -33,7 +33,7 @@ public class OnBidCommandHandler
     }
     [Function("OnBidCommandKafka")]
     public async Task RunKafka(
-        [KafkaTrigger("BrokerList",
+        [KafkaTrigger("broker",
             QueuesModule.BidCommandQueueName,
             Username = "KAFKA_USERNAME",
             Password = "KAFKA_PASSWORD",
