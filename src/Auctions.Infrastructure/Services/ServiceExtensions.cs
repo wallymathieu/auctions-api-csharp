@@ -11,7 +11,6 @@ public static class ServiceExtensions
     private static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
     {
         services.TryAddSingleton<ITime, Time>();
-        services.TryAddSingleton<Mapper>();
         services.RegisterAttributesForType<Auction>();
         services.AddSingleton(typeof(IKeyValueFactory<>), typeof(KeyValueFactory<>));
         return services;

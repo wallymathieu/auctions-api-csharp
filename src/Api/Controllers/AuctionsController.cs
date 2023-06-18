@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Wallymathieu.Auctions.ApiModels;
+using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.DomainModels;

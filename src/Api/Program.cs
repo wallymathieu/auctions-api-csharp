@@ -2,6 +2,7 @@ using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Api.Infrastructure.Queues;
 using Wallymathieu.Auctions.Api.Middleware.Auth;
 using Wallymathieu.Auctions.DomainModels;
@@ -64,6 +65,7 @@ if (azureStorageConnectionString != null)
 }
 builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<Mapper>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
 builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();

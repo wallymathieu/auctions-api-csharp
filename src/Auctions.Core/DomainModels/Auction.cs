@@ -1,4 +1,3 @@
-using Wallymathieu.Auctions.ApiModels;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Services;
 

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Wallymathieu.Auctions.ApiModels;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 namespace Wallymathieu.Auctions.Functions;
