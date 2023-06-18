@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions;
+namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
 public interface ICommandHandler<in TCommand, TResponse>
     where TCommand : ICommand<TResponse>

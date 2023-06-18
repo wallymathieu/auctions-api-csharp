@@ -3,7 +3,6 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Data.Cache;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data.Cache;

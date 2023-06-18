@@ -1,14 +1,10 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Wallymathieu.Auctions.Commands;
-using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 using Wallymathieu.Auctions.Infrastructure.Services.Cache;
 using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
-using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, Auction>;
-using ICreateBidCommandHandler= ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>;
 public static class ServiceExtensions
 {
     private static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)

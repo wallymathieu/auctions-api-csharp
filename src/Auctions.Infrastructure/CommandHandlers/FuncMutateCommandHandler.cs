@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Data;
-
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 /// <summary>
 /// An infrastructure command handler. Used in order to be able to implement mutation command handlers.

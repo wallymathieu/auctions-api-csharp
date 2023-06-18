@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Data;
-
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 /// <summary>
 /// An infrastructure command handler intended to be used together with a result type.

@@ -7,8 +7,7 @@ using Wallymathieu.Auctions.Models;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers;
-using ICreateAuctionCommandHandler= ICommandHandler<CreateAuctionCommand, Auction>;
-using ICreateBidCommandHandler= ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>;
+
 [ApiController]
 [Route("auctions")]
 public class AuctionsController : ControllerBase

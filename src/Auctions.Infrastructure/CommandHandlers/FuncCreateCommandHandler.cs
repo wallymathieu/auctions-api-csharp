@@ -1,8 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Data;
-
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
-
 class FuncCreateCommandHandler<TEntity, TCommand> : ICommandHandler<TCommand, TEntity>
     where TCommand : ICommand<TEntity> where TEntity : IEntity
 {

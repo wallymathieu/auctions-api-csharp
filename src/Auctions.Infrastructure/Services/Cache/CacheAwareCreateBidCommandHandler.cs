@@ -1,12 +1,9 @@
 using Microsoft.Extensions.Caching.Distributed;
-using Wallymathieu.Auctions.Commands;
-using Wallymathieu.Auctions.Domain;
 using Wallymathieu.Auctions.Infrastructure.Cache;
-using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
-using ICreateBidCommandHandler= ICommandHandler<CreateBidCommand, IResult<Bid,Errors>>;
-internal class CacheAwareCreateBidCommandHandler: ICreateBidCommandHandler
+internal class CacheAwareCreateBidCommandHandler: ICommandHandler<CreateBidCommand, IResult<Bid, Errors>>
 {
     private readonly ICreateBidCommandHandler _createBidCommandHandler;
     private readonly IDistributedCache _cache;

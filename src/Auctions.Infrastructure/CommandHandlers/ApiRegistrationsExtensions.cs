@@ -8,7 +8,7 @@ namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 /// <summary>
 /// Api registrations logic. Potentially some of the lambda compiled logic could be made into Roslyn generated code.
 /// </summary>
-public static partial class ApiRegistrationsExtensions
+public static class ApiRegistrationsExtensions
 {
     public static IServiceCollection RegisterAttributesForType<T>(this IServiceCollection services) where T : IEntity =>
         RegisterAttributesForType(services, typeof(T));

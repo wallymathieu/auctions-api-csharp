@@ -3,7 +3,7 @@ using Wallymathieu.Auctions.Models;
 
 namespace Wallymathieu.Auctions.Commands;
 
-public class CreateAuctionCommand: ICommand<TimedAscendingAuction>
+public class CreateAuctionCommand: ICommand<Auction>
 {
     public CreateAuctionCommand(UserId userId, CreateAuctionModel model)
     {
