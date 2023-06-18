@@ -31,7 +31,7 @@ public abstract class ApiSpec<TAuth>
                 ""startsAt"": ""2022-07-01T10:00:00.000Z"",
                 ""title"": ""Some auction"",
                 ""expiry"": ""2022-09-18T10:00:00.000Z"",
-                ""user"": ""seller1@hotmail.com"",
+                ""seller"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
                 ""bids"": []
         }").ToString(Formatting.Indented),
@@ -59,7 +59,7 @@ public abstract class ApiSpec<TAuth>
                 ""startsAt"": ""2021-12-01T10:00:00.000Z"",
                 ""title"": ""Some auction"",
                 ""expiry"": ""2022-12-18T10:00:00.000Z"",
-                ""user"": ""seller1@hotmail.com"",
+                ""seller"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
                 ""bids"": []
         }").ToString(Formatting.Indented),
@@ -111,7 +111,7 @@ public abstract class ApiSpec<TAuth>
                 ""startsAt"": ""2022-07-01T10:00:00.000Z"",
                 ""title"": ""Some auction"",
                 ""expiry"": ""2022-09-18T10:00:00.000Z"",
-                ""user"": ""seller1@hotmail.com"",
+                ""seller"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
                 ""bids"": [{
                     ""amount"": ""VAC11"",
