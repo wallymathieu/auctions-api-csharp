@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Wallymathieu.Auctions.Infrastructure.Cache;
-using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
-internal class CacheAwareCreateBidCommandHandler: ICommandHandler<CreateBidCommand, IResult<Bid, Errors>>
+internal class CacheAwareCreateBidCommandHandler: ICreateBidCommandHandler
 {
     private readonly ICreateBidCommandHandler _createBidCommandHandler;
     private readonly IDistributedCache _cache;

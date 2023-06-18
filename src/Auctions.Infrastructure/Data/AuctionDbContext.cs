@@ -22,21 +22,23 @@ public class AuctionDbContext: DbContext, IAuctionDbContext
     private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
 
-    async Task<IReadOnlyCollection<Auction>> IAuctionDbContext.GetAuctionsAsync()
+    async Task<IReadOnlyCollection<Auction>> IAuctionDbContext.GetAuctionsAsync(CancellationToken cancellationToken)
     {
-        return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync();
+        return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync(cancellationToken);
     }
 
-    public async Task<Auction?> GetAuction(long auctionId)
+    public async Task<Auction?> GetAuction(long auctionId, CancellationToken cancellationToken)
     {
-        var auction = await Auctions.FindAsync(auctionId);
-        if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync();
+        var auction = await Auctions.FindAsync(auctionId, cancellationToken);
+        if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync(cancellationToken);
         return auction;
     }
 
-    async ValueTask IAuctionDbContext.AddAuctionAsync(Auction auction) => await Auctions.AddAsync(auction);
+    async ValueTask IAuctionDbContext.AddAuctionAsync(Auction auction,CancellationToken cancellationToken) =>
+        await Auctions.AddAsync(auction, cancellationToken);
 
-    async Task IAuctionDbContext.SaveChangesAsync() => await SaveChangesAsync();
+    async Task IAuctionDbContext.SaveChangesAsync(CancellationToken cancellationToken) =>
+        await SaveChangesAsync(cancellationToken);
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

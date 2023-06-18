@@ -32,7 +32,7 @@ class FuncResultMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHan
         var r = _func(entity, cmd, _serviceProvider);
         if (r.IsOk)
         {
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
         }
         return r;
     }

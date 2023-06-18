@@ -28,7 +28,7 @@ class FuncMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHandler<T
         var entity = await _repository.FindAsync(keyValueFactory.Key(cmd), cancellationToken);
 
         var r = _func(entity, cmd, _serviceProvider);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
 
         return r;
     }

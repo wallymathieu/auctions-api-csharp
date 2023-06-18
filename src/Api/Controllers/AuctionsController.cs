@@ -32,20 +32,20 @@ public class AuctionsController : ControllerBase
     }
 
     [HttpGet(Name = "get_auctions")]
-    public async Task<IEnumerable<AuctionModel>> Get() =>
-        from auction in await _auctionRepository.GetAuctionsAsync()
+    public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
+        from auction in await _auctionRepository.GetAuctionsAsync(cancellationToken)
         select _mapper.MapAuctionToModel(auction);
 
     [HttpGet("{auctionId}", Name = "get_auction")]
-    public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId)
+    public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
     {
-        var auction = await _auctionRepository.GetAuctionAsync(auctionId);
+        var auction = await _auctionRepository.GetAuctionAsync(auctionId, cancellationToken);
         return auction is null ? NotFound() : _mapper.MapAuctionToModel(auction);
     }
 
     [HttpPost(Name = "create_auction")]
     public async Task<ActionResult> Post(
-        CreateAuctionModel model, CancellationToken token)
+        CreateAuctionModel model, CancellationToken cancellationToken)
     {
         if (User?.Identity?.Name==null)
         {
@@ -56,19 +56,19 @@ public class AuctionsController : ControllerBase
         var command = new CreateAuctionCommand(userId, model);
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, command, token);
+            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, command, cancellationToken);
             return Accepted();
         }
         else
         {
-            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(command,token));
+            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(command,cancellationToken));
             return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
         }
     }
 
     [HttpPost("{auctionId}/bids",Name = "add_bid")]
     public async Task<ActionResult> PostBid(long auctionId,
-        CreateBidModel model, CancellationToken token)
+        CreateBidModel model, CancellationToken cancellationToken)
     {
         if (User?.Identity?.Name == null)
         {
@@ -79,13 +79,13 @@ public class AuctionsController : ControllerBase
         var cmd = new CreateBidCommand(auctionId, userId, model);
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName, cmd, token);
+            await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName, cmd, cancellationToken);
             return Accepted();
         }
         else
         {
             var result=
-                await _createBidCommandHandler.Handle(cmd, token);
+                await _createBidCommandHandler.Handle(cmd, cancellationToken);
             return result switch
             {
                 Ok<Bid, Errors> => Ok(),

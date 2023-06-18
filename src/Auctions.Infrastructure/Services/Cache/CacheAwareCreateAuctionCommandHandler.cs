@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Wallymathieu.Auctions.Infrastructure.Cache;
-using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
-internal class CacheAwareCreateAuctionCommandHandler: ICommandHandler<CreateAuctionCommand, Auction>
+internal class CacheAwareCreateAuctionCommandHandler: ICreateAuctionCommandHandler
 {
     private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
     private readonly IDistributedCache _cache;

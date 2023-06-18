@@ -22,7 +22,7 @@ class FuncCreateCommandHandler<TEntity, TCommand> : ICommandHandler<TCommand, TE
     {
         var entity = _func(cmd, _serviceProvider);
         await _repository.AddAsync(entity, cancellationToken);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
         return entity;
     }
 }

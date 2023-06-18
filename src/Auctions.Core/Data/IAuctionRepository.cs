@@ -4,6 +4,6 @@ namespace Wallymathieu.Auctions.Data;
 
 public interface IAuctionRepository: IRepository<Auction>
 {
-    Task<Auction?> GetAuctionAsync(long auctionId);
-    Task<IReadOnlyCollection<Auction>> GetAuctionsAsync();
+    Task<Auction?> GetAuctionAsync(long auctionId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken);
 }

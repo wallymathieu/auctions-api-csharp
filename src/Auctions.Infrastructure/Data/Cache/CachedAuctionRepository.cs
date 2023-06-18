@@ -16,7 +16,7 @@ public class CachedAuctionRepository:AuctionRepository
         _cache = cache;
     }
 
-    public override async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync()
+    public override async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken)
     {
         var auctionsJson = await _cache.GetStringAsync(CacheKeys.Auctions);
         if (auctionsJson != null)
@@ -27,7 +27,7 @@ public class CachedAuctionRepository:AuctionRepository
         else
         {
             // There's nothing in the cache, retrieve data from the repository and cache it for one hour.
-            var auctions = await base.GetAuctionsAsync();
+            var auctions = await base.GetAuctionsAsync(cancellationToken);
             auctionsJson = JsonSerializer.Serialize(auctions);
             var cacheOptions = new DistributedCacheEntryOptions
             {
