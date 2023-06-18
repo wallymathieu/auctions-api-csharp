@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Infrastructure.Json;
 

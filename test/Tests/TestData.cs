@@ -1,4 +1,4 @@
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Tests;
 
@@ -11,7 +11,7 @@ public class TestData
     public static readonly UserId Seller = new("x1");
     public static readonly UserId Buyer = new("x2");
 
-    public static TimedAscendingAuction GetAuction()=>
+    public static TimedAscendingAuction GetEnglishAuction()=>
         new TimedAscendingAuction
         {
             AuctionId = AuctionId.Id,
@@ -20,12 +20,23 @@ public class TestData
             Expiry = EndsAt,
             User = Seller,
             Currency = CurrencyCode.SEK,
-            Options = 
+            Options =
             {
                 MinRaise = 1,
                 TimeFrame = TimeSpan.FromMinutes(1),
                 ReservePrice = 0,
             }
+        };
+    public static SingleSealedBidAuction GetVickreyAuction()=>
+        new SingleSealedBidAuction
+        {
+            AuctionId = AuctionId.Id,
+            Title = Title,
+            StartsAt = StartsAt,
+            Expiry = EndsAt,
+            User = Seller,
+            Currency = CurrencyCode.SEK,
+            Options = SingleSealedBidOptions.Vickrey
         };
 
     public static Amount Sek(long a) =>
@@ -37,7 +48,7 @@ public class TestData
             User: Buyer,
             Amount: Sek(100L),
             At: new DateTime(2016, 1, 2));
-
+    public static Bid BidOf200 => BidOf100 with { Amount = Sek(200L) };
     public static readonly UserId Buyer1 = new("x2");
     public static readonly UserId Buyer2 = new("x3");
 

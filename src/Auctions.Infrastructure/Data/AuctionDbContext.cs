@@ -2,16 +2,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.Domain;
+using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 
-public class AuctionDbContext: DbContext, IAuctionDbContext
+public class AuctionDbContext: DbContext
 {
     public AuctionDbContext()
     {
     }
-    public DbSet<TimedAscendingAuction> Auctions { get; set; }
+
+    public AuctionDbContext(DbContextOptions<AuctionDbContext> options):base(options)
+    {
+    }
+    public DbSet<Auction> Auctions { get; set; }
     private PropertyBuilder<T> WithAuctionIdConversion<T>(PropertyBuilder<T> self) =>
         self.HasConversion(new ValueConverter<AuctionId, long>(v => v.Id, v => new AuctionId(v)));
     private PropertyBuilder<T> WithUserId<T>(PropertyBuilder<T> self) =>
@@ -19,39 +23,42 @@ public class AuctionDbContext: DbContext, IAuctionDbContext
     private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
 
-    async Task<IReadOnlyCollection<TimedAscendingAuction>> IAuctionDbContext.GetAuctionsAsync()
+    public async ValueTask<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken)
     {
-        return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync();
+        return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync(cancellationToken);
     }
 
-    public async Task<TimedAscendingAuction?> GetAuction(long auctionId)
+    public async ValueTask<Auction?> GetAuction(long auctionId, CancellationToken cancellationToken)
     {
-        var auction = await Auctions.FindAsync(auctionId);
-        if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync();
+        var auction = await Auctions.FindAsync(auctionId, cancellationToken);
+        if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync(cancellationToken);
         return auction;
     }
 
-    void IAuctionDbContext.AddAuction(TimedAscendingAuction auction) => Auctions.Add(auction);
-
-    async Task IAuctionDbContext.SaveChangesAsync() => await SaveChangesAsync();
-
-    public AuctionDbContext(DbContextOptions options):base(options)
-    {
-    }
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Auction>(entity =>
+            {
+                entity.HasDiscriminator(b => b.AuctionType).IsComplete(false);
+                entity.ToTable("Auctions");
+                entity.HasKey(e => e.AuctionId);
+                entity.Property(e => e.Title).HasMaxLength(200);
+                entity.Property(o => o.AuctionId).UseIdentityColumn();
+                WithUserId(entity.Property(o => o.User));
+                HasCurrencyCodeConversion(entity.Property(e => e.Currency));
+                entity.HasMany(e => e.Bids).WithOne()
+                    .HasPrincipalKey(a=>a.AuctionId)
+                    .HasForeignKey("AuctionId");
+            });
         builder.Entity<TimedAscendingAuction>(entity =>
         {
-            entity.ToTable("Auctions");
-            entity.HasKey(e => e.AuctionId);
-            entity.Property(e => e.Title).HasMaxLength(200);
-            entity.Property(o => o.AuctionId).UseIdentityColumn();
-            WithUserId(entity.Property(o => o.User));
+            entity.HasDiscriminator(b => b.AuctionType).HasValue(AuctionType.TimedAscendingAuction);
             entity.OwnsOne<TimedAscendingOptions>(e=>e.Options);
-            HasCurrencyCodeConversion(entity.Property(e => e.Currency));
-            entity.HasMany(e => e.Bids).WithOne()
-                .HasPrincipalKey(a=>a.AuctionId)
-                .HasForeignKey("AuctionId");
+        });
+        builder.Entity<SingleSealedBidAuction>(entity =>
+        {
+            entity.HasDiscriminator(b => b.AuctionType).HasValue(AuctionType.SingleSealedBidAuction);
+            entity.Property(e=>e.Options);
         });
 
         builder.Entity<BidEntity>(entity =>
