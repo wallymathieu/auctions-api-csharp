@@ -1,11 +1,11 @@
-using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Wallymathieu.Auctions.Functions;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Json;
-using Wallymathieu.Auctions.Infrastructure.Services;
+using Wallymathieu.Auctions.Services;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -19,7 +19,9 @@ var host = new HostBuilder()
                 options.InstanceName = CacheKeys.Prefix;
             })
             .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
-            .AddAuctionServicesCached();
+            .AddAuctionServicesCached()
+            .AddScoped<ScopedUserContext>()
+            .AddScoped<IUserContext>(c=>c.GetRequiredService<ScopedUserContext>());
         services.AddSingleton(new JsonSerializerOptions().AddAuctionConverters());
     })
     .Build();

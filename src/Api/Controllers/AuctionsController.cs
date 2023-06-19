@@ -5,6 +5,7 @@ using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Infrastructure.Services;
+using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers;
 
@@ -17,18 +18,21 @@ public class AuctionsController : ControllerBase
     private readonly ICreateBidCommandHandler _createBidCommandHandler;
     private readonly IAuctionRepository _auctionRepository;
     private readonly IMessageQueue _messageQueue;
+    private readonly IUserContext _userContext;
 
     public AuctionsController(Mapper mapper,
         ICreateAuctionCommandHandler createAuctionCommandHandler,
         ICreateBidCommandHandler createBidCommandHandler,
         IAuctionRepository auctionRepository,
-        IMessageQueue messageQueue)
+        IMessageQueue messageQueue,
+        IUserContext userContext)
     {
         _mapper = mapper;
         _createAuctionCommandHandler = createAuctionCommandHandler;
         _createBidCommandHandler = createBidCommandHandler;
         _auctionRepository = auctionRepository;
         _messageQueue = messageQueue;
+        _userContext = userContext;
     }
 
     [HttpGet(Name = "get_auctions")]
@@ -54,7 +58,7 @@ public class AuctionsController : ControllerBase
 
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, model, cancellationToken);
+            await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, new UserIdDecorator<CreateAuctionCommand>(model,_userContext.UserId), cancellationToken);
             return Accepted();
         }
         else
@@ -76,7 +80,7 @@ public class AuctionsController : ControllerBase
         var cmd =  new CreateBidCommand(model.Amount, auctionId);
         if (_messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName, cmd, cancellationToken);
+            await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName, new UserIdDecorator<CreateBidCommand>(cmd,_userContext.UserId), cancellationToken);
             return Accepted();
         }
         else
