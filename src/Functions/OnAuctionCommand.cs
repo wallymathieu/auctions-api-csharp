@@ -32,7 +32,7 @@ public class OnAuctionCommandHandler
             QueuesModule.AuctionCommandQueueName,
             Username = "KAFKA_USERNAME",
             Password = "KAFKA_PASSWORD",
-            Protocol = BrokerProtocol.SaslSsl,
+            Protocol = BrokerProtocol.Plaintext,
             AuthenticationMode = BrokerAuthenticationMode.Plain,
             ConsumerGroup = "$Default")] string commandString,
         CancellationToken cancellationToken)

@@ -48,7 +48,11 @@ To run api/func/migrations locally you need the following env:
 source .env
 export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
 export ConnectionStrings__Redis="localhost"
+
 export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
+export Kafka__BootstrapServers="localhost:9092"
+export broker="localhost:9092"
+export AzureWebJobsStorage="UseDevelopmentStorage=true"
 ```
 
 If you want to run inside dev containers then the setup will be slightly different (since it should be the same environment as you have if you the apps through docker compose):
