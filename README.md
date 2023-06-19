@@ -49,6 +49,8 @@ source .env
 export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
 export ConnectionStrings__Redis="localhost"
 export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
+
+export AzureWebJobsStorage="UseDevelopmentStorage=true"
 ```
 
 If you want to run inside dev containers then the setup will be slightly different (since it should be the same environment as you have if you the apps through docker compose):
