@@ -85,12 +85,13 @@ public class AuctionsController : ControllerBase
         }
         else
         {
-            var result=
-                await _createBidCommandHandler.Handle(cmd, cancellationToken);
+            var result = await _createBidCommandHandler.Handle(cmd, cancellationToken);
             return result switch
             {
                 Ok<Bid, Errors> => Ok(),
-                Error<Bid, Errors> err => err.Value != Errors.UnknownAuction ? NotFound() : BadRequest(err.Value),
+                Error<Bid, Errors> err => err.Value == Errors.UnknownAuction
+                    ? NotFound()
+                    : BadRequest(err.Value),
                 _ => NotFound()
             };
         }

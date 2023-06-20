@@ -9,7 +9,7 @@ internal class CreateBidCommandHandler : ICreateBidCommandHandler
     private readonly IAuctionRepository _auctionRepository;
     private readonly AuctionDbContext _auctionDbContext;
     private readonly IUserContext _userContext;
-    private ITime _time;
+    private readonly ITime _time;
 
     public CreateBidCommandHandler(IAuctionRepository auctionRepository, AuctionDbContext auctionDbContext, IUserContext userContext, ITime time)
     {
@@ -22,6 +22,7 @@ internal class CreateBidCommandHandler : ICreateBidCommandHandler
     public async Task<IResult<Bid, Errors>> Handle(CreateBidCommand model, CancellationToken cancellationToken)
     {
         var auction = await _auctionRepository.GetAuctionAsync(model.AuctionId, cancellationToken);
+        if (auction is null) return new Error<Bid, Errors>(Errors.UnknownAuction);
         var result = auction.TryAddBid(model, _userContext, _time);
         if (result.IsOk)
         {
