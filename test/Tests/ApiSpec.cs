@@ -120,4 +120,18 @@ public abstract class ApiSpec<TAuth>
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
+    [Fact]
+    public async Task Cannot_find_unknown_auction()
+    {
+        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Cannot_find_unknown_auction)+".db");
+        var auctionResponse = await application.GetAuction(99, AuthToken.Seller1);
+        Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
+    }
+    [Fact]
+    public async Task Cannot_place_bid_on_unknown_auction()
+    {
+        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Cannot_place_bid_on_unknown_auction)+".db");
+        var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
+        Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
+    }
 }
