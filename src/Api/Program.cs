@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
@@ -25,10 +26,17 @@ builder.Services.AddControllers(c =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    var opts = new JsonSerializerOptions().AddAuctionConverters();
     options.MapType(typeof(Amount), () => new OpenApiSchema
     {
         Type = "string",
         Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
+    });
+    options.MapType<TimeSpan>(()=>new OpenApiSchema
+    {
+        Type = "string",
+        Format = "^(\\d{2}:)?\\d{2}:\\d{2}:\\d{2}$",
+        Example = new OpenApiString(JsonSerializer.Serialize(TimeSpan.FromSeconds(1234), opts))
     });
 });
 if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
