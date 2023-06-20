@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Wallymathieu.Auctions.Api.Middleware.Auth;
 using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Data;
@@ -47,7 +49,7 @@ public class AuctionsController : ControllerBase
         return auction is null ? NotFound() : _mapper.MapAuctionToModel(auction);
     }
 
-    [HttpPost(Name = "create_auction")]
+    [HttpPost(Name = "create_auction") /*, Authorize(AuthenticationSchemes=PayloadAuthenticationDefaults.AuthenticationScheme) */]
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
     {
@@ -68,7 +70,7 @@ public class AuctionsController : ControllerBase
         }
     }
 
-    [HttpPost("{auctionId}/bids",Name = "add_bid")]
+    [HttpPost("{auctionId}/bids",Name = "add_bid") /*, Authorize(AuthenticationSchemes=PayloadAuthenticationDefaults.AuthenticationScheme)*/]
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {

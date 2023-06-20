@@ -16,10 +16,7 @@ using Wallymathieu.Auctions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddControllers(c =>
-{
-    c.Filters.Add<DecodedHeaderAuthorizationFilter>();
-}).AddJsonOptions(opts =>
+builder.Services.AddControllers().AddJsonOptions(opts =>
 {
     opts.JsonSerializerOptions.AddAuctionConverters();
 });
@@ -75,9 +72,10 @@ builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<Mapper>();
 builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddOptions<PayloadAuthenticationOptions>();
+var principalHeader = builder.Configuration["PrincipalHeader"];
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
-builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
-if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
+if (!string.IsNullOrEmpty(principalHeader))
 {
     builder.Services.AddSingleton<IClaimsPrincipalParser, ClaimsPrincipalParser>();
 }
@@ -88,7 +86,12 @@ else
 //#else
 // TODO: Register JWT based auth
 //#endif
-
+builder.Services
+    .AddAuthentication(c=> c.DefaultAuthenticateScheme=PayloadAuthenticationDefaults.AuthenticationScheme)
+    .AddPayloadAuthentication(c=>
+    {
+        if (!string.IsNullOrEmpty(principalHeader)) c.PrincipalHeader = principalHeader;
+    });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
