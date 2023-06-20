@@ -73,25 +73,20 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<Mapper>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddOptions<PayloadAuthenticationOptions>();
-var principalHeader = builder.Configuration["PrincipalHeader"];
+builder.Services.AddSingleton<ClaimsPrincipalParser>();
+builder.Services.AddSingleton<JwtPayloadClaimsPrincipalParser>();
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
-if (!string.IsNullOrEmpty(principalHeader))
-{
-    builder.Services.AddSingleton<IClaimsPrincipalParser, ClaimsPrincipalParser>();
-}
-else
-{
-    builder.Services.AddSingleton<IClaimsPrincipalParser, JwtPayloadClaimsPrincipalParser>();
-}
+builder.Services
+    .AddAuthentication()
+    .AddPayloadAuthentication(c=>
+    {
+        var principalHeader = builder.Configuration["PrincipalHeader"];
+        if (!string.IsNullOrEmpty(principalHeader)) c.PrincipalHeader = principalHeader;
+    });
 //#else
 // TODO: Register JWT based auth
 //#endif
-builder.Services
-    .AddAuthentication(c=> c.DefaultAuthenticateScheme=PayloadAuthenticationDefaults.AuthenticationScheme)
-    .AddPayloadAuthentication(c=>
-    {
-        if (!string.IsNullOrEmpty(principalHeader)) c.PrincipalHeader = principalHeader;
-    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

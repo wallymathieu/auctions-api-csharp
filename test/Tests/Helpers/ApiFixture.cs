@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Wallymathieu.Auctions.Api.Middleware.Auth;
 using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Services;
@@ -35,15 +36,15 @@ public class JwtApiAuth: IApiAuth
     {
         if (!string.IsNullOrWhiteSpace(auth))
         {
-            r.Headers.Add("x-jwt-payload", auth);
+            r.Headers.Add(JwtPayloadClaimsPrincipalParser.Header, auth);
         }
     }
 
     public bool TryAddAuth(HttpRequestMessage r, AuthToken auth)
     {
         switch(auth){
-            case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true; 
-            case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true; 
+            case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true;
+            case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true;
             default: return false;
         }
     }
@@ -90,8 +91,8 @@ public class MsClientPrincipalApiAuth: IApiAuth
     public bool TryAddAuth(HttpRequestMessage r, AuthToken auth)
     {
         switch(auth){
-            case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true; 
-            case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true; 
+            case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true;
+            case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true;
             default: return false;
         }
     }
@@ -116,10 +117,10 @@ public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
                     services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
                     services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
                     services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + _db, conf=>conf.MigrationsAssembly("Auctions")));
-                   
+
                     services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
                     services.AddSingleton<ITime>(new FakeTime(new DateTime(2022,8,4)));
-                   
+
                 });
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
@@ -185,5 +186,5 @@ public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
             _auth.TryAddAuth(r, auth);
         }).GetAsync();
     private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-    
+
 }

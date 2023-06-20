@@ -8,13 +8,17 @@ namespace Wallymathieu.Auctions.Api.Middleware.Auth;
 /// </summary>
 public class PayloadAuthenticationHandler: AuthenticationHandler<PayloadAuthenticationOptions>
 {
-    private readonly IClaimsPrincipalParser _claimsPrincipalParser;
+    private readonly ClaimsPrincipalParser _claimsPrincipalParser;
+    private readonly JwtPayloadClaimsPrincipalParser _jwtPayloadClaimsPrincipalParser;
     public PayloadAuthenticationHandler(IOptionsMonitor<PayloadAuthenticationOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock, IClaimsPrincipalParser claimsPrincipalParser) : base(options, logger, encoder, clock)
+        ISystemClock clock,
+        ClaimsPrincipalParser claimsPrincipalParser,
+        JwtPayloadClaimsPrincipalParser jwtPayloadClaimsPrincipalParser) : base(options, logger, encoder, clock)
     {
         _claimsPrincipalParser = claimsPrincipalParser;
+        _jwtPayloadClaimsPrincipalParser = jwtPayloadClaimsPrincipalParser;
     }
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -25,7 +29,11 @@ public class PayloadAuthenticationHandler: AuthenticationHandler<PayloadAuthenti
             {
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
-            if (_claimsPrincipalParser.IsValid(apiKey,out var claimsIdentity))
+
+            IClaimsPrincipalParser parser = Options.PrincipalHeader == JwtPayloadClaimsPrincipalParser.Header
+                ? _jwtPayloadClaimsPrincipalParser
+                : _claimsPrincipalParser;
+            if (parser.IsValid(apiKey,out var claimsIdentity))
             {
                 Context.User = claimsIdentity!;
                 var success = AuthenticateResult.Success(

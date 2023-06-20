@@ -7,6 +7,8 @@ namespace Wallymathieu.Auctions.Api.Middleware.Auth;
 
 public class JwtPayloadClaimsPrincipalParser:IClaimsPrincipalParser
 {
+    public const string Header = "X-JWT-PAYLOAD";
+
     internal class JwtPayload
     {
         [JsonPropertyName("sub")]
@@ -39,13 +41,13 @@ public class JwtPayloadClaimsPrincipalParser:IClaimsPrincipalParser
                     new Claim[]
                     {
                         new(ClaimTypes.Name,deserialized.Name),
-                    })
+                    },"proxy", ClaimTypes.Name, ClaimTypes.Role)
             });
             return true;
         }
         catch (Exception e)
         {
-            _logger.LogWarning(e, "Failed to decode JWT body header"); 
+            _logger.LogWarning(e, "Failed to decode JWT body header");
             return false;
         }
     }

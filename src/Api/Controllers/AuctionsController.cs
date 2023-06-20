@@ -49,15 +49,10 @@ public class AuctionsController : ControllerBase
         return auction is null ? NotFound() : _mapper.MapAuctionToModel(auction);
     }
 
-    [HttpPost(Name = "create_auction") /*, Authorize(AuthenticationSchemes=PayloadAuthenticationDefaults.AuthenticationScheme) */]
+    [HttpPost(Name = "create_auction") , Authorize]
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
     {
-        if (User?.Identity?.Name==null) // TODO use Authorize
-        {
-            return Unauthorized();
-        }
-
         if (_messageQueue.Enabled)
         {
             await _messageQueue.SendMessageAsync(QueuesModule.AuctionCommandQueueName, new UserIdDecorator<CreateAuctionCommand>(model,_userContext.UserId), cancellationToken);
@@ -70,15 +65,10 @@ public class AuctionsController : ControllerBase
         }
     }
 
-    [HttpPost("{auctionId}/bids",Name = "add_bid") /*, Authorize(AuthenticationSchemes=PayloadAuthenticationDefaults.AuthenticationScheme)*/]
+    [HttpPost("{auctionId}/bids",Name = "add_bid"), Authorize]
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
-        if (User?.Identity?.Name == null) // TODO use Authorize
-        {
-            return Unauthorized();
-        }
-
         var cmd =  new CreateBidCommand(model.Amount, auctionId);
         if (_messageQueue.Enabled)
         {
