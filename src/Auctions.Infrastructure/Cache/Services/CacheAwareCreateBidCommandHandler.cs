@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Caching.Distributed;
-using Wallymathieu.Auctions.DomainModels;
-using Wallymathieu.Auctions.Infrastructure.Cache;
+using Wallymathieu.Auctions.Infrastructure.Services;
 
-namespace Wallymathieu.Auctions.Infrastructure.Services.Cache;
+namespace Wallymathieu.Auctions.Infrastructure.Cache.Services;
 internal class CacheAwareCreateBidCommandHandler: ICreateBidCommandHandler
 {
     private readonly ICreateBidCommandHandler _createBidCommandHandler;

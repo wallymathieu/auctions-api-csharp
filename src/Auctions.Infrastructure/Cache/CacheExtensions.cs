@@ -1,0 +1,29 @@
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
+using Wallymathieu.Auctions.Infrastructure.Cache.Data;
+using Wallymathieu.Auctions.Infrastructure.Cache.Services;
+using Wallymathieu.Auctions.Infrastructure.Data;
+using Wallymathieu.Auctions.Infrastructure.Services;
+
+namespace Wallymathieu.Auctions.Infrastructure.Cache;
+
+public static class CacheExtensions
+{
+    public static IServiceCollection AddAuctionRepositoryCached(this IServiceCollection services)
+    {
+        return services.AddAuctionRepositoryImplementation()
+            .AddScoped<IAuctionRepository>(c=>new CachedAuctionRepository(
+                c.GetRequiredService<IDistributedCache>(),
+                c.GetRequiredService<AuctionDbContext>()));
+    }
+    public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
+        services.AddAuctionServicesImplementation()
+            .AddScoped<ICreateAuctionCommandHandler>(c=>
+                new CacheAwareCreateAuctionCommandHandler(
+                    c.GetRequiredService<InnerService<ICreateAuctionCommandHandler>>().Service,
+                    c.GetRequiredService<IDistributedCache>()))
+            .AddScoped<ICreateBidCommandHandler>(c=>
+                new CacheAwareCreateBidCommandHandler(
+                    c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service,
+                    c.GetRequiredService<IDistributedCache>()));
+}

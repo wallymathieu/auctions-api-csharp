@@ -4,7 +4,7 @@ namespace Wallymathieu.Auctions;
 /// </summary>
 /// <typeparam name="TOk"></typeparam>
 /// <typeparam name="TError"></typeparam>
-public interface IResult<TOk, TError> : IResult
+public interface IResult<out TOk, out TError> : IResult
 {
     IResult<TOkResult,TError> Select<TOkResult>(Func<TOk,TOkResult> map);
     IResult<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map);
