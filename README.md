@@ -1,5 +1,13 @@
 # auctions-api-simple
+
 Simple Auction API
+
+There are currently these main implementations:
+
+- [main](https://github.com/wallymathieu/auctions-api-csharp/tree/main) is the core main implementation
+- [command-handlers-infrastructure](https://github.com/wallymathieu/auctions-api-csharp/tree/command-handlers-infrastructure) is the implementation but without hand written command handlers that binds to the entity methods
+
+## Getting started
 
 First copy .env sample to a new .env file
 
@@ -41,6 +49,8 @@ source .env
 export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
 export ConnectionStrings__Redis="localhost"
 export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
+
+export AzureWebJobsStorage="UseDevelopmentStorage=true"
 ```
 
 If you want to run inside dev containers then the setup will be slightly different (since it should be the same environment as you have if you the apps through docker compose):

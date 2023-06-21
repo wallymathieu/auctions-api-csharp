@@ -1,14 +1,11 @@
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
-using Wallymathieu.Auctions.Infrastructure.Services.Cache;
 using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 public static class ServiceExtensions
 {
-    private static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
+    internal static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
     {
         services.TryAddSingleton<ITime, Time>();
         services.RegisterAttributesForType<Auction>();
@@ -17,16 +14,10 @@ public static class ServiceExtensions
     }
 
     public static IServiceCollection AddAuctionServicesNoCache(this IServiceCollection services) =>
-        AddAuctionServicesImplementation(services);
-
-    public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
         AddAuctionServicesImplementation(services)
             .AddScoped<ICreateAuctionCommandHandler>(c=>
-                new CacheAwareCreateAuctionCommandHandler(
-                    c.GetRequiredService<ICreateAuctionCommandHandler>(),
-                    c.GetRequiredService<IDistributedCache>()))
+                    c.GetRequiredService<InnerService<ICreateAuctionCommandHandler>>().Service)
             .AddScoped<ICreateBidCommandHandler>(c=>
-                new CacheAwareCreateBidCommandHandler(
-                    c.GetRequiredService<ICreateBidCommandHandler>(),
-                    c.GetRequiredService<IDistributedCache>()));
+                    c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service);
+
 }

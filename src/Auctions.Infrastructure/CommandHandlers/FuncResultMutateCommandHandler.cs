@@ -30,6 +30,10 @@ class FuncResultMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHan
         var keyValueFactory = _serviceProvider.GetRequiredService<IKeyValueFactory<TCommand>>();
         var entity = await _repository.FindAsync(keyValueFactory.Key(cmd), cancellationToken);
 
+        if (entity is null)
+        {
+            return default;
+        }
         var r = _func(entity, cmd, _serviceProvider);
         if (r.IsOk)
         {

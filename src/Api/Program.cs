@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
@@ -15,20 +16,24 @@ using Wallymathieu.Auctions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddControllers(c =>
-{
-    c.Filters.Add<DecodedHeaderAuthorizationFilter>();
-}).AddJsonOptions(opts =>
+builder.Services.AddControllers().AddJsonOptions(opts =>
 {
     opts.JsonSerializerOptions.AddAuctionConverters();
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    var opts = new JsonSerializerOptions().AddAuctionConverters();
     options.MapType(typeof(Amount), () => new OpenApiSchema
     {
         Type = "string",
         Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
+    });
+    options.MapType<TimeSpan>(()=>new OpenApiSchema
+    {
+        Type = "string",
+        Format = "^(\\d{2}:)?\\d{2}:\\d{2}:\\d{2}$",
+        Example = new OpenApiString(JsonSerializer.Serialize(TimeSpan.FromSeconds(1234), opts))
     });
 });
 if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
@@ -67,16 +72,17 @@ builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<Mapper>();
 builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddOptions<PayloadAuthenticationOptions>();
+builder.Services.AddSingleton<ClaimsPrincipalParser>();
+builder.Services.AddSingleton<JwtPayloadClaimsPrincipalParser>();
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
-builder.Services.AddSingleton<DecodedHeaderAuthorizationFilter>();
-if (!string.IsNullOrEmpty(builder.Configuration["PrincipalHeader"]))
-{
-    builder.Services.AddSingleton<IClaimsPrincipalParser, ClaimsPrincipalParser>();
-}
-else
-{
-    builder.Services.AddSingleton<IClaimsPrincipalParser, JwtPayloadClaimsPrincipalParser>();
-}
+builder.Services
+    .AddAuthentication()
+    .AddPayloadAuthentication(c=>
+    {
+        var principalHeader = builder.Configuration["PrincipalHeader"];
+        if (!string.IsNullOrEmpty(principalHeader)) c.PrincipalHeader = principalHeader;
+    });
 //#else
 // TODO: Register JWT based auth
 //#endif

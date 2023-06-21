@@ -1,8 +1,13 @@
+using System.Text.Json.Serialization;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.DomainModels;
 
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType,
+    TypeDiscriminatorPropertyName = "$type"),
+JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
+JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
 public abstract class Auction: IEntity
 {
 #pragma warning disable CS8618

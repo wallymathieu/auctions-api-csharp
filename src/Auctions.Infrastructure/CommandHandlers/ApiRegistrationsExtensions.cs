@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Wallymathieu.Auctions.Infrastructure.Services;
 
 // ReSharper disable InconsistentNaming
 
@@ -72,7 +73,7 @@ public static class ApiRegistrationsExtensions
             var regType = typeof(ICommandHandler<,>).MakeGenericType(commandType, returnType);
             Func<IServiceProvider, object> serviceFactory =
                 CreateFuncCreateOnlyServiceProviderFactory(t, method, commandType);
-            services.AddScoped(regType, svc => serviceFactory(svc));
+            services.AddScoped(typeof(InnerService<>).MakeGenericType(regType), svc =>serviceFactory(svc));
             return true;
         }
 
@@ -91,14 +92,16 @@ public static class ApiRegistrationsExtensions
         //<TCommand, IServiceProvider, T>
         var funcType = typeof(Func<,,>).MakeGenericType(commandType, typeof(IServiceProvider), t);
         var parameter_Svc = Expression.Parameter(typeof(IServiceProvider), "svc");
+        var innerServiceType = typeof(InnerService<>).MakeGenericType(typeof(ICommandHandler<,>).MakeGenericType(commandType, t));
         // (cmd, svcProvider) => `EntityType`.`MethodInfo`(cmd, svcProvider)
         Func<IServiceProvider, object> lambda = Expression.Lambda<Func<IServiceProvider, object>>(
-            Expression.New( // new
-                implType.GetConstructors()[0], // FuncCreateCommandHandler<TEntity,TCommand>
-                Expression.Constant(Delegate.CreateDelegate(funcType, methodInfo)),
-                parameter_Svc
-            ),
-            parameter_Svc).Compile();
+            Expression.New(innerServiceType.GetConstructors()[0],
+                    Expression.New( // new
+                    implType.GetConstructors()[0], // FuncCreateCommandHandler<TEntity,TCommand>
+                    Expression.Constant(Delegate.CreateDelegate(funcType, methodInfo)),
+                    parameter_Svc
+                    ),
+            parameter_Svc)).Compile();
         return lambda;
     }
 
@@ -117,7 +120,7 @@ public static class ApiRegistrationsExtensions
                 var regType = typeof(ICommandHandler<,>).MakeGenericType(commandType, returnType);
                 Func<IServiceProvider, object> serviceFactory =
                     CreateFuncCreateServiceFactory(t, method, commandType, serviceParameters);
-                services.AddScoped(regType, svc => serviceFactory(svc));
+                services.AddScoped(typeof(InnerService<>).MakeGenericType(regType), svc => serviceFactory(svc));
                 return true;
             }
             default:
@@ -134,6 +137,7 @@ public static class ApiRegistrationsExtensions
         Type commandType, Type[] serviceParameters)
     {
         var implType = typeof(FuncCreateCommandHandler<,>).MakeGenericType(t, commandType);
+        var innerServiceType = typeof(InnerService<>).MakeGenericType(typeof(ICommandHandler<,>).MakeGenericType(commandType, t));
         //<TCommand, IServiceProvider, T>
         var parameter_Svc = Expression.Parameter(typeof(IServiceProvider), "svc");
         var parameter_Cmd = Expression.Parameter(commandType, "cmd");
@@ -146,13 +150,14 @@ public static class ApiRegistrationsExtensions
             select (Expression)Expression.Call(getRequiredService, parameter_Svc);
         // (cmd, svc) => `EntityType`.`MethodInfo`(cmd, svcProvider.GetRequiredService<TService>() ...)
         Func<IServiceProvider, object> lambda = Expression.Lambda<Func<IServiceProvider, object>>(
+            Expression.New(innerServiceType.GetConstructors()[0],
             Expression.New( // new
                 implType.GetConstructors()[0], // FuncCreateCommandHandler<T,TCommand>
                 Expression.Lambda( // (cmd, svcProvider) =>
                     Expression.Call(methodInfo, new Expression[] { parameter_Cmd }.Union(parameters).ToArray()),
                     parameter_Cmd, parameter_Svc),
                 parameter_Svc
-            ),
+            )),
             parameter_Svc).Compile();
         return lambda;
     }
@@ -189,7 +194,7 @@ public static class ApiRegistrationsExtensions
                 var handlerTCommand = typeof(ICommandHandler<,>).MakeGenericType(commandType, returnType);
                 Func<IServiceProvider, object> serviceFactory =
                     CreateFuncMutateServicesFactory(t, method, commandType, serviceParameters, returnType);
-                services.AddScoped(handlerTCommand, svc => serviceFactory(svc));
+                services.AddScoped(typeof(InnerService<>).MakeGenericType(handlerTCommand), svc => serviceFactory(svc));
                 return true;
             }
             default:
@@ -215,7 +220,7 @@ public static class ApiRegistrationsExtensions
                 (_, true) => typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, typeof(object)),
                 _ => typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, returnType)
             };
-
+        var innerServiceType = typeof(InnerService<>).MakeGenericType(typeof(ICommandHandler<,>).MakeGenericType(commandType, returnType));
         var parameter_Entity = Expression.Parameter(t, "entity");
         var parameter_Cmd = Expression.Parameter(commandType, "cmd");
         var parameter_Svc = Expression.Parameter(typeof(IServiceProvider), "svc");
@@ -229,6 +234,7 @@ public static class ApiRegistrationsExtensions
             select (Expression)Expression.Call(getRequiredService, parameter_Svc);
         // (entity, cmd, svcProvider) => entity.`MethodInfo`(cmd, svcProvider)
         Func<IServiceProvider, object> lambda = Expression.Lambda<Func<IServiceProvider, object>>(
+            Expression.New(innerServiceType.GetConstructors()[0],
                 Expression.New( // new
                     funcMutateCommandHandlerTT
                         .GetConstructors()[0], // FuncMutateCommandHandler<TEntity,TCommand,TReturnType>
@@ -238,8 +244,7 @@ public static class ApiRegistrationsExtensions
                             new Expression[] { parameter_Cmd }.Union(parameters).ToArray()),
                         parameter_Entity, parameter_Cmd, parameter_Svc),
                     parameter_Svc
-                ),
-                parameter_Svc)
+                )), parameter_Svc)
             .Compile();
         return lambda;
     }
@@ -256,7 +261,7 @@ public static class ApiRegistrationsExtensions
                 var handlerTCommand = typeof(ICommandHandler<,>).MakeGenericType(commandType, returnType);
                 Func<IServiceProvider, object> serviceFactory =
                     CreateFuncMutateOnlyServiceProviderFactory(t, method, commandType, returnType);
-                services.AddScoped(handlerTCommand, svc => serviceFactory(svc));
+                services.AddScoped(typeof(InnerService<>).MakeGenericType(handlerTCommand), svc => serviceFactory(svc));
                 return true;
             }
             default:
@@ -275,11 +280,13 @@ public static class ApiRegistrationsExtensions
         var funcMutateCommandHandlerTT = returnType == typeof(Unit)
             ? typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, typeof(object))
             : typeof(FuncMutateCommandHandler<,,>).MakeGenericType(t, commandType, returnType);
+        var innerServiceType = typeof(InnerService<>).MakeGenericType(typeof(ICommandHandler<,>).MakeGenericType(commandType, returnType));
         var parameter_Entity = Expression.Parameter(t, "entity");
         var parameter_Cmd = Expression.Parameter(commandType, "cmd");
         var parameter_Svc = Expression.Parameter(typeof(IServiceProvider), "svc");
         // (entity, cmd, svcProvider) => entity.`MethodInfo`(cmd, svcProvider)
         Func<IServiceProvider, object> lambda = Expression.Lambda<Func<IServiceProvider, object>>(
+            Expression.New(innerServiceType.GetConstructors()[0],
                 Expression.New( // new
                     funcMutateCommandHandlerTT
                         .GetConstructors()[0], // FuncMutateCommandHandler<TEntity,TCommand,TReturnType>
@@ -288,8 +295,7 @@ public static class ApiRegistrationsExtensions
                         Expression.Call(parameter_Entity, methodInfo, parameter_Cmd, parameter_Svc),
                         parameter_Entity, parameter_Cmd, parameter_Svc),
                     parameter_Svc
-                ),
-                parameter_Svc)
+                )), parameter_Svc)
             .Compile();
         return lambda;
     }

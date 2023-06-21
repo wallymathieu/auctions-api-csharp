@@ -4,5 +4,5 @@ namespace Wallymathieu.Auctions.Services;
 
 public interface IUserContext
 {
-    UserId UserId { get; }
+    UserId? UserId { get; }
 }
