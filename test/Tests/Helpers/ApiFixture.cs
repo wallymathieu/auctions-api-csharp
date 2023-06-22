@@ -104,6 +104,7 @@ public class MsClientPrincipalApiAuth: IApiAuth
 
 public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
 {
+    private readonly FakeTime _fakeTime= new(InitialNow);
     TestServer Create()
     {
         var application = new WebApplicationFactory<Program>()
@@ -118,7 +119,7 @@ public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
                     services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + _db, conf=>conf.MigrationsAssembly("Auctions")));
 
                     services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
-                    services.AddSingleton<ITime>(new FakeTime(new DateTime(2022,8,4)));
+                    services.AddSingleton<ITime>(_fakeTime);
                     ConfigureServices(services);
                 });
                 builder.UseEnvironment("Test");
@@ -189,4 +190,5 @@ public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
         }).GetAsync();
     private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+    public void SetTime(DateTimeOffset now) => _fakeTime.Now = now;
 }
