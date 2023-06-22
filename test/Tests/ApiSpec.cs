@@ -14,7 +14,7 @@ public abstract class ApiSyncSpec<TAuth>
     [Fact]
     public async Task Create_auction_1()
     {
-        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Create_auction_1)+".db");
+        using var application = new ApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Create_auction_1)+".db");
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var stringContent = await response.Content.ReadAsStringAsync();
         Assert.Multiple(() =>
@@ -29,7 +29,7 @@ public abstract class ApiSyncSpec<TAuth>
     [Fact]
     public async Task Create_auction_2()
     {
-        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Create_auction_2)+".db");
+        using var application = new ApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Create_auction_2)+".db");
         var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
         var stringContent = await response.Content.ReadAsStringAsync();
         Assert.Multiple(() =>
@@ -57,7 +57,7 @@ public abstract class ApiSyncSpec<TAuth>
     ]
     public async Task Fail_to_create_auction(string sample, int index)
     {
-        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Fail_to_create_auction)+"_"+index+".db");
+        using var application = new ApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Fail_to_create_auction)+"_"+index+".db");
         var response = await application.PostAuction(sample, AuthToken.Seller1);
         Assert.Multiple(() =>
         {
@@ -67,7 +67,7 @@ public abstract class ApiSyncSpec<TAuth>
     [Fact]
     public async Task Place_bid_as_buyer_on_auction_1()
     {
-        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Place_bid_as_buyer_on_auction_1)+".db");
+        using var application = new ApiFixture<TAuth>(this.GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Place_bid_as_buyer_on_auction_1)+".db");
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
@@ -86,14 +86,14 @@ public abstract class ApiSyncSpec<TAuth>
     [Fact]
     public async Task Cannot_find_unknown_auction()
     {
-        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Cannot_find_unknown_auction)+".db");
+        using var application = new ApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Cannot_find_unknown_auction)+".db");
         var auctionResponse = await application.GetAuction(99, AuthToken.Seller1);
         Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
     }
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()
     {
-        using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Cannot_place_bid_on_unknown_auction)+".db");
+        using var application = new ApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Cannot_place_bid_on_unknown_auction)+".db");
         var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
     }
@@ -106,7 +106,7 @@ public abstract class ApiAsyncSpec<TAuth>
     [Fact]
     public async Task Create_auction_1()
     {
-        using var application = new AsyncApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Create_auction_1)+".db");
+        using var application = new AsyncApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Create_auction_1)+".db");
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var auctionResponse = await application.GetAuction(1, AuthToken.Seller1);
         var stringContent = await auctionResponse.Content.ReadAsStringAsync();
@@ -122,7 +122,7 @@ public abstract class ApiAsyncSpec<TAuth>
     [Fact]
     public async Task Create_auction_2()
     {
-        using var application = new AsyncApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Create_auction_2)+".db");
+        using var application = new AsyncApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Create_auction_2)+".db");
         var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
         var auctionResponse = await application.GetAuction(1, AuthToken.Seller1);
         var stringContent = await auctionResponse.Content.ReadAsStringAsync();
@@ -152,7 +152,7 @@ public abstract class ApiAsyncSpec<TAuth>
     ]
     public async Task Fail_to_create_auction(string sample, int index)
     {
-        using var application = new AsyncApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Fail_to_create_auction)+"_"+index+".db");
+        using var application = new AsyncApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Fail_to_create_auction)+"_"+index+".db");
         var response = await application.PostAuction(sample, AuthToken.Seller1);
         Assert.Multiple(() =>
         {
@@ -162,7 +162,7 @@ public abstract class ApiAsyncSpec<TAuth>
     [Fact]
     public async Task Place_bid_as_buyer_on_auction_1()
     {
-        using var application = new AsyncApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Place_bid_as_buyer_on_auction_1)+".db");
+        using var application = new AsyncApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Place_bid_as_buyer_on_auction_1)+".db");
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         var auctionResponse = await application.GetAuction(1, AuthToken.Seller1);
@@ -181,14 +181,14 @@ public abstract class ApiAsyncSpec<TAuth>
     [Fact]
     public async Task Cannot_find_unknown_auction()
     {
-        using var application = new AsyncApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Cannot_find_unknown_auction)+".db");
+        using var application = new AsyncApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Cannot_find_unknown_auction)+".db");
         var auctionResponse = await application.GetAuction(99, AuthToken.Seller1);
         Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
     }
     [Fact]
     public async Task Place_bid_on_unknown_auction()
     {
-        using var application = new AsyncApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Place_bid_on_unknown_auction)+".db");
+        using var application = new AsyncApiFixture<TAuth>(GetType().Name+"_"+typeof(TAuth).Name+"_"+nameof(Place_bid_on_unknown_auction)+".db");
         var bidResponse = await application.PostBidToAuction(199, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.Accepted, bidResponse.StatusCode);
 
