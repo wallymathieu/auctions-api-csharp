@@ -6,7 +6,10 @@ public class OnBidCommandHandler
     private readonly JsonSerializerOptions _serializerOptions;
     private readonly ScopedUserContext _userContext;
 
-    public OnBidCommandHandler(ILoggerFactory loggerFactory, ICreateBidCommandHandler createBidCommandHandler, JsonSerializerOptions serializerOptions, ScopedUserContext userContext)
+    public OnBidCommandHandler(ILoggerFactory loggerFactory,
+        ICreateBidCommandHandler createBidCommandHandler,
+        JsonSerializerOptions serializerOptions,
+        ScopedUserContext userContext)
     {
         _createBidCommandHandler = createBidCommandHandler;
         _serializerOptions = serializerOptions;
@@ -20,9 +23,9 @@ public class OnBidCommandHandler
         string commandString, CancellationToken cancellationToken)
     {
         var command = JsonSerializer.Deserialize<UserIdDecorator<CreateBidCommand>>(commandString, _serializerOptions);
+        if (command == null) throw new NullReferenceException(nameof(command));
         _userContext.UserId = command.UserId;
         _logger.LogInformation($"bid received");
-        if (command == null) throw new NullReferenceException(nameof(command));
         var result = await _createBidCommandHandler.Handle(command.Command, cancellationToken);
         switch (result)
         {

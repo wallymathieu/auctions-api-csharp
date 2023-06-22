@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Api.Middleware.Auth;
-using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Services;
 
@@ -120,14 +119,17 @@ public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
 
                     services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
                     services.AddSingleton<ITime>(new FakeTime(new DateTime(2022,8,4)));
-
+                    ConfigureServices(services);
                 });
+                builder.UseEnvironment("Test");
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         var context = serviceScope.ServiceProvider.GetRequiredService<AuctionDbContext>();
         context.Database.EnsureCreated();
         return application.Server;
     }
+
+    protected virtual void ConfigureServices(IServiceCollection services) {}
 
     private void RemoveDbFile()
     {
