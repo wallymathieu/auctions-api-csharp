@@ -23,7 +23,7 @@ class FuncMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHandler<T
         _db = serviceProvider.GetRequiredService<AuctionDbContext>();
     }
 
-    public async Task<TResponse> Handle(TCommand cmd, CancellationToken cancellationToken)
+    public async Task<TResponse?> Handle(TCommand cmd, CancellationToken cancellationToken)
     {
         var keyValueFactory = _serviceProvider.GetRequiredService<IKeyValueFactory<TCommand>>();
         var entity = await _repository.FindAsync(keyValueFactory.Key(cmd), cancellationToken);

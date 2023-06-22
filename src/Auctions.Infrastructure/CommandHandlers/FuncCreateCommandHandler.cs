@@ -19,7 +19,7 @@ class FuncCreateCommandHandler<TEntity, TCommand> : ICommandHandler<TCommand, TE
         _db = serviceProvider.GetRequiredService<AuctionDbContext>();
     }
 
-    public async Task<TEntity> Handle(TCommand cmd, CancellationToken cancellationToken)
+    public async Task<TEntity?> Handle(TCommand cmd, CancellationToken cancellationToken)
     {
         var entity = _func(cmd, _serviceProvider);
         await _repository.AddAsync(entity, cancellationToken);
