@@ -8,21 +8,6 @@ using static JsonSamples;
 public class ApiSyncSpecJwtToken:ApiSyncSpec<JwtApiAuth>{}
 public class ApiSyncSpecMsClientPrincipal:ApiSyncSpec<MsClientPrincipalApiAuth>{}
 
-public static class JsonSamples
-{
-    public const string FirstAuctionRequest = @"{
-        ""startsAt"": ""2022-07-01T10:00:00.000Z"",
-        ""endsAt"": ""2022-09-18T10:00:00.000Z"",
-        ""title"": ""Some auction"",
-        ""currency"": ""VAC""
-}";
-    public const string SecondAuctionRequest = @"{
-        ""startsAt"": ""2021-12-01T10:00:00.000Z"",
-        ""endsAt"": ""2022-12-18T10:00:00.000Z"",
-        ""title"": ""Some auction"",
-        ""currency"": ""VAC""
-}";
-}
 public abstract class ApiSyncSpec<TAuth>
     where TAuth:IApiAuth, new()
 {
@@ -35,15 +20,7 @@ public abstract class ApiSyncSpec<TAuth>
         Assert.Multiple(() =>
         {
             Assert.Equal(HttpStatusCode.Created,response.StatusCode);
-            Assert.Equal(JToken.Parse(@"{
-                ""id"": 1,
-                ""startsAt"": ""2022-07-01T10:00:00.000Z"",
-                ""title"": ""Some auction"",
-                ""expiry"": ""2022-09-18T10:00:00.000Z"",
-                ""seller"": ""seller1@hotmail.com"",
-                ""currency"": ""VAC"",
-                ""bids"": []
-        }").ToString(Formatting.Indented),
+            Assert.Equal(JToken.Parse(FirstAuctionResponse).ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
@@ -58,15 +35,7 @@ public abstract class ApiSyncSpec<TAuth>
         Assert.Multiple(() =>
         {
             Assert.Equal(HttpStatusCode.Created,response.StatusCode);
-            Assert.Equal(JToken.Parse(@"{
-                ""id"": 1,
-                ""startsAt"": ""2021-12-01T10:00:00.000Z"",
-                ""title"": ""Some auction"",
-                ""expiry"": ""2022-12-18T10:00:00.000Z"",
-                ""seller"": ""seller1@hotmail.com"",
-                ""currency"": ""VAC"",
-                ""bids"": []
-        }").ToString(Formatting.Indented),
+            Assert.Equal(JToken.Parse(SecondAuctionResponse).ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
@@ -101,8 +70,8 @@ public abstract class ApiSyncSpec<TAuth>
         using var application = new ApiFixture<TAuth>(typeof(TAuth).Name+"_"+nameof(Place_bid_as_buyer_on_auction_1)+".db");
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
-        var auctionResponse = await application.GetAuction(1, AuthToken.Seller1);
         var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
+        var auctionResponse = await application.GetAuction(1, AuthToken.Seller1);
         var stringContent = await auctionResponse.Content.ReadAsStringAsync();
         Assert.Multiple(() =>
         {
@@ -110,17 +79,7 @@ public abstract class ApiSyncSpec<TAuth>
             Assert.Equal(HttpStatusCode.OK,bidResponse.StatusCode);
             Assert.Empty(bidResponseString);
             Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
-            Assert.Equal(JToken.Parse(@"{
-                ""id"": 1,
-                ""startsAt"": ""2022-07-01T10:00:00.000Z"",
-                ""title"": ""Some auction"",
-                ""expiry"": ""2022-09-18T10:00:00.000Z"",
-                ""seller"": ""seller1@hotmail.com"",
-                ""currency"": ""VAC"",
-                ""bids"": [{
-                    ""amount"": ""VAC11"",
-                    ""bidder"": ""buyer1@hotmail.com""
-                }]}").ToString(Formatting.Indented),
+            Assert.Equal(WithBid(FirstAuctionResponse,"VAC11","buyer1@hotmail.com").ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
@@ -155,15 +114,7 @@ public abstract class ApiAsyncSpec<TAuth>
         {
             Assert.Equal(HttpStatusCode.Accepted,response.StatusCode);
             Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
-            Assert.Equal(JToken.Parse(@"{
-                ""id"": 1,
-                ""startsAt"": ""2022-07-01T10:00:00.000Z"",
-                ""title"": ""Some auction"",
-                ""expiry"": ""2022-09-18T10:00:00.000Z"",
-                ""seller"": ""seller1@hotmail.com"",
-                ""currency"": ""VAC"",
-                ""bids"": []
-        }").ToString(Formatting.Indented),
+            Assert.Equal(JToken.Parse(FirstAuctionResponse).ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
@@ -179,15 +130,7 @@ public abstract class ApiAsyncSpec<TAuth>
         {
             Assert.Equal(HttpStatusCode.Accepted,response.StatusCode);
             Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
-            Assert.Equal(JToken.Parse(@"{
-                ""id"": 1,
-                ""startsAt"": ""2021-12-01T10:00:00.000Z"",
-                ""title"": ""Some auction"",
-                ""expiry"": ""2022-12-18T10:00:00.000Z"",
-                ""seller"": ""seller1@hotmail.com"",
-                ""currency"": ""VAC"",
-                ""bids"": []
-        }").ToString(Formatting.Indented),
+            Assert.Equal(JToken.Parse(SecondAuctionResponse).ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }
@@ -231,17 +174,7 @@ public abstract class ApiAsyncSpec<TAuth>
             Assert.Equal(HttpStatusCode.Accepted,bidResponse.StatusCode);
             Assert.Empty(bidResponseString);
             Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
-            Assert.Equal(JToken.Parse(@"{
-                ""id"": 1,
-                ""startsAt"": ""2022-07-01T10:00:00.000Z"",
-                ""title"": ""Some auction"",
-                ""expiry"": ""2022-09-18T10:00:00.000Z"",
-                ""seller"": ""seller1@hotmail.com"",
-                ""currency"": ""VAC"",
-                ""bids"": [{
-                    ""amount"": ""VAC11"",
-                    ""bidder"": ""buyer1@hotmail.com""
-                }]}").ToString(Formatting.Indented),
+            Assert.Equal(WithBid(FirstAuctionResponse,"VAC11","buyer1@hotmail.com").ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }

@@ -38,6 +38,7 @@ public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, 
                     catch (Exception e)
                     {
                         _logger.LogError(e,"Failed to add auction");
+                        throw;
                     }
                     return;
                 }
@@ -51,6 +52,7 @@ public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, 
                     catch (Exception e)
                     {
                         _logger.LogError(e,"Failed to add bid");
+                        throw;
                     }
                     return;
                 }
