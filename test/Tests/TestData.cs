@@ -6,8 +6,9 @@ public class TestData
 {
     public static readonly AuctionId AuctionId = new(1L);
     public static readonly string Title = "auction";
-    public static DateTimeOffset StartsAt = new DateTime(2016, 1, 1);
-    public static DateTimeOffset EndsAt = new DateTime(2016, 2, 1);
+    public static readonly DateTimeOffset InitialNow = new DateTime(2015, 12, 4,0,0,0,DateTimeKind.Utc);
+    public static readonly DateTimeOffset StartsAt = new DateTime(2016, 1, 1, 0,0,0,DateTimeKind.Utc);
+    public static readonly DateTimeOffset EndsAt = new DateTime(2016, 2, 1, 0,0,0,DateTimeKind.Utc);
     public static readonly UserId Seller = new("x1");
     public static readonly UserId Buyer = new("x2");
 
