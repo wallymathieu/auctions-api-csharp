@@ -23,9 +23,9 @@ public class OnAuctionCommandHandler
         string commandString, CancellationToken cancellationToken)
     {
         var command = JsonSerializer.Deserialize<UserIdDecorator<CreateAuctionCommand>>(commandString, _serializerOptions);
+        if (command == null) throw new NullReferenceException(nameof(command));
         _userContext.UserId = command.UserId;
         _logger.LogInformation("Create auction command received");
-        if (command == null) throw new NullReferenceException(nameof(command));
         var result = await _createAuctionCommandHandler.Handle(command.Command, cancellationToken);
         _logger.LogInformation("Create auction command processed {AuctionId}", result.Id);
     }

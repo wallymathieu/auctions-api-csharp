@@ -4,12 +4,10 @@ namespace Wallymathieu.Auctions.Tests.Helpers;
 
 internal class FakeTime : ITime
 {
-    private readonly DateTimeOffset _now;
-
     public FakeTime(DateTimeOffset now)
     {
-        _now = now;
+        Now = now;
     }
 
-    public DateTimeOffset Now => _now;
+    public DateTimeOffset Now { get; set; }
 }
