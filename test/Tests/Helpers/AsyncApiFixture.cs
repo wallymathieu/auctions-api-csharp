@@ -8,15 +8,23 @@ namespace Wallymathieu.Auctions.Tests.Helpers;
 
 public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, new()
 {
-    class AsyncMessageQueue : IMessageQueue
+    /// <summary>
+    /// Note:
+    /// <br/>- In order to be able to test the API with a message queue, we assume that it is somewhat equivalent to a API invocation
+    /// directly with hidden side effects. Since the tests don't try to measure the time to only enqueue, we instead execute immediately.
+    /// <br/>- An otherwise hidden side effect would be if the execution of the command throws an exception. We will get
+    /// an exception directly in the enqueue call. Since the business logic does not use exceptions for business purposes
+    /// this should be a good enough tradeoff.
+    /// </summary>
+    class FakeAsyncMessageQueue : IMessageQueue
     {
         private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
         private readonly ICreateBidCommandHandler _createBidCommandHandler;
-        private readonly ILogger<AsyncMessageQueue> _logger;
+        private readonly ILogger<FakeAsyncMessageQueue> _logger;
 
-        public AsyncMessageQueue(ICreateAuctionCommandHandler createAuctionCommandHandler,
+        public FakeAsyncMessageQueue(ICreateAuctionCommandHandler createAuctionCommandHandler,
             ICreateBidCommandHandler createBidCommandHandler,
-            ILogger<AsyncMessageQueue> logger)
+            ILogger<FakeAsyncMessageQueue> logger)
         {
             _createAuctionCommandHandler = createAuctionCommandHandler;
             _createBidCommandHandler = createBidCommandHandler;
@@ -47,6 +55,7 @@ public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, 
                     var cmd = command as UserIdDecorator<CreateBidCommand>;
                     try
                     {
+
                         await _createBidCommandHandler.Handle(cmd!.Command, cancellationToken);
                     }
                     catch (Exception e)
@@ -67,6 +76,6 @@ public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, 
     protected override void ConfigureServices(IServiceCollection services)
     {
         services.Remove(services.First(s => s.ServiceType == typeof(IMessageQueue)));
-        services.AddScoped<IMessageQueue, AsyncMessageQueue>();
+        services.AddScoped<IMessageQueue, FakeAsyncMessageQueue>();
     }
 }
