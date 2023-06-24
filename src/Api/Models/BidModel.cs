@@ -6,4 +6,5 @@ namespace Wallymathieu.Auctions.Api.Models;
 /// </summary>
 public record BidModel(
     Amount Amount,
-    string? Bidder);
+    string? Bidder,
+    TimeSpan At);

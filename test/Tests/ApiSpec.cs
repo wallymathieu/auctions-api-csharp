@@ -90,7 +90,10 @@ public abstract class BaseApiSpec
             Assert.True(bidResponse.IsSuccessStatusCode);
             Assert.Empty(bidResponseString);
             Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
-            Assert.Equal(HasEnded(WithPriceAndWinner(WithBid(JToken.Parse(FirstAuctionResponse),"VAC11","#1"), "VAC11", "#1")).ToString(Formatting.Indented),
+            Assert.Equal(HasEnded(
+                    WithPriceAndWinner(
+                        WithBid(JToken.Parse(FirstAuctionResponse),"VAC11","#1", "02:00:00"),
+                    "VAC11", "#1")).ToString(Formatting.Indented),
                 JToken.Parse(stringContent).ToString(Formatting.Indented));
         });
     }

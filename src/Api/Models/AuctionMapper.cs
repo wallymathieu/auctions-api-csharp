@@ -32,6 +32,8 @@ public class AuctionMapper
             Winner: bidUserMapper.GetUserString(amountAndWinner?.Winner),
             HasEnded: hasEnded,
             Bids: arg.GetBids(now)?.Select(bid =>
-                new BidModel(bid.Amount, bidUserMapper.GetUserString(bid.User))).ToArray() ?? Array.Empty<BidModel>());
+                new BidModel(bid.Amount,
+                    bidUserMapper.GetUserString(bid.User),
+                    bid.At-arg.StartsAt)).ToArray() ?? Array.Empty<BidModel>());
     }
 }

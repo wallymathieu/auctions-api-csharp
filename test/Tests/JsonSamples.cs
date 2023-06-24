@@ -44,10 +44,10 @@ public static class JsonSamples
                 ""hasEnded"": false
         }";
 
-    public static JToken WithBid(JToken token, string amount, string bidder)
+    public static JToken WithBid(JToken token, string amount, string bidder, string at)
     {
         JArray array = (JArray)(token["bids"] ?? new JArray());
-        array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}""}}"));
+        array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}"", ""at"":""{at}""}}"));
         return token;
     }
 
