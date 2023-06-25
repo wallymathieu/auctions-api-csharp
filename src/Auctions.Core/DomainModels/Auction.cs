@@ -8,7 +8,7 @@ namespace Wallymathieu.Auctions.DomainModels;
     TypeDiscriminatorPropertyName = "$type"),
 JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
 JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
-public abstract class Auction
+public abstract class Auction: IState
 {
 #pragma warning disable CS8618
     protected Auction()
@@ -31,6 +31,8 @@ public abstract class Auction
     public UserId User { get; init; }
     public CurrencyCode Currency { get; init; }
     public AuctionType AuctionType { get; set; }
+
+    public bool OpenBidders { get; set; } = false;
 
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
@@ -69,6 +71,8 @@ public abstract class Auction
 
     public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
     public abstract IEnumerable<Bid> GetBids(DateTimeOffset time);
+    public abstract (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time);
+    public abstract bool HasEnded(DateTimeOffset time);
 }
 
 public enum AuctionType

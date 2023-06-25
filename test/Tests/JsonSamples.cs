@@ -19,7 +19,10 @@ public static class JsonSamples
                 ""expiry"": """+EndsAt.ToString(TimeFormatter.TimeFormat)+@""",
                 ""seller"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
-                ""bids"": []
+                ""bids"": [],
+                ""price"": null,
+                ""winner"": null,
+                ""hasEnded"": false
         }";
     public const string SecondAuctionRequest = @"{
         ""startsAt"": ""2021-12-01T10:00:00.000Z"",
@@ -35,14 +38,29 @@ public static class JsonSamples
                 ""expiry"": ""2022-12-18T10:00:00.000Z"",
                 ""seller"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
-                ""bids"": []
+                ""bids"": [],
+                ""price"": null,
+                ""winner"": null,
+                ""hasEnded"": false
         }";
 
-    public static JToken WithBid(string auction, string amount, string bidder)
+    public static JToken WithBid(JToken token, string amount, string bidder, string at)
     {
-        var token = JToken.Parse(auction);
         JArray array = (JArray)(token["bids"] ?? new JArray());
-        array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}""}}"));
+        array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}"", ""at"":""{at}""}}"));
+        return token;
+    }
+
+    public static JToken WithPriceAndWinner(JToken token, string amount, string winner)
+    {
+        token["price"] = amount;
+        token["winner"] = winner;
+        return token;
+    }
+
+    public static JToken HasEnded(JToken token)
+    {
+        token["hasEnded"] = true;
         return token;
     }
 }

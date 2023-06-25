@@ -9,6 +9,9 @@ public record AuctionModel(
     DateTimeOffset StartsAt,
     string Title,
     DateTimeOffset Expiry,
-    string Seller,
+    string? Seller,
     CurrencyCode Currency,
-    BidModel[] Bids);
+    BidModel[] Bids,
+    Amount? Price,
+    string? Winner,
+    bool HasEnded);

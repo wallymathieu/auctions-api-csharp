@@ -70,7 +70,7 @@ if (azureStorageConnectionString != null)
 }
 builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<Mapper>();
+builder.Services.AddSingleton<AuctionMapper>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddOptions<PayloadAuthenticationOptions>();
 builder.Services.AddSingleton<ClaimsPrincipalParser>();

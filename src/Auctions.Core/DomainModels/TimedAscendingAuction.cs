@@ -1,5 +1,7 @@
 namespace Wallymathieu.Auctions.DomainModels;
-
+/// <summary>
+/// The responsibility of this class is to handle the domain model of "timed ascending" auction model.
+/// </summary>
 public class TimedAscendingAuction : Auction, IState
 {
     public TimedAscendingAuction()
@@ -82,7 +84,7 @@ public class TimedAscendingAuction : Auction, IState
         return Array.Empty<Bid>();
     }
 
-    public (Amount, UserId)? TryGetAmountAndWinner(DateTimeOffset time)
+    public override (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)
     {
         switch (GetState(time))
         {
@@ -99,7 +101,7 @@ public class TimedAscendingAuction : Auction, IState
         }
     }
 
-    public bool HasEnded(DateTimeOffset time)
+    public override bool HasEnded(DateTimeOffset time)
     {
         return GetState(time) switch
         {
