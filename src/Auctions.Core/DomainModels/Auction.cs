@@ -8,7 +8,7 @@ namespace Wallymathieu.Auctions.DomainModels;
     TypeDiscriminatorPropertyName = "$type"),
 JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
 JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
-public abstract class Auction: IEntity
+public abstract class Auction: IEntity, IState
 {
 #pragma warning disable CS8618
     protected Auction()
@@ -31,6 +31,8 @@ public abstract class Auction: IEntity
     public UserId User { get; init; }
     public CurrencyCode Currency { get; init; }
     public AuctionType AuctionType { get; set; }
+
+    public bool OpenBidders { get; set; } = false;
 
     [CommandHandler]
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
@@ -61,16 +63,18 @@ public abstract class Auction: IEntity
                 };
     }
     [CommandHandler]
-    public IResult<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
+    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
     {
         var bid = new Bid(userContext.UserId, model.Amount, time.Now);
         return TryAddBid(time.Now, bid, out var error)
-            ? new Ok<Bid, Errors>(bid)
-            : new Error<Bid, Errors>(error);
+            ? Result<Bid, Errors>.Ok(bid)
+            : Result<Bid, Errors>.Error(error);
     }
 
     public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
     public abstract IEnumerable<Bid> GetBids(DateTimeOffset time);
+    public abstract (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time);
+    public abstract bool HasEnded(DateTimeOffset time);
 }
 
 public enum AuctionType

@@ -89,7 +89,7 @@ left as an exercise to the reader).
 public abstract class Auction : IEntity
 {
     //...
-    public IResult<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
+    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
     {
        //...
     }

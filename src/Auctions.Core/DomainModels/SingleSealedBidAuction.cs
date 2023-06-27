@@ -1,5 +1,7 @@
 namespace Wallymathieu.Auctions.DomainModels;
-
+/// <summary>
+/// The responsibility of this class is to handle the domain model of "single sealed bid" auction model.
+/// </summary>
 public class SingleSealedBidAuction: Auction, IState
 {
     public SingleSealedBidAuction()
@@ -70,7 +72,7 @@ public class SingleSealedBidAuction: Auction, IState
         return Array.Empty<Bid>();
     }
 
-    public (Amount, UserId)? TryGetAmountAndWinner(DateTimeOffset time)
+    public override (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)
     {
         switch (GetState(time))
         {
@@ -103,7 +105,7 @@ public class SingleSealedBidAuction: Auction, IState
         }
     }
 
-    public bool HasEnded(DateTimeOffset time)
+    public override bool HasEnded(DateTimeOffset time)
     {
         return GetState(time) switch
         {

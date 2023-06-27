@@ -102,7 +102,14 @@ public class MsClientPrincipalApiAuth: IApiAuth
     }
 }
 
-public class ApiFixture<TAuth>:IDisposable where TAuth:IApiAuth, new()
+public interface IApiFixture:IDisposable
+{
+    Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken auth);
+    Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken auth);
+    Task<HttpResponseMessage> GetAuction(long id, AuthToken auth);
+    void SetTime(DateTimeOffset now);
+}
+public class ApiFixture<TAuth>:IApiFixture, IDisposable where TAuth:IApiAuth, new()
 {
     private readonly FakeTime _fakeTime= new(InitialNow);
     TestServer Create()

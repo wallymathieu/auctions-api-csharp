@@ -15,21 +15,21 @@ namespace Wallymathieu.Auctions.Api.Controllers;
 [Route("auctions")]
 public class AuctionsController : ControllerBase
 {
-    private readonly Mapper _mapper;
+    private readonly AuctionMapper _auctionMapper;
     private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
     private readonly ICreateBidCommandHandler _createBidCommandHandler;
     private readonly IAuctionRepository _auctionRepository;
     private readonly IMessageQueue _messageQueue;
     private readonly IUserContext _userContext;
 
-    public AuctionsController(Mapper mapper,
+    public AuctionsController(AuctionMapper auctionMapper,
         ICreateAuctionCommandHandler createAuctionCommandHandler,
         ICreateBidCommandHandler createBidCommandHandler,
         IAuctionRepository auctionRepository,
         IMessageQueue messageQueue,
         IUserContext userContext)
     {
-        _mapper = mapper;
+        _auctionMapper = auctionMapper;
         _createAuctionCommandHandler = createAuctionCommandHandler;
         _createBidCommandHandler = createBidCommandHandler;
         _auctionRepository = auctionRepository;
@@ -40,13 +40,13 @@ public class AuctionsController : ControllerBase
     [HttpGet(Name = "get_auctions")]
     public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
         from auction in await _auctionRepository.GetAuctionsAsync(cancellationToken)
-        select _mapper.MapAuctionToModel(auction);
+        select _auctionMapper.MapAuctionToModel(auction);
 
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
     {
         var auction = await _auctionRepository.GetAuctionAsync(auctionId, cancellationToken);
-        return auction is null ? NotFound() : _mapper.MapAuctionToModel(auction);
+        return auction is null ? NotFound() : _auctionMapper.MapAuctionToModel(auction);
     }
 
     [HttpPost(Name = "create_auction") , Authorize]
@@ -60,7 +60,7 @@ public class AuctionsController : ControllerBase
         }
         else
         {
-            var auction = _mapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(model,cancellationToken));
+            var auction = _auctionMapper.MapAuctionToModel(await _createAuctionCommandHandler.Handle(model,cancellationToken));
             return CreatedAtAction(nameof(GetSingle),new {auctionId = auction.Id },auction);
         }
     }
@@ -78,14 +78,10 @@ public class AuctionsController : ControllerBase
         else
         {
             var result = await _createBidCommandHandler.Handle(cmd, cancellationToken);
-            return result switch
-            {
-                Ok<Bid, Errors> => Ok(),
-                Error<Bid, Errors> err => err.Value == Errors.UnknownAuction
-                    ? NotFound()
-                    : BadRequest(err.Value),
-                _ => NotFound()
-            };
+            if (result is null) return NotFound();
+            return result.Match<ActionResult>(ok => Ok(), err => err == Errors.UnknownAuction
+                ? NotFound()
+                : BadRequest(err));
         }
     }
 }

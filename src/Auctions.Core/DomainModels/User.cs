@@ -38,7 +38,7 @@ public abstract partial record User(UserId Id)
         if (match.Success)
         {
             string typ = match.Groups["type"].Value;
-            string id = match.Groups["id"].Value;
+            string? id = match.Groups["id"].Value;
             string name = match.Groups["name"].Value;
             switch (typ)
             {

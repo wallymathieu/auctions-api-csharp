@@ -27,14 +27,8 @@ public class OnBidCommandHandler
         _userContext.UserId = command.UserId;
         _logger.LogInformation($"bid received");
         var result = await _createBidCommandHandler.Handle(command.Command, cancellationToken);
-        switch (result)
-        {
-            case Ok<Bid,Errors> ok:
-                _logger.LogInformation("bid processed successfully {Result}", ok);
-                break;
-            case Error<Bid,Errors> error:
-                _logger.LogInformation("bid processed {Error}", error);
-                break;
-        }
+        if (result is null) return;
+        result.Match(ok => _logger.LogInformation("bid processed successfully {Result}", ok),
+            error => _logger.LogInformation("bid processed {Error}", error));
     }
 }
