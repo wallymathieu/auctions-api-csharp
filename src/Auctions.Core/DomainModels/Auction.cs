@@ -61,12 +61,12 @@ public abstract class Auction: IState
                     }
                 };
     }
-    public IResult<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
+    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
     {
         var bid = new Bid(userContext.UserId, model.Amount, time.Now);
         return TryAddBid(time.Now, bid, out var error)
-            ? new Ok<Bid, Errors>(bid)
-            : new Error<Bid, Errors>(error);
+            ? Result<Bid, Errors>.Ok(bid)
+            : Result<Bid, Errors>.Error(error);
     }
 
     public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);

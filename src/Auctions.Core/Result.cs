@@ -4,10 +4,85 @@ namespace Wallymathieu.Auctions;
 /// </summary>
 /// <typeparam name="TOk"></typeparam>
 /// <typeparam name="TError"></typeparam>
-public interface IResult<out TOk, out TError> : IResult
+public sealed class Result<TOk, TError> : IResult
 {
-    IResult<TOkResult,TError> Select<TOkResult>(Func<TOk,TOkResult> map);
-    IResult<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map);
+    private readonly Tag _tag;
+    private readonly TOk? _ok;
+    private readonly TError? _error;
+
+    private enum Tag
+    {
+        Ok,
+        Error
+    }
+    private Result(Tag tag, TOk? ok, TError? error)
+    {
+        _tag = tag;
+        _ok = ok;
+        _error = error;
+    }
+
+    public static Result<TOk, TError> Ok(TOk ok)
+    {
+        return new Result<TOk, TError>(Tag.Ok, ok, default);
+    }
+    public static Result<TOk, TError> Error(TError error)
+    {
+        return new Result<TOk, TError>(Tag.Error, default, error);
+    }
+    public Result<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map)
+    {
+        switch (_tag)
+        {
+            case Tag.Ok:
+                return Result<TOkResult, TError>.Ok(map(_ok!));
+            case Tag.Error:
+                return Result<TOkResult, TError>.Error(_error!);
+            default:
+                throw new InvalidOperationException();
+        }
+    }
+
+    public Result<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map)
+    {
+        switch (_tag)
+        {
+            case Tag.Ok:
+                return Result<TOk, TErrorResult>.Ok(_ok!);
+            case Tag.Error:
+                return Result<TOk, TErrorResult>.Error(map(_error!));
+            default:
+                throw new InvalidOperationException();
+        }
+    }
+
+    public void Match(Action<TOk> ok, Action<TError> error)
+    {
+        switch (_tag)
+        {
+            case Tag.Ok:
+                ok(_ok!);
+                break;
+            case Tag.Error:
+                error(_error!);
+                break;
+        }
+    }
+    public TResult Match<TResult>(Func<TOk,TResult> ok, Func<TError,TResult> error)
+    {
+        switch (_tag)
+        {
+            case Tag.Ok:
+                return ok(_ok!);
+            case Tag.Error:
+                return error(_error!);
+            default:
+                throw new InvalidOperationException();
+        }
+    }
+
+    public bool IsOk => _tag == Tag.Ok;
+    public bool IsError => _tag == Tag.Error;
 }
 /// <summary>
 ///
@@ -16,30 +91,4 @@ public interface IResult
 {
     public bool IsOk { get; }
     public bool IsError { get; }
-}
-
-public record Ok<TOk,TError>(TOk Value):IResult<TOk,TError>
-{
-    public IResult<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map) =>
-        new Ok<TOkResult, TError>(map(Value));
-
-    public IResult<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map) =>
-        new Ok<TOk, TErrorResult>(Value);
-
-    public bool IsOk => true;
-
-    public bool IsError => false;
-}
-
-public record Error<TOk,TError>(TError Value):IResult<TOk,TError>
-{
-    public IResult<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map) =>
-        new Error<TOkResult, TError>(Value);
-
-    public IResult<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map) =>
-        new Error<TOk, TErrorResult>(map(Value));
-
-    public bool IsOk => false;
-
-    public bool IsError => true;
 }

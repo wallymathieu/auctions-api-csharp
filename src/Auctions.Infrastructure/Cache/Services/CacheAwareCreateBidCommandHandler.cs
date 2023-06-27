@@ -13,7 +13,7 @@ internal class CacheAwareCreateBidCommandHandler: ICreateBidCommandHandler
         _cache = cache;
     }
 
-    public async Task<IResult<Bid,Errors>> Handle(CreateBidCommand model, CancellationToken cancellationToken)
+    public async Task<Result<Bid,Errors>> Handle(CreateBidCommand model, CancellationToken cancellationToken)
     {
         var res = await _createBidCommandHandler.Handle(model, cancellationToken);
         await _cache.RemoveAsync(CacheKeys.Auctions, cancellationToken);

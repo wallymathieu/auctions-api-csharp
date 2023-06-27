@@ -19,10 +19,10 @@ internal class CreateBidCommandHandler : ICreateBidCommandHandler
         _time = time;
     }
 
-    public async Task<IResult<Bid, Errors>> Handle(CreateBidCommand model, CancellationToken cancellationToken)
+    public async Task<Result<Bid, Errors>> Handle(CreateBidCommand model, CancellationToken cancellationToken)
     {
         var auction = await _auctionRepository.GetAuctionAsync(model.AuctionId, cancellationToken);
-        if (auction is null) return new Error<Bid, Errors>(Errors.UnknownAuction);
+        if (auction is null) return Result<Bid, Errors>.Error(Errors.UnknownAuction);
         var result = auction.TryAddBid(model, _userContext, _time);
         if (result.IsOk)
         {
