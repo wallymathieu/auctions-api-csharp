@@ -3,6 +3,7 @@ using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Wallymathieu.Auctions.Api.Hubs;
 using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Api.Infrastructure.Queues;
 using Wallymathieu.Auctions.Api.Middleware.Auth;
@@ -21,6 +22,7 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
     opts.JsonSerializerOptions.AddAuctionConverters();
 });
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSignalR();
 builder.Services.AddSwaggerGen(options =>
 {
     var opts = new JsonSerializerOptions().AddAuctionConverters();
@@ -100,5 +102,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapHub<AuctionHub>("/query/auctions");
 app.Run();

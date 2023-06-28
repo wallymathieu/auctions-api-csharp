@@ -6,14 +6,14 @@ public class TestData
 {
     public static readonly AuctionId AuctionId = new(1L);
     public static readonly string Title = "auction";
-    public static readonly DateTimeOffset InitialNow = new DateTime(2015, 12, 4,0,0,0,DateTimeKind.Utc);
-    public static readonly DateTimeOffset StartsAt = new DateTime(2016, 1, 1, 0,0,0,DateTimeKind.Utc);
-    public static readonly DateTimeOffset EndsAt = new DateTime(2016, 2, 1, 0,0,0,DateTimeKind.Utc);
+    public static readonly DateTime InitialNow = new DateTime(2015, 12, 4,0,0,0,DateTimeKind.Utc);
+    public static readonly DateTime StartsAt = new DateTime(2016, 1, 1, 0,0,0,DateTimeKind.Utc);
+    public static readonly DateTime EndsAt = new DateTime(2016, 2, 1, 0,0,0,DateTimeKind.Utc);
     public static readonly UserId Seller = new("x1");
     public static readonly UserId Buyer = new("x2");
 
     public static TimedAscendingAuction GetEnglishAuction()=>
-        new TimedAscendingAuction
+        new()
         {
             AuctionId = AuctionId.Id,
             Title = Title,
@@ -29,7 +29,7 @@ public class TestData
             }
         };
     public static SingleSealedBidAuction GetVickreyAuction()=>
-        new SingleSealedBidAuction
+        new()
         {
             AuctionId = AuctionId.Id,
             Title = Title,
