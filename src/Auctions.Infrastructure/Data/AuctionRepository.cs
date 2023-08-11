@@ -1,4 +1,3 @@
-using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
