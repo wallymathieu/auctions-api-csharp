@@ -22,7 +22,7 @@ public class AuctionMapper
         var hasEnded = arg.HasEnded(now);
         IBidUserMapper bidUserMapper = arg.OpenBidders? new BidUserMapper():new NumberedBidUserMapper(arg.Bids);
         return new AuctionModel(
-            Id: arg.Id.Id,
+            Id: arg.AuctionId.Id,
             StartsAt :arg.StartsAt,
             Title: arg.Title,
             Expiry: arg.Expiry,

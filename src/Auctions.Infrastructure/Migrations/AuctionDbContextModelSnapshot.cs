@@ -22,7 +22,7 @@ namespace App.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Wallymathieu.Auctions.Domain.Auction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.Auction", b =>
                 {
                     b.Property<long>("AuctionId")
                         .ValueGeneratedOnAdd()
@@ -40,6 +40,9 @@ namespace App.Migrations
 
                     b.Property<DateTimeOffset>("Expiry")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("OpenBidders")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("StartsAt")
                         .HasColumnType("datetimeoffset");
@@ -63,7 +66,7 @@ namespace App.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Wallymathieu.Auctions.Domain.BidEntity", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.BidEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,9 +92,9 @@ namespace App.Migrations
                     b.ToTable("Bids", (string)null);
                 });
 
-            modelBuilder.Entity("Wallymathieu.Auctions.Domain.SingleSealedBidAuction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.SingleSealedBidAuction", b =>
                 {
-                    b.HasBaseType("Wallymathieu.Auctions.Domain.Auction");
+                    b.HasBaseType("Wallymathieu.Auctions.DomainModels.Auction");
 
                     b.Property<int>("Options")
                         .HasColumnType("int");
@@ -99,9 +102,9 @@ namespace App.Migrations
                     b.HasDiscriminator().HasValue(0);
                 });
 
-            modelBuilder.Entity("Wallymathieu.Auctions.Domain.TimedAscendingAuction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.TimedAscendingAuction", b =>
                 {
-                    b.HasBaseType("Wallymathieu.Auctions.Domain.Auction");
+                    b.HasBaseType("Wallymathieu.Auctions.DomainModels.Auction");
 
                     b.Property<DateTimeOffset?>("EndsAt")
                         .HasColumnType("datetimeoffset");
@@ -109,13 +112,13 @@ namespace App.Migrations
                     b.HasDiscriminator().HasValue(1);
                 });
 
-            modelBuilder.Entity("Wallymathieu.Auctions.Domain.BidEntity", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.BidEntity", b =>
                 {
-                    b.HasOne("Wallymathieu.Auctions.Domain.Auction", null)
+                    b.HasOne("Wallymathieu.Auctions.DomainModels.Auction", null)
                         .WithMany("Bids")
                         .HasForeignKey("AuctionId");
 
-                    b.OwnsOne("Wallymathieu.Auctions.Domain.Amount", "Amount", b1 =>
+                    b.OwnsOne("Wallymathieu.Auctions.DomainModels.Amount", "Amount", b1 =>
                         {
                             b1.Property<long>("BidEntityId")
                                 .HasColumnType("bigint");
@@ -140,9 +143,9 @@ namespace App.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Wallymathieu.Auctions.Domain.TimedAscendingAuction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.TimedAscendingAuction", b =>
                 {
-                    b.OwnsOne("Wallymathieu.Auctions.Domain.TimedAscendingOptions", "Options", b1 =>
+                    b.OwnsOne("Wallymathieu.Auctions.DomainModels.TimedAscendingOptions", "Options", b1 =>
                         {
                             b1.Property<long>("TimedAscendingAuctionAuctionId")
                                 .HasColumnType("bigint");
@@ -168,7 +171,7 @@ namespace App.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Wallymathieu.Auctions.Domain.Auction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.Auction", b =>
                 {
                     b.Navigation("Bids");
                 });

@@ -14,13 +14,10 @@ public abstract class Auction: IState
     protected Auction()
 #pragma warning restore CS8618
     {
-
     }
 
     public ICollection<BidEntity> Bids { get; init; } = new List<BidEntity>();
-    public AuctionId Id => new(AuctionId);
-
-    public long AuctionId { get; set; }
+    public AuctionId AuctionId { get; set; }
 
     public DateTimeOffset StartsAt { get; init; }
     public string Title { get; init; }

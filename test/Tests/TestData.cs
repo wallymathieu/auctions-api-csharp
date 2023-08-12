@@ -15,7 +15,7 @@ public class TestData
     public static TimedAscendingAuction GetEnglishAuction()=>
         new TimedAscendingAuction
         {
-            AuctionId = AuctionId.Id,
+            AuctionId = AuctionId,
             Title = Title,
             StartsAt = StartsAt,
             Expiry = EndsAt,
@@ -31,7 +31,7 @@ public class TestData
     public static SingleSealedBidAuction GetVickreyAuction()=>
         new SingleSealedBidAuction
         {
-            AuctionId = AuctionId.Id,
+            AuctionId = AuctionId,
             Title = Title,
             StartsAt = StartsAt,
             Expiry = EndsAt,

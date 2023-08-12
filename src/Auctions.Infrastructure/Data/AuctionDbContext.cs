@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 
@@ -27,7 +26,7 @@ public class AuctionDbContext: DbContext
         return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync(cancellationToken);
     }
 
-    public async ValueTask<Auction?> GetAuction(long auctionId, CancellationToken cancellationToken)
+    public async ValueTask<Auction?> GetAuction(AuctionId auctionId, CancellationToken cancellationToken)
     {
         var auction = await Auctions.FindAsync(auctionId, cancellationToken);
         if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync(cancellationToken);
@@ -41,8 +40,8 @@ public class AuctionDbContext: DbContext
                 entity.HasDiscriminator(b => b.AuctionType).IsComplete(false);
                 entity.ToTable("Auctions");
                 entity.HasKey(e => e.AuctionId);
+                WithAuctionIdConversion(entity.Property(e => e.AuctionId).ValueGeneratedOnAdd());
                 entity.Property(e => e.Title).HasMaxLength(200);
-                entity.Property(o => o.AuctionId).UseIdentityColumn();
                 WithUserId(entity.Property(o => o.User));
                 HasCurrencyCodeConversion(entity.Property(e => e.Currency));
                 entity.HasMany(e => e.Bids).WithOne()
