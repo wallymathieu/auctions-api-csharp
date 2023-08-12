@@ -12,3 +12,4 @@ information not intended for all users of the API.
 
 ## AutoMapper
 
+Read the [usage guide](https://www.jimmybogard.com/automapper-usage-guidelines/).

@@ -10,11 +10,11 @@ We have an implicit dependency on entity framework core since the classes are wr
 
 ### Cache
 
-Cache logic is generally not a core business concern but a operations requirement in order for the application to perform well. It is seen as a cross cutting concern and is therefore placed in the infrastructure layer.
+Cache logic is generally not a core business concern but a operations requirement in order for the application to perform well. It is seen as a cross cutting concern and is therefore placed in the infrastructure part.
 
 ### Services
 
-Services in this application does not implement any business logic but glues together the application domain with the database. They are therefore placed in the infrastructure layer. We could implement the services through the means of more advanced patterns but that makes it harder for developers to get into the infrastructure (see the branch with that implementation as reference).
+Services in this application does not implement any business logic but glues together the application domain with the database. They are therefore placed in the infrastructure part. We could implement the services through the means of more advanced patterns but that makes it harder for developers to get into the infrastructure (see the branch with that implementation as reference).
 
 ### Logging
 
