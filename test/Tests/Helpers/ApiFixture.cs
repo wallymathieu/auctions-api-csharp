@@ -109,7 +109,7 @@ public interface IApiFixture:IDisposable
     Task<HttpResponseMessage> GetAuction(long id, AuthToken auth);
     void SetTime(DateTimeOffset now);
 }
-public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth, new()
+public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
 {
     private readonly FakeTime _fakeTime= new(InitialNow);
     private readonly IDatabaseContextSetup _databaseContextSetup;
@@ -141,10 +141,10 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth, new()
     private readonly TestServer _testServer;
     private readonly TAuth _auth;
 
-    public ApiFixture(IDatabaseContextSetup databaseContextSetup)
+    public ApiFixture(IDatabaseContextSetup databaseContextSetup, TAuth auth)
     {
         _databaseContextSetup = databaseContextSetup;
-        _auth= new TAuth();
+        _auth = auth;
         _databaseContextSetup.TryRemove();
         _testServer = Create();
     }

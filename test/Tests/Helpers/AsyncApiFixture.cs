@@ -6,7 +6,7 @@ using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, new()
+public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth
 {
     /// <summary>
     /// Note:
@@ -71,7 +71,7 @@ public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, 
         }
     }
 
-    public AsyncApiFixture(string db) : base(new SqlLiteDatabaseContextSetup(db)) { }
+    public AsyncApiFixture(IDatabaseContextSetup dbContextSetup, TAuth auth) : base(dbContextSetup, auth) { }
 
     protected override void ConfigureServices(IServiceCollection services)
     {

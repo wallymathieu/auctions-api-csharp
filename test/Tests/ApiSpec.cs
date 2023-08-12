@@ -102,7 +102,7 @@ public abstract class ApiSyncSpec<TAuth>: BaseApiSpec
     where TAuth:IApiAuth, new()
 {
     public override IApiFixture CreateApiFixture(string testName) =>
-        new ApiFixture<TAuth>(new SqlLiteDatabaseContextSetup($"{GetType().Name}_{testName}.db"));
+        new ApiFixture<TAuth>(new SqlLiteDatabaseContextSetup($"{GetType().Name}_{testName}.db"), new TAuth());
 
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()
@@ -118,7 +118,7 @@ public abstract class ApiAsyncSpec<TAuth>: BaseApiSpec
     where TAuth:IApiAuth, new()
 {
     public override IApiFixture CreateApiFixture(string testName) =>
-        new AsyncApiFixture<TAuth>($"{GetType().Name}_{testName}.db");
+        new AsyncApiFixture<TAuth>(new SqlLiteDatabaseContextSetup($"{GetType().Name}_{testName}.db"), new TAuth());
 
 
     [Fact]
