@@ -49,20 +49,24 @@ public abstract class BaseApiSpec
         Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
     }
     [Theory,
-     InlineData(@"{
-        ""startsAt"": ""2021-12-01T10:00:00.000Z"",
-        ""endsAt"": ""2022-12-18T10:00:00.000Z"",
-        ""title"": ""Some auction"",
-        ""currency"": ""VAC"",
-        ""timeFrame"": -1,
-        ""reservePrice"": null,
-        ""minRaise"":null
-    }",1),
-     InlineData(@"{
-        ""startsAt"": ""2021-12-01T10:00:00.000Z"",
-        ""endsAt"": ""2022-12-18T10:00:00.000Z"",
-        ""title"": ""Some auction"",
-    }",2),
+     InlineData("""
+                {
+                        "startsAt": "2021-12-01T10:00:00.000Z",
+                        "endsAt": "2022-12-18T10:00:00.000Z",
+                        "title": "Some auction",
+                        "currency": "VAC",
+                        "timeFrame": -1,
+                        "reservePrice": null,
+                        "minRaise":null
+                    }
+                """,1),
+     InlineData("""
+                {
+                        "startsAt": "2021-12-01T10:00:00.000Z",
+                        "endsAt": "2022-12-18T10:00:00.000Z",
+                        "title": "Some auction",
+                    }
+                """,2),
     ]
     public async Task Fail_to_create_auction(string sample, int index)
     {
@@ -79,7 +83,7 @@ public abstract class BaseApiSpec
         using var application = CreateApiFixture(nameof(Place_bid_as_buyer_on_auction_1));
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         application.SetTime(StartsAt.AddHours(2));
-        var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
+        var bidResponse = await application.PostBidToAuction(1, """{"amount":"VAC11"}""", AuthToken.Buyer1);
         application.SetTime(EndsAt.AddHours(2));
         var auctionResponse = await application.GetAuction(1, AuthToken.Seller1);
         var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
@@ -125,7 +129,7 @@ public abstract class ApiAsyncSpec<TAuth>: BaseApiSpec
     public async Task Place_bid_on_unknown_auction()
     {
         using var application = CreateApiFixture(nameof(Place_bid_on_unknown_auction));
-        var bidResponse = await application.PostBidToAuction(199, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
+        var bidResponse = await application.PostBidToAuction(199, """{"amount":"VAC11"}""", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.Accepted, bidResponse.StatusCode);
 
     }
