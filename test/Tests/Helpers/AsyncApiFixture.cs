@@ -71,7 +71,7 @@ public class AsyncApiFixture<TAuth> : ApiFixture<TAuth> where TAuth : IApiAuth, 
         }
     }
 
-    public AsyncApiFixture(string db) : base(db) { }
+    public AsyncApiFixture(string db) : base(new SqlLiteDatabaseContextSetup(db)) { }
 
     protected override void ConfigureServices(IServiceCollection services)
     {
