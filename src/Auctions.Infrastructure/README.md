@@ -42,3 +42,6 @@ article/book was written. He also tries to give you ample examples of how he has
 in the context of the popular frameworks and languages of that time). We need to learn of the spirit of the architecture
 and not the letter. The letter is a snapshot of a specific time and place. The spirit is the reason for the
 architecture. In that sense I do not think that the two architectures are mutually exclusive.
+
+In this case we have a small (but complicated) domain with features of the domain tied to the domain entities. It makes
+less sense to organize into transaction scripts per slice in this case.
