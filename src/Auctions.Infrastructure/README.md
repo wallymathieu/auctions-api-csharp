@@ -43,5 +43,5 @@ in the context of the popular frameworks and languages of that time). We need to
 and not the letter. The letter is a snapshot of a specific time and place. The spirit is the reason for the
 architecture. In that sense I do not think that the two architectures are mutually exclusive.
 
-In this case we have a small (but complicated) domain with features of the domain tied to the domain entities. It makes
-less sense to organize into transaction scripts per slice in this case.
+In this case we have a small (but complicated) domain with features of the domain tied to the domain entities, we could see
+this entire app as a slice since it is intended to only model a single bounded context.
