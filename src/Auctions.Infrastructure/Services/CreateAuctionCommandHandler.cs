@@ -4,6 +4,9 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 
+/// <summary>
+/// Glue class
+/// </summary>
 internal class CreateAuctionCommandHandler:ICreateAuctionCommandHandler
 {
     private readonly AuctionDbContext _auctionDbContext;

@@ -37,9 +37,9 @@ public abstract partial record User(UserId Id)
         Match match = UserRegex().Match(user);
         if (match.Success)
         {
-            string typ = match.Groups["type"].Value;
-            string? id = match.Groups["id"].Value;
-            string name = match.Groups["name"].Value;
+            var typ = match.Groups["type"].Value;
+            var id = match.Groups["id"].Value;
+            var name = match.Groups["name"].Value;
             switch (typ)
             {
                 case "BuyerOrSeller":

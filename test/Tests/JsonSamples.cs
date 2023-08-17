@@ -14,9 +14,9 @@ public static class JsonSamples
 
     public static readonly string FirstAuctionResponse = @"{
                 ""id"": 1,
-                ""startsAt"":"""+StartsAt.ToString(TimeFormatter.TimeFormat)+@""",
+                ""startsAt"":"""+TimeFormatter.Format(StartsAt)+@""",
                 ""title"": ""Some auction"",
-                ""expiry"": """+EndsAt.ToString(TimeFormatter.TimeFormat)+@""",
+                ""expiry"": """+TimeFormatter.Format(EndsAt)+@""",
                 ""seller"": ""seller1@hotmail.com"",
                 ""currency"": ""VAC"",
                 ""bids"": [],

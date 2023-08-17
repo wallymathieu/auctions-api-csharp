@@ -1,8 +1,5 @@
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Wallymathieu.Auctions.Infrastructure.Cache;
-using Wallymathieu.Auctions.Infrastructure.Cache.Services;
 using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 public static class ServiceExtensions

@@ -27,6 +27,6 @@ public class OnAuctionCommandHandler
         _userContext.UserId = command.UserId;
         _logger.LogInformation("Create auction command received");
         var result = await _createAuctionCommandHandler.Handle(command.Command, cancellationToken);
-        _logger.LogInformation("Create auction command processed {AuctionId}", result.Id);
+        _logger.LogInformation("Create auction command processed {AuctionId}", result.AuctionId);
     }
 }

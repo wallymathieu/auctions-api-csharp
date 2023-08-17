@@ -4,6 +4,9 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 
+/// <summary>
+/// Glue class
+/// </summary>
 internal class CreateBidCommandHandler : ICreateBidCommandHandler
 {
     private readonly IAuctionRepository _auctionRepository;
@@ -19,7 +22,7 @@ internal class CreateBidCommandHandler : ICreateBidCommandHandler
         _time = time;
     }
 
-    public async Task<Result<Bid, Errors>> Handle(CreateBidCommand model, CancellationToken cancellationToken)
+    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken)
     {
         var auction = await _auctionRepository.GetAuctionAsync(model.AuctionId, cancellationToken);
         if (auction is null) return Result<Bid, Errors>.Error(Errors.UnknownAuction);

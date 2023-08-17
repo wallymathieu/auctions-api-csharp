@@ -1,6 +1,10 @@
 namespace Wallymathieu.Auctions.Infrastructure;
 
-public class TimeFormatter
+/// <summary>
+/// Class intended to format time in a known format.
+/// </summary>
+public static class TimeFormatter
 {
-    public const string TimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZ";
+    public static string Format(DateTimeOffset dateTime) => dateTime.ToString(TimeFormat);
+    private const string TimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZ";
 }

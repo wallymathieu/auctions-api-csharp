@@ -1,10 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Wallymathieu.Auctions.Data;
-using Wallymathieu.Auctions.DomainModels;
-using Wallymathieu.Auctions.Infrastructure.Cache.Data;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 
@@ -28,6 +24,7 @@ public static class DataExtensions
     {
         return services.AddDbContext<AuctionDbContext>(e =>
             e.UseSqlServer(connection,
-                opt => opt.MigrationsAssembly("Auctions.Infrastructure")));
+                opt => opt.MigrationsAssembly(Migrations.AssemblyName)));
     }
+
 }

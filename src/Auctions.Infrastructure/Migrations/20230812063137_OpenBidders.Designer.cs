@@ -12,8 +12,8 @@ using Wallymathieu.Auctions.Infrastructure.Data;
 namespace App.Migrations
 {
     [DbContext(typeof(AuctionDbContext))]
-    [Migration("20230417163507_AdjustCurrencyConversion")]
-    partial class AdjustCurrencyConversion
+    [Migration("20230812063137_OpenBidders")]
+    partial class OpenBidders
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,51 @@ namespace App.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Auctions.Domain.BidEntity", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.Auction", b =>
+                {
+                    b.Property<long>("AuctionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AuctionId"));
+
+                    b.Property<int>("AuctionType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<DateTimeOffset>("Expiry")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("OpenBidders")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("StartsAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("User")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("AuctionId");
+
+                    b.ToTable("Auctions", (string)null);
+
+                    b.HasDiscriminator<int>("AuctionType").IsComplete(false);
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.BidEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,55 +95,41 @@ namespace App.Migrations
                     b.ToTable("Bids", (string)null);
                 });
 
-            modelBuilder.Entity("Auctions.Domain.TimedAscendingAuction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.SingleSealedBidAuction", b =>
                 {
-                    b.Property<long>("AuctionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                    b.HasBaseType("Wallymathieu.Auctions.DomainModels.Auction");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AuctionId"));
+                    b.Property<int>("Options")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasDiscriminator().HasValue(0);
+                });
+
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.TimedAscendingAuction", b =>
+                {
+                    b.HasBaseType("Wallymathieu.Auctions.DomainModels.Auction");
 
                     b.Property<DateTimeOffset?>("EndsAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset>("Expiry")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("StartsAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("User")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.HasKey("AuctionId");
-
-                    b.ToTable("Auctions", (string)null);
+                    b.HasDiscriminator().HasValue(1);
                 });
 
-            modelBuilder.Entity("Auctions.Domain.BidEntity", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.BidEntity", b =>
                 {
-                    b.HasOne("Auctions.Domain.TimedAscendingAuction", null)
+                    b.HasOne("Wallymathieu.Auctions.DomainModels.Auction", null)
                         .WithMany("Bids")
                         .HasForeignKey("AuctionId");
 
-                    b.OwnsOne("Auctions.Domain.Amount", "Amount", b1 =>
+                    b.OwnsOne("Wallymathieu.Auctions.DomainModels.Amount", "Amount", b1 =>
                         {
                             b1.Property<long>("BidEntityId")
                                 .HasColumnType("bigint");
 
-                            b1.Property<int>("Currency")
-                                .HasColumnType("int");
+                            b1.Property<string>("Currency")
+                                .IsRequired()
+                                .HasMaxLength(3)
+                                .HasColumnType("nvarchar(3)");
 
                             b1.Property<long>("Value")
                                 .HasColumnType("bigint");
@@ -116,9 +146,9 @@ namespace App.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Auctions.Domain.TimedAscendingAuction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.TimedAscendingAuction", b =>
                 {
-                    b.OwnsOne("Auctions.Domain.TimedAscendingOptions", "Options", b1 =>
+                    b.OwnsOne("Wallymathieu.Auctions.DomainModels.TimedAscendingOptions", "Options", b1 =>
                         {
                             b1.Property<long>("TimedAscendingAuctionAuctionId")
                                 .HasColumnType("bigint");
@@ -144,7 +174,7 @@ namespace App.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Auctions.Domain.TimedAscendingAuction", b =>
+            modelBuilder.Entity("Wallymathieu.Auctions.DomainModels.Auction", b =>
                 {
                     b.Navigation("Bids");
                 });

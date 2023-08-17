@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Api.Middleware.Auth;
 using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Commands;
-using Wallymathieu.Auctions.Data;
 using Wallymathieu.Auctions.DomainModels;
+using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Services;
@@ -45,7 +45,7 @@ public class AuctionsController : ControllerBase
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
     {
-        var auction = await _auctionRepository.GetAuctionAsync(auctionId, cancellationToken);
+        var auction = await _auctionRepository.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
         return auction is null ? NotFound() : _auctionMapper.MapAuctionToModel(auction);
     }
 
@@ -69,7 +69,7 @@ public class AuctionsController : ControllerBase
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
-        var cmd =  new CreateBidCommand(model.Amount, auctionId);
+        var cmd =  new CreateBidCommand(model.Amount, new AuctionId(auctionId));
         if (_messageQueue.Enabled)
         {
             await _messageQueue.SendMessageAsync(QueuesModule.BidCommandQueueName, new UserIdDecorator<CreateBidCommand>(cmd,_userContext.UserId), cancellationToken);

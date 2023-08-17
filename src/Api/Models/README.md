@@ -9,3 +9,8 @@ associated domain logic. Since we have separate API models we can easily version
 to create a separate adapter service (such as a separate docker image) to do versioning logic.
 Due to the separation you can also avoid accidentally exposing secret information such as bidder or seller
 information not intended for all users of the API.
+
+## AutoMapper
+
+Read the [usage guide](https://www.jimmybogard.com/automapper-usage-guidelines/). Please note that everything is not a
+nail.
