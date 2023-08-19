@@ -44,4 +44,5 @@ and not the letter. The letter is a snapshot of a specific time and place. The s
 architecture. In that sense I do not think that the two architectures are mutually exclusive.
 
 In this case we have a small (but complicated) domain with features of the domain tied to the domain entities, we could see
-this entire app as a slice since it is intended to only model a single bounded context.
+this entire app as a slice since it is intended to only model a single bounded context. We could have used transaction scripts
+and moved the code that now resides in the domain entities into what is now glue services.
