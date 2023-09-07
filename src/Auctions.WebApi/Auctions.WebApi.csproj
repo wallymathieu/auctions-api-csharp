@@ -30,7 +30,7 @@
       </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Auctions.Core\Auctions.Core.csproj" />
+    <ProjectReference Include="..\Auctions.Domain\Auctions.Domain.csproj" />
     <ProjectReference Include="..\Auctions.Infrastructure\Auctions.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

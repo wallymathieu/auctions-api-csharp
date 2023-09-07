@@ -1,5 +1,5 @@
 {
-    "azureFunctions.deploySubpath": "Functions/bin/Release/net7.0/publish",
+    "azureFunctions.deploySubpath": "AzureFunctions/bin/Release/net7.0/publish",
     "azureFunctions.projectLanguage": "C#",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
@@ -7,5 +7,5 @@
     "cSpell.words": [
         "Wallymathieu"
     ],
-    "azureFunctions.projectSubpath": "src/Functions"
+    "azureFunctions.projectSubpath": "src/AzureFunctions"
 }
