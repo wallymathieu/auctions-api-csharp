@@ -46,7 +46,7 @@ services:
     image: wallymathieu/auctions-api-functions:latest
     build:
       context: .
-      dockerfile: ./src/Functions/Dockerfile
+      dockerfile: ./src/Auctions.AzureFunctions/Dockerfile
     ports:
       - 8084:80
     environment:

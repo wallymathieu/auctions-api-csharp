@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS installer-env
 
 COPY src ./src
 
-RUN cd /src/Functions && \
+RUN cd /src/Auctions.AzureFunctions && \
     mkdir -p /home/site/wwwroot && \
     dotnet publish *.csproj --output /home/site/wwwroot
 

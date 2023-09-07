@@ -2,11 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Api (Development)",
+      "name": "WebApi (Development)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/Api/bin/Debug/net7.0/Api.dll",
+      "program": "${workspaceFolder}/src/Auctions.WebApi/bin/Debug/net7.0/Auctions.WebApi.dll",
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,

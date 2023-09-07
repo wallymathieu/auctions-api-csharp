@@ -35,7 +35,7 @@
 			}
 		},
 		{
-			"label": "clean release (functions)",
+			"label": "clean release (Azure functions)",
 			"command": "dotnet",
 			"args": [
 				"clean",
@@ -47,11 +47,11 @@
 			"type": "process",
 			"problemMatcher": "$msCompile",
 			"options": {
-				"cwd": "${workspaceFolder}/src/Functions"
+				"cwd": "${workspaceFolder}/src/AzureFunctions"
 			}
 		},
 		{
-			"label": "publish (functions)",
+			"label": "publish (Azure functions)",
 			"command": "dotnet",
 			"args": [
 				"publish",
@@ -61,17 +61,17 @@
 				"/consoleloggerparameters:NoSummary"
 			],
 			"type": "process",
-			"dependsOn": "clean release (functions)",
+			"dependsOn": "clean release (Azure functions)",
 			"problemMatcher": "$msCompile",
 			"options": {
-				"cwd": "${workspaceFolder}/src/Functions"
+				"cwd": "${workspaceFolder}/src/AzureFunctions"
 			}
 		},
 		{
 			"type": "func",
-			"dependsOn": "build (functions)",
+			"dependsOn": "build (Azure functions)",
 			"options": {
-				"cwd": "${workspaceFolder}/src/Functions/bin/Debug/net7.0"
+				"cwd": "${workspaceFolder}/src/AzureFunctions/bin/Debug/net7.0"
 			},
 			"command": "host start",
 			"isBackground": true,
