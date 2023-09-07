@@ -3,7 +3,7 @@ namespace Wallymathieu.Auctions;
 /// <summary>
 /// This is the same type of class as can be found <a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-core-fsharpresult-2.html">in F#</a> and <a href="https://github.com/mcintyre321/OneOf">in C#</a>.
 /// The implementation of this class matches the F# implementation if you were to decompile it into C#.
-/// Main reason why we want a reimplementation is to make it friendly to the C# use-cases in this application.
+/// Main reason why we want a reimplementation is to make it friendly to the C# code in this application.
 /// </summary>
 /// <typeparam name="TOk"></typeparam>
 /// <typeparam name="TError"></typeparam>
