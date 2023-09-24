@@ -86,3 +86,7 @@ Either the decoded JWT in the `x-jwt-payload` header or specify an encoded claim
 ```bash
 dotnet ef migrations add NewMigration --project ./src/Auctions.Infrastructure/Auctions.Infrastructure.csproj --startup-project ./src/Auctions.WebApi/Auctions.WebApi.csproj
 ```
+
+## Inspiration
+
+- [Clean Architecture](https://www.goodreads.com/en/book/show/18043011)
