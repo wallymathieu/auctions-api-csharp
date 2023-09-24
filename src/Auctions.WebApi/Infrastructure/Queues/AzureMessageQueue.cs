@@ -8,16 +8,15 @@ namespace Wallymathieu.Auctions.Api.Infrastructure.Queues;
 public class AzureMessageQueue:IMessageQueue
 {
     private readonly JsonSerializerOptions _serializerOptions;
-    private readonly QueueServiceClient? _queueServiceClient;
+    private readonly QueueServiceClient _queueServiceClient;
 
-    public AzureMessageQueue(IEnumerable<QueueServiceClient> clients)
+    public AzureMessageQueue(QueueServiceClient client)
     {
         _serializerOptions = new JsonSerializerOptions();
         _serializerOptions.AddAuctionConverters();
-        _queueServiceClient = clients.FirstOrDefault();
+        _queueServiceClient = client;
     }
 
-    public bool Enabled => _queueServiceClient != null;
     public async Task SendMessageAsync(string queueName, object command, CancellationToken cancellationToken)
     {
         if (_queueServiceClient == null) throw new InvalidOperationException("Message queue is not enabled");

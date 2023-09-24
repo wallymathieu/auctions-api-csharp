@@ -5,9 +5,6 @@ using Wallymathieu.Auctions.Tests.Helpers;
 
 namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
-public class ApiSyncSpecJwtToken:ApiSyncSpec<JwtApiAuth>{}
-public class ApiSyncSpecMsClientPrincipal:ApiSyncSpec<MsClientPrincipalApiAuth>{}
-
 public abstract class BaseApiSpec
 {
     public abstract IApiFixture CreateApiFixture(string testName);
@@ -108,13 +105,7 @@ public abstract class ApiSyncSpec<TAuth>: BaseApiSpec
     public override IApiFixture CreateApiFixture(string testName) =>
         new ApiFixture<TAuth>(new SqlLiteDatabaseContextSetup($"{GetType().Name}_{testName}.db"), new TAuth());
 
-    [Fact]
-    public async Task Cannot_place_bid_on_unknown_auction()
-    {
-        using var application = CreateApiFixture(nameof(Cannot_place_bid_on_unknown_auction));
-        var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
-        Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
-    }
+
 }
 public class ApiAsyncSpecJwtToken:ApiAsyncSpec<JwtApiAuth>{}
 public class ApiAsyncSpecMsClientPrincipal:ApiAsyncSpec<MsClientPrincipalApiAuth>{}
@@ -128,9 +119,11 @@ public abstract class ApiAsyncSpec<TAuth>: BaseApiSpec
     [Fact]
     public async Task Place_bid_on_unknown_auction()
     {
+        const int unknownAuction = 199;
         using var application = CreateApiFixture(nameof(Place_bid_on_unknown_auction));
-        var bidResponse = await application.PostBidToAuction(199, """{"amount":"VAC11"}""", AuthToken.Buyer1);
+        var bidResponse = await application.PostBidToAuction(unknownAuction, """{"amount":"VAC11"}""", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.Accepted, bidResponse.StatusCode);
-
+        Assert.Equal(HttpStatusCode.NotFound,(
+            await application.GetAuction(unknownAuction,AuthToken.Buyer1)).StatusCode);
     }
 }
