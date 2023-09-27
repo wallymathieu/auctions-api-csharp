@@ -15,25 +15,44 @@ public class AuctionMapper
         _time = time;
     }
 
-    public AuctionModel MapAuctionToModel(Auction arg)
+    public AuctionModel MapAuctionToModel(Auction auction)
     {
         var now = _time.Now;
-        var amountAndWinner = arg.TryGetAmountAndWinner(now);
-        var hasEnded = arg.HasEnded(now);
-        IBidUserMapper bidUserMapper = arg.OpenBidders? new BidUserMapper():new NumberedBidUserMapper(arg.Bids);
+        var amountAndWinner = auction.TryGetAmountAndWinner(now);
+        var hasEnded = auction.HasEnded(now);
+        var bidUserMapper = BidUserMapper(auction);
         return new AuctionModel(
-            Id: arg.AuctionId.Id,
-            StartsAt :arg.StartsAt,
-            Title: arg.Title,
-            Expiry: arg.Expiry,
-            Seller: arg.User.ToString(),
-            Currency: arg.Currency,
+            Id: auction.AuctionId.Id,
+            StartsAt :auction.StartsAt,
+            Title: auction.Title,
+            Expiry: auction.Expiry,
+            Seller: auction.User.ToString(),
+            Currency: auction.Currency,
             Price: amountAndWinner?.Amount,
             Winner: bidUserMapper.GetUserString(amountAndWinner?.Winner),
             HasEnded: hasEnded,
-            Bids: arg.GetBids(now)?.Select(bid =>
-                new BidModel(bid.Amount,
-                    bidUserMapper.GetUserString(bid.User),
-                    bid.At-arg.StartsAt)).ToArray() ?? Array.Empty<BidModel>());
+            Bids: auction.GetBids(now)?.Select(bid =>
+                MapToBidModel(auction, bid, bidUserMapper)).ToArray() ?? Array.Empty<BidModel>());
+    }
+
+    private static IBidUserMapper BidUserMapper(Auction auction)
+    {
+        IBidUserMapper bidUserMapper = auction.OpenBidders
+            ? new BidUserMapper()
+            : new NumberedBidUserMapper(auction.Bids);
+        return bidUserMapper;
+    }
+
+    private static BidModel MapToBidModel(Auction auction, Bid bid, IBidUserMapper bidUserMapper)
+    {
+        return new BidModel(bid.Amount,
+            bidUserMapper.GetUserString(bid.User),
+            bid.At-auction.StartsAt);
+    }
+
+    public BidModel MapBidToModel(Auction auction, Bid bid)
+    {
+        var bidUserMapper = BidUserMapper(auction);
+        return MapToBidModel(auction, bid, bidUserMapper);
     }
 }
