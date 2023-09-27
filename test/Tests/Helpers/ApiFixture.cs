@@ -145,7 +145,6 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
     {
         _databaseContextSetup = databaseContextSetup;
         _auth = auth;
-        _databaseContextSetup.TryRemove();
         _testServer = Create();
     }
 

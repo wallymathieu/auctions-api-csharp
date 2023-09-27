@@ -5,8 +5,8 @@ using Wallymathieu.Auctions.Tests.Helpers;
 
 namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
-public class ApiSyncSpecJwtToken:ApiSyncSpec<JwtApiAuth>{}
-public class ApiSyncSpecMsClientPrincipal:ApiSyncSpec<MsClientPrincipalApiAuth>{}
+public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqlLiteDatabaseContextSetup>{}
+public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqlLiteDatabaseContextSetup>{}
 
 public abstract class BaseApiSpec
 {
@@ -102,11 +102,16 @@ public abstract class BaseApiSpec
         });
     }
 }
-public abstract class ApiSyncSpec<TAuth>: BaseApiSpec
+public abstract class ApiSyncSpec<TAuth, TDatabaseContextSetup>: BaseApiSpec
     where TAuth:IApiAuth, new()
+    where TDatabaseContextSetup: IDatabaseContextSetup, new()
 {
-    public override IApiFixture CreateApiFixture(string testName) =>
-        new ApiFixture<TAuth>(new SqlLiteDatabaseContextSetup($"{GetType().Name}_{testName}.db"), new TAuth());
+    public override IApiFixture CreateApiFixture(string testName)
+    {
+        var dbContext = new TDatabaseContextSetup();
+        dbContext.Init(GetType(), testName);
+        return new ApiFixture<TAuth>(dbContext, new TAuth());
+    }
 
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()

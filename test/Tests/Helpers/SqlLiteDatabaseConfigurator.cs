@@ -9,11 +9,11 @@ namespace Wallymathieu.Auctions.Tests.Helpers;
 /// </summary>
 public class SqlLiteDatabaseContextSetup : IDatabaseContextSetup
 {
-    private readonly string _db;
+    private string? _db;
 
-    public SqlLiteDatabaseContextSetup(string db)
+    public void Init(Type testClass, string testName)
     {
-        _db = db;
+        _db = $"{testClass.Name}_{testName}.db";
     }
 
     public void Use(IServiceCollection services)
