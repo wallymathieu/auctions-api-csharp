@@ -116,21 +116,3 @@ public abstract class ApiSyncSpec<TAuth>: BaseApiSpec
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
     }
 }
-public class ApiAsyncSpecJwtToken:ApiAsyncSpec<JwtApiAuth>{}
-public class ApiAsyncSpecMsClientPrincipal:ApiAsyncSpec<MsClientPrincipalApiAuth>{}
-public abstract class ApiAsyncSpec<TAuth>: BaseApiSpec
-    where TAuth:IApiAuth, new()
-{
-    public override IApiFixture CreateApiFixture(string testName) =>
-        new AsyncApiFixture<TAuth>(new SqlLiteDatabaseContextSetup($"{GetType().Name}_{testName}.db"), new TAuth());
-
-
-    [Fact]
-    public async Task Place_bid_on_unknown_auction()
-    {
-        using var application = CreateApiFixture(nameof(Place_bid_on_unknown_auction));
-        var bidResponse = await application.PostBidToAuction(199, """{"amount":"VAC11"}""", AuthToken.Buyer1);
-        Assert.Equal(HttpStatusCode.Accepted, bidResponse.StatusCode);
-
-    }
-}

@@ -1,12 +1,12 @@
 namespace Wallymathieu.Auctions.Infrastructure.Queues;
 public class UserIdDecorator<T>
 {
-    public UserIdDecorator(T command, UserId? userId)
+    public UserIdDecorator(T value, UserId? userId)
     {
-        Command = command;
+        Value = value;
         UserId = userId;
     }
 
-    public T Command { get; }
+    public T Value { get; }
     public UserId? UserId { get; }
 }
