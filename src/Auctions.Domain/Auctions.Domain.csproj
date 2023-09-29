@@ -5,7 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Wallymathieu.Auctions</RootNamespace>
-      
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
     </PropertyGroup>
     <ItemGroup>
       <InternalsVisibleTo Include="Auctions.Infrastructure" />

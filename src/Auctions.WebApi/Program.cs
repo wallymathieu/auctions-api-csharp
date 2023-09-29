@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
@@ -23,6 +24,24 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    var webAssembly = typeof(Program).GetTypeInfo().Assembly;
+    var informationalVersion =
+        (webAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute))
+            as AssemblyInformationalVersionAttribute[])?.First().InformationalVersion;
+
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = informationalVersion ?? "dev",
+        Title = "API",
+        Description = "Some API",
+        Contact = new OpenApiContact
+            {Name = "Dev", Email = "developers@somecompany.com", Url = new Uri("https://somecompany.com")}
+    });
+
+    //Set the comments path for the swagger json and ui.
+    var xmlPath = webAssembly.Location.Replace(".dll",".xml").Replace(".exe", ".xml");
+    if (File.Exists(xmlPath))
+        options.IncludeXmlComments(xmlPath);
     var opts = new JsonSerializerOptions().AddAuctionConverters();
     options.MapType(typeof(Amount), () => new OpenApiSchema
     {
@@ -92,8 +111,14 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(c => { c.RouteTemplate = "swagger/{documentName}/swagger.json"; });
+
+    app.UseReDoc(c =>
+    {
+        c.RoutePrefix = "docs";
+        c.EnableUntrustedSpec();
+        c.SpecUrl("/swagger/v1/swagger.json");
+    });
 }
 
 app.UseHttpsRedirection();
