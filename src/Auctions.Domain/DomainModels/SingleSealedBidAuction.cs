@@ -2,6 +2,12 @@ namespace Wallymathieu.Auctions.DomainModels;
 /// <summary>
 /// The responsibility of this class is to handle the domain model of "single sealed bid" auction model.
 /// </summary>
+/// <remarks>
+/// Single sealed bid auction is a type of auction where the bidders are not aware of the other bids. The bids are disclosed at the end of the auction.
+/// You can read more about the different types of blind auctions on Wikipedia:
+/// - [First price sealed bid auction](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction) or a
+/// - [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction)
+/// </remarks>
 public class SingleSealedBidAuction: Auction, IState
 {
     public SingleSealedBidAuction()

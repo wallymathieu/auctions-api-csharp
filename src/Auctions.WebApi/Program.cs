@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
@@ -23,13 +24,35 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    var webAssembly = typeof(Program).GetTypeInfo().Assembly;
+    var informationalVersion =
+        (webAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute))
+            as AssemblyInformationalVersionAttribute[])?.First().InformationalVersion;
+
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = informationalVersion ?? "dev",
+        Title = "Auction API",
+        Description = "Simple implementation of Auction API in C#",
+        Contact = new OpenApiContact
+        {
+            Name = "Oskar Gewalli",
+            Email = "wallymathieu@users.noreply.github.com",
+            Url = new Uri("https://github.com/wallymathieu/auctions-api-csharp")
+        }
+    });
+
+    //Set the comments path for the swagger json and ui.
+    var xmlPath = webAssembly.Location.Replace(".dll", ".xml").Replace(".exe", ".xml");
+    if (File.Exists(xmlPath))
+        options.IncludeXmlComments(xmlPath);
     var opts = new JsonSerializerOptions().AddAuctionConverters();
     options.MapType(typeof(Amount), () => new OpenApiSchema
     {
         Type = "string",
         Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
     });
-    options.MapType<TimeSpan>(()=>new OpenApiSchema
+    options.MapType<TimeSpan>(() => new OpenApiSchema
     {
         Type = "string",
         Format = "^(\\d{2}:)?\\d{2}:\\d{2}:\\d{2}$",
@@ -68,7 +91,7 @@ if (azureStorageConnectionString != null)
         azureClientsBuilder.UseCredential(new DefaultAzureCredential());
     });
 }
-builder.Services.AddScoped<IMessageQueue,AzureMessageQueue>();
+builder.Services.AddScoped<IMessageQueue, AzureMessageQueue>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<AuctionMapper>();
 builder.Services.AddScoped<IUserContext, UserContext>();
@@ -78,7 +101,7 @@ builder.Services.AddSingleton<JwtPayloadClaimsPrincipalParser>();
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
 builder.Services
     .AddAuthentication()
-    .AddPayloadAuthentication(c=>
+    .AddPayloadAuthentication(c =>
     {
         var principalHeader = builder.Configuration["PrincipalHeader"];
         if (!string.IsNullOrEmpty(principalHeader)) c.PrincipalHeader = principalHeader;
@@ -92,8 +115,14 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(c => { c.RouteTemplate = "swagger/{documentName}/swagger.json"; });
+
+    app.UseReDoc(c =>
+    {
+        c.RoutePrefix = "docs";
+        c.EnableUntrustedSpec();
+        c.SpecUrl("/swagger/v1/swagger.json");
+    });
 }
 
 app.UseHttpsRedirection();

@@ -5,7 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Wallymathieu.Auctions</RootNamespace>
-      
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!--disable missing comment warning-->
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
     <ItemGroup>
       <InternalsVisibleTo Include="Auctions.Infrastructure" />
