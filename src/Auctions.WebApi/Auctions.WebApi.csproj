@@ -9,6 +9,8 @@
     <RootNamespace>Wallymathieu.Auctions.Api</RootNamespace>
     <UserSecretsId>f53f5151-d9ac-4eeb-a835-cb1ed85fd2d4</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--disable missing comment warning-->
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />

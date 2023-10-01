@@ -27,20 +27,33 @@ public class AuctionsController : ControllerBase
         _createBidCommandHandler = createBidCommandHandler;
         _auctionRepository = auctionRepository;
     }
-
+    /// <summary>
+    /// Get all auctions
+    /// </summary>
+    /// <remarks>
+    /// Get a list of auctions.
+    /// </remarks>
     [HttpGet(Name = "get_auctions")]
     public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
         from auction in await _auctionRepository.GetAuctionsAsync(cancellationToken)
         select _auctionMapper.MapAuctionToModel(auction);
-
+    /// <summary>
+    /// Get a single auction
+    /// </summary>
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
     {
         var auction = await _auctionRepository.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
         return auction is null ? NotFound() : _auctionMapper.MapAuctionToModel(auction);
     }
-
-    [HttpPost(Name = "create_auction") , Authorize]
+    /// <summary>
+    /// Create an auction
+    /// </summary>
+    /// <remarks>
+    /// Create an auction. Note that the auction models are restricted to be either [Vickrey auction](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction) or [Timed ascending auction](https://en.wikipedia.org/wiki/English_auction).
+    /// </remarks>
+    [HttpPost(Name = "create_auction") , Authorize,
+     ProducesResponseType(typeof(void),StatusCodes.Status200OK)]
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
     {
@@ -49,8 +62,13 @@ public class AuctionsController : ControllerBase
             _auctionMapper.MapAuctionToModel(auction);
         return CreatedAtAction(nameof(GetSingle), new { auctionId = auctionModel.Id }, auctionModel);
     }
-
-    [HttpPost("{auctionId}/bids",Name = "add_bid"), Authorize]
+    /// <summary>
+    /// Add a bid on an auction
+    /// </summary>
+    [HttpPost("{auctionId}/bids",Name = "add_bid"), Authorize,
+     ProducesResponseType(typeof(void),StatusCodes.Status200OK),
+     ProducesResponseType(typeof(Errors),StatusCodes.Status400BadRequest),
+     ProducesResponseType(typeof(void),StatusCodes.Status404NotFound)]
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
