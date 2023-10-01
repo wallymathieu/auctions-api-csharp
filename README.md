@@ -89,4 +89,8 @@ dotnet ef migrations add NewMigration --project ./src/Auctions.Infrastructure/Au
 
 ## Inspiration
 
+The main inspiration for the architecture of the API is found in this book:
+
 - [Clean Architecture](https://www.goodreads.com/en/book/show/18043011)
+
+Note that there are many variants of "the clean architecture" described in the .net space with different interpretations of what it means to implement this architecture.
