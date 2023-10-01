@@ -1,0 +1,40 @@
+# AuctionSite
+
+###
+# group: v2
+# @name Create auction v2
+POST {{url}}/auctions
+x-jwt-payload: {{seller}}
+Content-Type: application/json
+
+{
+    "id": 1,
+    "startsAt": "{{$datetime iso8601}}",
+    "endsAt": "{{$datetime iso8601 2 h}}",
+    "title": "Some auction",
+    "currency": "VAC"
+}
+
+<> ./Create auction v2.201.json
+// {{url}}/auctions
+
+###
+# group: v2
+# @name Place bid as buyer on auction 1 (v2)
+POST {{url}}/auctions/1/bids
+x-jwt-payload: {{buyer}}
+Content-Type: application/json
+
+{
+  "auction": "1",
+  "amount": "VAC11"
+}
+
+###
+# group: v2
+# @name auctions [auth]
+GET {{url}}/auctions
+x-jwt-payload: {{buyer}}
+
+<> ./auctions [auth].200.json
+// {{url}}/auctions

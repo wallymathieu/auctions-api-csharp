@@ -1,5 +1,5 @@
 echo "Include connection strings in environment"
-source .env
+source .env.devcontainer
 export SA_PASSWORD=${SA_PASSWORD}
 export ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
 export ConnectionStrings__Redis=${ConnectionStrings__Redis}

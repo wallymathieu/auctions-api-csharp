@@ -10,7 +10,7 @@ public class AuctionRepository : IAuctionRepository
 
     public AuctionRepository(AuctionDbContext dbContext) => _dbContext = dbContext;
 
-    public virtual async Task<Auction?> GetAuctionAsync(long auctionId, CancellationToken cancellationToken) =>
+    public virtual async Task<Auction?> GetAuctionAsync(AuctionId auctionId, CancellationToken cancellationToken) =>
         await _dbContext.GetAuction(auctionId, cancellationToken);
 
     public virtual async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken) =>
@@ -20,5 +20,5 @@ public class AuctionRepository : IAuctionRepository
         await _dbContext.AddAsync(entity, cancellationToken);
 
     public async Task<Auction?> FindAsync(object identifier, CancellationToken cancellationToken) =>
-        await GetAuctionAsync((long)identifier, cancellationToken);
+        await _dbContext.FindAsync<Auction>(identifier, cancellationToken);
 }

@@ -109,9 +109,10 @@ public interface IApiFixture:IDisposable
     Task<HttpResponseMessage> GetAuction(long id, AuthToken auth);
     void SetTime(DateTimeOffset now);
 }
-public class ApiFixture<TAuth>:IApiFixture, IDisposable where TAuth:IApiAuth, new()
+public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
 {
     private readonly FakeTime _fakeTime= new(InitialNow);
+    private readonly IDatabaseContextSetup _databaseContextSetup;
     TestServer Create()
     {
         var application = new WebApplicationFactory<Program>()
@@ -120,11 +121,7 @@ public class ApiFixture<TAuth>:IApiFixture, IDisposable where TAuth:IApiAuth, ne
                 _auth.Configure(builder);
                 builder.ConfigureServices(services =>
                 {
-                    services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
-                    services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
-                    services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
-                    services.AddDbContext<AuctionDbContext>(c=>c.UseSqlite("Data Source=" + _db, conf=>conf.MigrationsAssembly("Auctions")));
-
+                    _databaseContextSetup.Use(services);
                     services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
                     services.AddSingleton<ITime>(_fakeTime);
                     ConfigureServices(services);
@@ -132,44 +129,29 @@ public class ApiFixture<TAuth>:IApiFixture, IDisposable where TAuth:IApiAuth, ne
                 builder.UseEnvironment("Test");
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var context = serviceScope.ServiceProvider.GetRequiredService<AuctionDbContext>();
-        context.Database.EnsureCreated();
+        _databaseContextSetup.Migrate(serviceScope);
         return application.Server;
     }
 
+
     protected virtual void ConfigureServices(IServiceCollection services) {}
 
-    private void RemoveDbFile()
-    {
-        if (File.Exists(_db))
-        {
-            try
-            {
-                File.Delete(_db);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-    }
+
 
     private readonly TestServer _testServer;
-    private readonly string _db;
     private readonly TAuth _auth;
 
-    public ApiFixture(string db)
+    public ApiFixture(IDatabaseContextSetup databaseContextSetup, TAuth auth)
     {
-        _db = db;
-        _auth= new TAuth();
-        RemoveDbFile();
+        _databaseContextSetup = databaseContextSetup;
+        _auth = auth;
         _testServer = Create();
     }
 
     public void Dispose()
     {
         _testServer.Dispose();
-        RemoveDbFile();
+        _databaseContextSetup.TryRemove();
     }
     public TestServer Server=>_testServer;
 

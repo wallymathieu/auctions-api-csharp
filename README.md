@@ -38,7 +38,7 @@ docker compose up -d redis
 To build the app run:
 
 ```bash
-cd src/Api
+cd src/Auctions.WebApi
 dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer
 ```
 
@@ -63,15 +63,15 @@ To run migrations and api using above environment:
 
 ```bash
 dotnet tool restore
-cd src/Api
+cd src/Auctions.WebApi
 dotnet ef database update
 dotnet run
 ```
 
-To run functions locally using above environment:
+To run Azure Functions locally using above environment:
 
 ```bash
-cd src/Functions
+cd src/Auctions.AzureFunctions
 func start
 ```
 
@@ -84,5 +84,13 @@ Either the decoded JWT in the `x-jwt-payload` header or specify an encoded claim
 ## Add migration
 
 ```bash
-dotnet ef migrations add NewMigration --project ./src/Auctions.Infrastructure/Auctions.Infrastructure.csproj --startup-project ./src/Api/Api.csproj
+dotnet ef migrations add NewMigration --project ./src/Auctions.Infrastructure/Auctions.Infrastructure.csproj --startup-project ./src/Auctions.WebApi/Auctions.WebApi.csproj
 ```
+
+## Inspiration
+
+The main inspiration for the architecture of the API is found in this book:
+
+- [Clean Architecture](https://www.goodreads.com/en/book/show/18043011)
+
+Note that there are many variants of "the clean architecture" described in the .net space with different interpretations of what it means to implement this architecture.

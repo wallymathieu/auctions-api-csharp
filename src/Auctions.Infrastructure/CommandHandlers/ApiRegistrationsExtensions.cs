@@ -8,6 +8,7 @@ using Wallymathieu.Auctions.Infrastructure.Services;
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 /// <summary>
 /// Api registrations logic. Potentially some of the lambda compiled logic could be made into Roslyn generated code.
+/// Note the use of decorators in order to be able to share the logic between the different types of command handlers.
 /// </summary>
 public static class ApiRegistrationsExtensions
 {
