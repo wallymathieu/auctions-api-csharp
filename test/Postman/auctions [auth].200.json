@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,
+    "startsAt": "2023-04-29T05:21:07Z",
+    "title": "Some auction",
+    "expiry": "2023-04-29T07:21:07Z",
+    "user": "Test",
+    "currency": "VAC",
+    "bids": [
+      {
+        "amount": "VAC11",
+        "bidder": "Buyer"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "startsAt": "2023-04-29T05:21:33Z",
+    "title": "Some auction",
+    "expiry": "2023-04-29T07:21:33Z",
+    "user": "Test",
+    "currency": "VAC",
+    "bids": []
+  }
+]
