@@ -50,7 +50,10 @@ public class AuctionsController : ControllerBase
     /// Create an auction
     /// </summary>
     /// <remarks>
-    /// Create an auction. Note that the auction models are restricted to be either [Vickrey auction](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction) or [Timed ascending auction](https://en.wikipedia.org/wiki/English_auction).
+    /// Create an auction. Note that the auction models are restricted to be a closed bid auction either as a
+    /// [First price sealed bid auction](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction) or a
+    /// [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction). It can also be a
+    /// [Timed ascending auction also known as an English auction](https://en.wikipedia.org/wiki/English_auction).
     /// </remarks>
     [HttpPost(Name = "create_auction") , Authorize,
      ProducesResponseType(typeof(void),StatusCodes.Status200OK)]
