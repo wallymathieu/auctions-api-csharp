@@ -1,0 +1,80 @@
+﻿@page "/auctions"
+@using Wallymathieu.Auctions.Commands
+@inject IAuctionRepository Repository
+@inject ICreateAuctionCommandHandler CreateAuctionCommandHandler
+
+
+<PageTitle>Auctions</PageTitle>
+
+<h1>Auctions</h1>
+
+<p>This page display all of the auctions.</p>
+
+@if (auctions == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Starts at</th>
+            <th>Expires at</th>
+            <th>Title</th>
+            <th>Seller</th>
+            <th>Max bid amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var forecast in auctions)
+        {
+            <tr>
+                <td>@forecast.StartsAt.Date.ToShortDateString()</td>
+                <td>@forecast.Expiry.Date.ToShortDateString()</td>
+                <td>@forecast.Title</td>
+                <td>@forecast.User</td>
+                <td>@forecast.Bids.Max(b=>b.Amount)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <input placeholder="Title" @bind="title" required="required" />
+    <input placeholder="Currency" @bind="currency" required="required" />
+    <input placeholder="Starts at" @bind="startsAt" type="datetime-local" required="required" />
+    <input placeholder="Ends at" @bind="endsAt" type="datetime-local" required="required" />
+    <button @onclick="AddAuction">Add Auction</button>
+}
+
+@code {
+    private IReadOnlyCollection<Auction>? auctions;
+    private string? title;
+    private string? currency=CurrencyCode.VAC.ToString();
+    private DateTime? startsAt;
+    private DateTime? endsAt;
+
+    protected override async Task OnInitializedAsync()
+    {
+        auctions = await Repository.GetAuctionsAsync(default);
+    }
+    private async Task AddAuction()
+    {
+        if (!string.IsNullOrWhiteSpace(value: title)
+            && Enum.TryParse<CurrencyCode>( value: currency, result: out var c)
+            && startsAt!=null
+            && endsAt!=null)
+        {
+            var result = await CreateAuctionCommandHandler.Handle(model: new CreateAuctionCommand(
+                Title: title,
+                Currency: c,
+                StartsAt: startsAt.Value,
+                EndsAt: endsAt.Value,
+                MinRaise: null,
+                ReservePrice: null,
+                TimeFrame: null,
+                SingleSealedBidOptions: null), cancellationToken: default);
+            title = string.Empty;
+        }
+    }
+}

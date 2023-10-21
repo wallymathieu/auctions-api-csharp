@@ -1,15 +1,16 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Options;
 
-namespace Wallymathieu.Auctions.Api.Middleware.Auth;
+namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
+
 /// <summary>
-/// See also https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
+///     See also https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
 /// </summary>
-public class PayloadAuthenticationHandler: AuthenticationHandler<PayloadAuthenticationOptions>
+internal class PayloadAuthenticationHandler : AuthenticationHandler<PayloadAuthenticationOptions>
 {
     private readonly ClaimsPrincipalParser _claimsPrincipalParser;
     private readonly JwtPayloadClaimsPrincipalParser _jwtPayloadClaimsPrincipalParser;
+
     public PayloadAuthenticationHandler(IOptionsMonitor<PayloadAuthenticationOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
@@ -20,20 +21,18 @@ public class PayloadAuthenticationHandler: AuthenticationHandler<PayloadAuthenti
         _claimsPrincipalParser = claimsPrincipalParser;
         _jwtPayloadClaimsPrincipalParser = jwtPayloadClaimsPrincipalParser;
     }
+
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         try
         {
             var apiKey = Request.Headers[Options.PrincipalHeader];
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                return Task.FromResult(AuthenticateResult.NoResult());
-            }
+            if (string.IsNullOrEmpty(apiKey)) return Task.FromResult(AuthenticateResult.NoResult());
 
-            IClaimsPrincipalParser parser = Options.PrincipalHeader == JwtPayloadClaimsPrincipalParser.Header
+            IClaimsPrincipalParser parser = Options.PrincipalHeader == JwtPayload.Header
                 ? _jwtPayloadClaimsPrincipalParser
                 : _claimsPrincipalParser;
-            if (parser.IsValid(apiKey,out var claimsIdentity))
+            if (parser.IsValid(apiKey, out var claimsIdentity))
             {
                 Context.User = claimsIdentity!;
                 var success = AuthenticateResult.Success(
@@ -43,7 +42,6 @@ public class PayloadAuthenticationHandler: AuthenticationHandler<PayloadAuthenti
             }
 
             return Task.FromResult(AuthenticateResult.Fail("InvalidClaimsIdentity"));
-
         }
         catch (Exception e)
         {
