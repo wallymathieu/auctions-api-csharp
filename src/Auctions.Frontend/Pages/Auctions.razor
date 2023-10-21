@@ -41,7 +41,14 @@ else
     </table>
 
     <input placeholder="Title" @bind="title" required="required" />
-    <input placeholder="Currency" @bind="currency" required="required" />
+    <label>
+        Currency
+        <select @bind="currency" required="required">
+            <option value="@CurrencyCode.VAC">VAC</option>
+            <option value="@CurrencyCode.SEK">SEK</option>
+            <option value="@CurrencyCode.DKK">DKK</option>
+        </select>
+    </label>
     <input placeholder="Starts at" @bind="startsAt" type="datetime-local" required="required" />
     <input placeholder="Ends at" @bind="endsAt" type="datetime-local" required="required" />
     <button @onclick="AddAuction">Add Auction</button>
