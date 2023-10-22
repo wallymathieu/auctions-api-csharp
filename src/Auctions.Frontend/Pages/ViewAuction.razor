@@ -1,5 +1,6 @@
 ﻿@page "/auctions/{Id:long}"
 @using Wallymathieu.Auctions.Commands
+@using Wallymathieu.Auctions.Frontend.Data
 @inject IAuctionRepository Repository
 @inject ICreateBidCommandHandler CreateBidCommandHandler
 
@@ -9,10 +10,16 @@
 
 <p>This page display an auction.</p>
 
-@if (_auction == null)
+@if ( !_auction.Loaded)
 {
     <p>
         <em>Loading...</em>
+    </p>
+}
+else if (_auction.Data == null)
+{
+    <p>
+        <em>Not found</em>
     </p>
 }
 else
@@ -28,10 +35,10 @@ else
         </thead>
         <tbody>
         <tr>
-            <td>@_auction.StartsAt.Date.ToShortDateString()</td>
-            <td>@_auction.Expiry.Date.ToShortDateString()</td>
-            <td>@_auction.Title</td>
-            <td>@_auction.User</td>
+            <td>@_auction.Data.StartsAt.Date.ToShortDateString()</td>
+            <td>@_auction.Data.Expiry.Date.ToShortDateString()</td>
+            <td>@_auction.Data.Title</td>
+            <td>@_auction.Data.User</td>
         </tr>
         </tbody>
     </table>
@@ -45,7 +52,7 @@ else
         </thead>
         <tbody>
         @{
-            foreach (var bid in _auction.Bids)
+            foreach (var bid in _auction.Data.Bids)
             {
                 <tr>
                     <td>@bid.Amount</td>
@@ -58,7 +65,10 @@ else
             <td>
                 <input placeholder="Amount" type="number" @bind="_newBid"/>
             </td>
-            <td></td>
+            <td>
+                @if (!string.IsNullOrEmpty(_err))
+                {<div id="amountFeedback">@_err</div>}
+            </td>
             <td>
                 <button @onclick="AddBid">Add bid</button>
             </td>
@@ -72,23 +82,26 @@ else
     [Parameter]
     public long Id { get; set; }
 
-    private Auction? _auction=null;
-    private string? _newBid;
+    private readonly RemoteData<Auction> _auction=new();
+    private int? _newBid;
+    private string? _err;
 
     protected override async Task OnInitializedAsync()
     {
-        //Console.WriteLine(Id);
-        _auction = await Repository.GetAuctionAsync(new AuctionId(this.Id), default);
-        //Console.WriteLine("has auction "+_auction!=null);
+        _auction.OnLoad(await Repository.GetAuctionAsync(new AuctionId(this.Id), default));
     }
 
     private async Task AddBid()
     {
-        if (!string.IsNullOrWhiteSpace(_newBid) && Int32.TryParse(_newBid, out var bid))
+        if (_newBid!=null)
         {
-            await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(bid, _auction.Currency), _auction.AuctionId), default);
-            _newBid = string.Empty;
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data.Currency), _auction.Data.AuctionId), default);
+            _err = result?.Match<string?>(ok => null, err => err.ToString());
+            _newBid = null;
+        }
+        else
+        {
+            _err = "Missing bid";
         }
     }
-
 }
