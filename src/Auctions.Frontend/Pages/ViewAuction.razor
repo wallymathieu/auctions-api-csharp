@@ -9,7 +9,7 @@
 
 <p>This page display an auction.</p>
 
-@if (auction == null)
+@if (_auction == null)
 {
     <p>
         <em>Loading...</em>
@@ -28,10 +28,10 @@ else
         </thead>
         <tbody>
         <tr>
-            <td>@auction.StartsAt.Date.ToShortDateString()</td>
-            <td>@auction.Expiry.Date.ToShortDateString()</td>
-            <td>@auction.Title</td>
-            <td>@auction.User</td>
+            <td>@_auction.StartsAt.Date.ToShortDateString()</td>
+            <td>@_auction.Expiry.Date.ToShortDateString()</td>
+            <td>@_auction.Title</td>
+            <td>@_auction.User</td>
         </tr>
         </tbody>
     </table>
@@ -45,7 +45,7 @@ else
         </thead>
         <tbody>
         @{
-            foreach (var bid in auction.Bids)
+            foreach (var bid in _auction.Bids)
             {
                 <tr>
                     <td>@bid.Amount</td>
@@ -56,7 +56,7 @@ else
         }
         <tr>
             <td>
-                <input placeholder="Amount" type="number" @bind="newBid"/>
+                <input placeholder="Amount" type="number" @bind="_newBid"/>
             </td>
             <td></td>
             <td>
@@ -72,20 +72,22 @@ else
     [Parameter]
     public long Id { get; set; }
 
-    private Auction? auction;
-    private string? newBid;
+    private Auction? _auction=null;
+    private string? _newBid;
 
     protected override async Task OnInitializedAsync()
     {
-        auction = await Repository.GetAuctionAsync(new AuctionId(this.Id), default);
+        //Console.WriteLine(Id);
+        _auction = await Repository.GetAuctionAsync(new AuctionId(this.Id), default);
+        //Console.WriteLine("has auction "+_auction!=null);
     }
 
     private async Task AddBid()
     {
-        if (!string.IsNullOrWhiteSpace(newBid) && Int32.TryParse(newBid, out var bid))
+        if (!string.IsNullOrWhiteSpace(_newBid) && Int32.TryParse(_newBid, out var bid))
         {
-            await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(bid, auction.Currency), auction.AuctionId), default);
-            newBid = string.Empty;
+            await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(bid, _auction.Currency), _auction.AuctionId), default);
+            _newBid = string.Empty;
         }
     }
 
