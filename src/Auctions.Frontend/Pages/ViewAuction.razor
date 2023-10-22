@@ -94,7 +94,7 @@ else
     {
         if (_newBid != null)
         {
-            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data.Currency), _auction.Data.AuctionId), default);
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data.Currency), _auction.Data.AuctionId));
             result?.Match(ok =>
             {
                 _newBid = null;
