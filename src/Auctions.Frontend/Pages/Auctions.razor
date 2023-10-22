@@ -10,7 +10,7 @@
 
 <p>This page display all of the auctions.</p>
 
-@if (auctions == null)
+@if (_auctions == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -23,65 +23,67 @@ else
             <th>Expires at</th>
             <th>Title</th>
             <th>Seller</th>
-            <th>Max bid amount</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var forecast in auctions)
+        @foreach (var forecast in _auctions)
         {
             <tr>
                 <td>@forecast.StartsAt.Date.ToShortDateString()</td>
                 <td>@forecast.Expiry.Date.ToShortDateString()</td>
                 <td>@forecast.Title</td>
                 <td>@forecast.User</td>
-                <td>@forecast.Bids.Max(b=>b.Amount)</td>
             </tr>
         }
         </tbody>
     </table>
 
-    <input placeholder="Title" @bind="title" required="required" />
+    <input placeholder="Title" @bind="_title" required="required" />
     <label>
         Currency
-        <select @bind="currency" required="required">
+        <select @bind="_currency" required="required">
             <option value="@CurrencyCode.VAC">VAC</option>
             <option value="@CurrencyCode.SEK">SEK</option>
             <option value="@CurrencyCode.DKK">DKK</option>
         </select>
     </label>
-    <input placeholder="Starts at" @bind="startsAt" type="datetime-local" required="required" />
-    <input placeholder="Ends at" @bind="endsAt" type="datetime-local" required="required" />
+    <input placeholder="Starts at" @bind="_startsAt" type="datetime-local" required="required" />
+    <input placeholder="Ends at" @bind="_endsAt" type="datetime-local" required="required" />
     <button @onclick="AddAuction">Add Auction</button>
 }
 
 @code {
-    private IReadOnlyCollection<Auction>? auctions;
-    private string? title;
-    private string? currency=CurrencyCode.VAC.ToString();
-    private DateTime? startsAt;
-    private DateTime? endsAt;
+    private IReadOnlyCollection<Auction>? _auctions;
+    private string? _title;
+    private string? _currency=CurrencyCode.VAC.ToString();
+    private DateTime? _startsAt;
+    private DateTime? _endsAt;
 
     protected override async Task OnInitializedAsync()
     {
-        auctions = await Repository.GetAuctionsAsync(default);
+        _auctions = await Repository.GetAuctionsAsync(default);
     }
     private async Task AddAuction()
     {
-        if (!string.IsNullOrWhiteSpace(value: title)
-            && Enum.TryParse<CurrencyCode>( value: currency, result: out var c)
-            && startsAt!=null
-            && endsAt!=null)
+        if (!string.IsNullOrWhiteSpace(value: _title)
+            && Enum.TryParse<CurrencyCode>( value: _currency, result: out var c)
+            && _startsAt!=null
+            && _endsAt!=null)
         {
             var result = await CreateAuctionCommandHandler.Handle(model: new CreateAuctionCommand(
-                Title: title,
+                Title: _title,
                 Currency: c,
-                StartsAt: startsAt.Value,
-                EndsAt: endsAt.Value,
+                StartsAt: _startsAt.Value,
+                EndsAt: _endsAt.Value,
                 MinRaise: null,
                 ReservePrice: null,
                 TimeFrame: null,
                 SingleSealedBidOptions: null), cancellationToken: default);
-            title = string.Empty;
+            _auctions = await Repository.GetAuctionsAsync(cancellationToken: default);
+            _title = string.Empty;
+            _startsAt = null;
+            _endsAt = null;
+            _currency = CurrencyCode.VAC.ToString();
         }
     }
 }
