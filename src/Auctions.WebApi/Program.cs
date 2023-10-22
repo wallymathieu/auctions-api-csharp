@@ -2,9 +2,9 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Json;
+using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Web;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
@@ -56,7 +56,7 @@ builder.AddAuctionsWebInfrastructure();
 builder.Services.AddAuctionsWebJwt()
     .AddHttpContextAccessor()
     .AddHttpContextUserContext();
-builder.Services.AddSingleton<AuctionMapper>();
+builder.Services.AddAuctionMapper();
 builder.Services.AddOptions<PayloadAuthenticationOptions>();
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
 builder.Services

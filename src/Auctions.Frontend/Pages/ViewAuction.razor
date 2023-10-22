@@ -1,8 +1,10 @@
 ﻿@page "/auctions/{Id:long}"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
+@using Wallymathieu.Auctions.Infrastructure.Models
 @inject IAuctionRepository Repository
 @inject ICreateBidCommandHandler CreateBidCommandHandler
+@inject AuctionMapper Mapper
 
 <PageTitle>Auction</PageTitle>
 
@@ -38,7 +40,7 @@ else
             <td>@_auction.Data.StartsAt.Date.ToShortDateString()</td>
             <td>@_auction.Data.Expiry.Date.ToShortDateString()</td>
             <td>@_auction.Data.Title</td>
-            <td>@_auction.Data.User</td>
+            <td>@_auction.Data.Seller</td>
         </tr>
         </tbody>
     </table>
@@ -52,12 +54,12 @@ else
         </thead>
         <tbody>
         @{
-            foreach (var bid in _auction.Data.GetBids(DateTime.UtcNow))
+            foreach (var bid in _auction.Data.Bids)
             {
                 <tr>
                     <td>@bid.Amount</td>
-                    <td>@bid.User</td>
-                    <td>@bid.At.Date.ToShortDateString()</td>
+                    <td>@bid.Bidder</td>
+                    <td>@bid.At.ToString()</td>
                 </tr>
             }
         }
@@ -81,21 +83,30 @@ else
     [Parameter]
     public long Id { get; set; }
 
-    private readonly RemoteData<Auction> _auction=new();
+    private readonly RemoteData<AuctionModel> _auction=new();
     private int? _newBid;
     private string? _errorDescription;
 
+    private async Task LoadAuction()
+    {
+        var auction = await Repository.GetAuctionAsync(new AuctionId(this.Id));
+        _auction.OnLoad(
+            auction is not null
+            ? Mapper.MapAuctionToModel(auction)
+            : null);
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        _auction.OnLoad(await Repository.GetAuctionAsync(new AuctionId(this.Id)));
+        await LoadAuction();
     }
 
     private async Task AddBid()
     {
         if (_newBid != null)
         {
-            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data.Currency), _auction.Data.AuctionId));
-            result?.Match(ok =>
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), new(_auction.Data.Id)));
+            result?.Match(_ =>
             {
                 _newBid = null;
             }, err =>
@@ -104,7 +115,7 @@ else
             });
             if (result?.IsOk ?? false)
             {
-                _auction.OnLoad(await Repository.GetAuctionAsync(new AuctionId(this.Id)));
+                await LoadAuction();
             }
         }
         else

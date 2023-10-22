@@ -1,8 +1,10 @@
 ﻿@page "/auctions"
 @using Wallymathieu.Auctions.Commands
+@using Wallymathieu.Auctions.Frontend.Data
+@using Wallymathieu.Auctions.Infrastructure.Models
 @inject IAuctionRepository Repository
 @inject ICreateAuctionCommandHandler CreateAuctionCommandHandler
-
+@inject AuctionMapper Mapper
 
 <PageTitle>Auctions</PageTitle>
 
@@ -10,11 +12,11 @@
 
 <p>This page display all of the auctions.</p>
 
-@if (_auctions == null)
+@if (!_auctions.Loaded)
 {
     <p><em>Loading...</em></p>
 }
-else
+else if (_auctions.Data!=null)
 {
     <table class="table">
         <thead>
@@ -26,13 +28,13 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var auction in _auctions)
+        @foreach (var auction in _auctions.Data)
         {
             <tr>
-                <td><a href="/auctions/@auction.AuctionId">@auction.Title</a> </td>
+                <td><a href="/auctions/@auction.Id">@auction.Title</a> </td>
                 <td>@auction.StartsAt.Date.ToShortDateString()</td>
                 <td>@auction.Expiry.Date.ToShortDateString()</td>
-                <td>@auction.User</td>
+                <td>@auction.Seller</td>
             </tr>
         }
         </tbody>
@@ -53,15 +55,22 @@ else
 }
 
 @code {
-    private IReadOnlyCollection<Auction>? _auctions;
+    private readonly RemoteData<IReadOnlyCollection<AuctionModel>> _auctions=new();
     private string? _title;
     private string? _currency=CurrencyCode.VAC.ToString();
     private DateTime? _startsAt;
     private DateTime? _endsAt;
 
+    private async Task LoadAuctions()
+    {
+        _auctions.OnLoad( (
+            from auction in await Repository.GetAuctionsAsync()
+            select Mapper.MapAuctionToModel(auction)).ToArray());
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        _auctions = await Repository.GetAuctionsAsync();
+        await LoadAuctions();
     }
     private async Task AddAuction()
     {
@@ -79,7 +88,7 @@ else
                 ReservePrice: null,
                 TimeFrame: null,
                 SingleSealedBidOptions: null));
-            _auctions = await Repository.GetAuctionsAsync();
+            await LoadAuctions();
             _title = string.Empty;
             _startsAt = null;
             _endsAt = null;
