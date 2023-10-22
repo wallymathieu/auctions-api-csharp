@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Wallymathieu.Auctions.Frontend.Data;
 using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Infrastructure.Web;
-using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
