@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Wallymathieu.Auctions.Frontend.Data;
 
-public class ApplicationDbContext : IdentityDbContext
+public class FrontendDbContext : IdentityDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    public FrontendDbContext(DbContextOptions<FrontendDbContext> options)
         : base(options)
     {
     }
