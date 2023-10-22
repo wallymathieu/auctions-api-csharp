@@ -21,8 +21,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.AddAuctionsWebInfrastructure();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddOptions<PayloadAuthenticationOptions>();
+builder.Services
+    .AddHttpContextAccessor()
+    .AddHttpContextUserContext();
 
 var app = builder.Build();
 
@@ -36,6 +37,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

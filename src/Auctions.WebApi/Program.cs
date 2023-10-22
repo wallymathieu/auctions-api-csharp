@@ -53,8 +53,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 builder.AddAuctionsWebInfrastructure();
-builder.Services.AddAuctionsWebJwt();
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuctionsWebJwt()
+    .AddHttpContextAccessor()
+    .AddHttpContextUserContext();
 builder.Services.AddSingleton<AuctionMapper>();
 builder.Services.AddOptions<PayloadAuthenticationOptions>();
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure

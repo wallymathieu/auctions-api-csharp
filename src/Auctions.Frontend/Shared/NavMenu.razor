@@ -2,7 +2,7 @@
 @using System.Security.Claims
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHttpContextAccessor HttpContext
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -30,12 +30,10 @@
 @if (User!=null && SignInManager.IsSignedIn(User))
 {
     <div class="nav-item px-3">
-        <NavLink class="nav-link" href="/Identity/Account/Manage" title="Manage">Hello @User.Identity?.Name!</NavLink>
+        <NavLink class="nav-link" href="/Identity/Account/Manage" title="Manage"><span class="oi oi-home" aria-hidden="true"></span>Hello @User.Identity?.Name!</NavLink>
     </div>
     <div class="nav-item px-3">
-        <form class="form-inline" href="/Identity/Account/Logout" asp-route-returnUrl="/" method="post" >
-            <button type="submit" class="nav-link btn btn-link"><span class="oi oi-home" aria-hidden="true"></span>Logout</button>
-        </form>
+        <NavLink class="nav-link" href="/Identity/Account/Logout" title="Logout"><span class="oi oi-key" aria-hidden="true"></span>Logout</NavLink>
     </div>
 }
 else
@@ -65,10 +63,9 @@ else
     ClaimsPrincipal? User;
     protected override async Task OnInitializedAsync()
     {
-        if (authenticationState is not null)
+        if (HttpContext.HttpContext?.User!=null)
         {
-            var authState = await authenticationState;
-            User = authState?.User;
+            User = HttpContext.HttpContext?.User;
         }
     }
 }

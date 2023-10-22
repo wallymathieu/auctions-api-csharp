@@ -20,7 +20,8 @@ public static class Extensions
         if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
         {
             builder.Services.AddAuctionRepositoryCached()
-                .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                .AddAuctionDbContextSqlServer(
+                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
                 .AddStackExchangeRedisCache(options =>
                 {
                     options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
@@ -31,7 +32,8 @@ public static class Extensions
         else
         {
             builder.Services.AddAuctionRepositoryNoCache()
-                .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                .AddAuctionDbContextSqlServer(
+                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
                 .AddAuctionServicesNoCache();
         }
 
@@ -49,13 +51,15 @@ public static class Extensions
                 azureClientsBuilder.UseCredential(new DefaultAzureCredential());
             });
         }
+
         builder.Services.AddScoped<IMessageQueue, AzureMessageQueue>();
-        builder.Services.AddScoped<IUserContext, UserContext>();
     }
 
-    public static void AddAuctionsWebJwt(this IServiceCollection services)
-    {
-        services.AddSingleton<ClaimsPrincipalParser>();
-        services.AddSingleton<JwtPayloadClaimsPrincipalParser>();
-    }
+    public static IServiceCollection AddAuctionsWebJwt(this IServiceCollection services) =>
+        services
+            .AddSingleton<ClaimsPrincipalParser>()
+            .AddSingleton<JwtPayloadClaimsPrincipalParser>();
+
+    public static IServiceCollection AddHttpContextUserContext(this IServiceCollection services) =>
+        services.AddScoped<IUserContext, UserContext>();
 }
