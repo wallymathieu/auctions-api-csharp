@@ -61,7 +61,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _auctions = await Repository.GetAuctionsAsync(default);
+        _auctions = await Repository.GetAuctionsAsync();
     }
     private async Task AddAuction()
     {
@@ -78,8 +78,8 @@ else
                 MinRaise: null,
                 ReservePrice: null,
                 TimeFrame: null,
-                SingleSealedBidOptions: null), cancellationToken: default);
-            _auctions = await Repository.GetAuctionsAsync(cancellationToken: default);
+                SingleSealedBidOptions: null));
+            _auctions = await Repository.GetAuctionsAsync();
             _title = string.Empty;
             _startsAt = null;
             _endsAt = null;

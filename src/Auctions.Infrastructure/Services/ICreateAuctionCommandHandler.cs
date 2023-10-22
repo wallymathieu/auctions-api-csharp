@@ -5,5 +5,5 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 /// </summary>
 public interface ICreateAuctionCommandHandler
 {
-    Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken);
+    Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken=default);
 }

@@ -52,7 +52,7 @@ else
         </thead>
         <tbody>
         @{
-            foreach (var bid in _auction.Data.Bids)
+            foreach (var bid in _auction.Data.GetBids(DateTime.UtcNow))
             {
                 <tr>
                     <td>@bid.Amount</td>
@@ -87,7 +87,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _auction.OnLoad(await Repository.GetAuctionAsync(new AuctionId(this.Id), default));
+        _auction.OnLoad(await Repository.GetAuctionAsync(new AuctionId(this.Id)));
     }
 
     private async Task AddBid()
@@ -102,6 +102,10 @@ else
             {
                 _errorDescription = err.ToString();
             });
+            if (result?.IsOk ?? false)
+            {
+                _auction.OnLoad(await Repository.GetAuctionAsync(new AuctionId(this.Id)));
+            }
         }
         else
         {
