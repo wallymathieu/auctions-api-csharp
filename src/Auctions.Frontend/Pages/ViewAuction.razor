@@ -66,8 +66,7 @@ else
                 <input placeholder="Amount" type="number" @bind="_newBid"/>
             </td>
             <td>
-                @if (!string.IsNullOrEmpty(_err))
-                {<div id="amountFeedback">@_err</div>}
+                <DisplayError Error="@_err" Description="@_errDescription" />
             </td>
             <td>
                 <button @onclick="AddBid">Add bid</button>
@@ -84,7 +83,8 @@ else
 
     private readonly RemoteData<Auction> _auction=new();
     private int? _newBid;
-    private string? _err;
+    private Errors? _err;
+    private string? _errDescription;
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,15 +93,17 @@ else
 
     private async Task AddBid()
     {
-        if (_newBid!=null)
+        if (_newBid != null)
         {
             var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data.Currency), _auction.Data.AuctionId), default);
-            _err = result?.Match<string?>(ok => null, err => err.ToString());
+            _err = result?.Match<Errors?>(ok => null, err => err);
+            _errDescription = null;
             _newBid = null;
         }
         else
         {
-            _err = "Missing bid";
+            _err = null;
+            _errDescription = "";
         }
     }
 }
