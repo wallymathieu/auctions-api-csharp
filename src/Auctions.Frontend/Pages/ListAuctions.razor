@@ -19,20 +19,20 @@ else
     <table class="table">
         <thead>
         <tr>
+            <th>Title</th>
             <th>Starts at</th>
             <th>Expires at</th>
-            <th>Title</th>
             <th>Seller</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var forecast in _auctions)
+        @foreach (var auction in _auctions)
         {
             <tr>
-                <td>@forecast.StartsAt.Date.ToShortDateString()</td>
-                <td>@forecast.Expiry.Date.ToShortDateString()</td>
-                <td>@forecast.Title</td>
-                <td>@forecast.User</td>
+                <td><a href="/auctions/@auction.AuctionId">@auction.Title</a> </td>
+                <td>@auction.StartsAt.Date.ToShortDateString()</td>
+                <td>@auction.Expiry.Date.ToShortDateString()</td>
+                <td>@auction.User</td>
             </tr>
         }
         </tbody>
