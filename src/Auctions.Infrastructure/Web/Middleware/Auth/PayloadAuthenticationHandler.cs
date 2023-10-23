@@ -29,7 +29,7 @@ internal class PayloadAuthenticationHandler : AuthenticationHandler<PayloadAuthe
             var apiKey = Request.Headers[Options.PrincipalHeader];
             if (string.IsNullOrEmpty(apiKey)) return Task.FromResult(AuthenticateResult.NoResult());
 
-            IClaimsPrincipalParser parser = Options.PrincipalHeader == JwtPayload.Header
+            IClaimsPrincipalParser parser = Options.PrincipalHeader == JwtPayloadClaimsPrincipal.Header
                 ? _jwtPayloadClaimsPrincipalParser
                 : _claimsPrincipalParser;
             if (parser.IsValid(apiKey, out var claimsIdentity))

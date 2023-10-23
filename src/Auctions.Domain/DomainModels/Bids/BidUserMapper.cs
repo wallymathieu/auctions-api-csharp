@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Infrastructure.Models;
+namespace Wallymathieu.Auctions.DomainModels.Bids;
 
 public class BidUserMapper : IBidUserMapper
 {

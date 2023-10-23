@@ -43,9 +43,9 @@ internal class ClaimsPrincipalParser : IClaimsPrincipalParser
 
     private class ClientPrincipalClaim
     {
-        [JsonPropertyName("typ")] public string Type { get; }
+        [JsonPropertyName("typ")] public string Type { get; set; }
 
-        [JsonPropertyName("val")] public string Value { get; }
+        [JsonPropertyName("val")] public string Value { get; set; }
     }
 
     private class ClientPrincipal
@@ -56,6 +56,6 @@ internal class ClaimsPrincipalParser : IClaimsPrincipalParser
 
         [JsonPropertyName("role_typ")] public string RoleClaimType { get; set; }
 
-        [JsonPropertyName("claims")] public IEnumerable<ClientPrincipalClaim> Claims { get; set; }
+        [JsonPropertyName("claims")] public ClientPrincipalClaim[] Claims { get; set; }
     }
 }

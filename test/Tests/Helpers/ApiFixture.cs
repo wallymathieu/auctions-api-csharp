@@ -35,7 +35,7 @@ public class JwtApiAuth: IApiAuth
     {
         if (!string.IsNullOrWhiteSpace(auth))
         {
-            r.Headers.Add(JwtPayload.Header, auth);
+            r.Headers.Add(JwtPayloadClaimsPrincipal.Header, auth);
         }
     }
 
