@@ -43,8 +43,10 @@ internal class ClaimsPrincipalParser : IClaimsPrincipalParser
 
     private class ClientPrincipalClaim
     {
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
         [JsonPropertyName("typ")] public string Type { get; set; }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
         [JsonPropertyName("val")] public string Value { get; set; }
     }
 
