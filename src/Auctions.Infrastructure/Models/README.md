@@ -10,6 +10,8 @@ to create a separate adapter service (such as a separate docker image) to do ver
 Due to the separation you can also avoid accidentally exposing secret information such as bidder or seller
 information not intended for all users of the API.
 
+You could view the raw domain model as being what an administrator should be able to see.
+
 ## AutoMapper
 
 Read the [usage guide](https://www.jimmybogard.com/automapper-usage-guidelines/). Please note that everything is not a

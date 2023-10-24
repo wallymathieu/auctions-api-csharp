@@ -3,12 +3,12 @@ using Azure.Storage.Queues;
 using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 
-namespace Wallymathieu.Auctions.Api.Infrastructure.Queues;
+namespace Wallymathieu.Auctions.Infrastructure.Web.Queues;
 
-public class AzureMessageQueue:IMessageQueue
+internal class AzureMessageQueue : IMessageQueue
 {
-    private readonly JsonSerializerOptions _serializerOptions;
     private readonly QueueServiceClient? _queueServiceClient;
+    private readonly JsonSerializerOptions _serializerOptions;
 
     public AzureMessageQueue(IEnumerable<QueueServiceClient> clients)
     {
@@ -18,6 +18,7 @@ public class AzureMessageQueue:IMessageQueue
     }
 
     public bool Enabled => _queueServiceClient != null;
+
     public async Task SendMessageAsync(string queueName, object command, CancellationToken cancellationToken)
     {
         if (_queueServiceClient == null) throw new InvalidOperationException("Message queue is not enabled");
