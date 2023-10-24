@@ -1,7 +1,7 @@
-using Wallymathieu.Auctions.DomainModels;
+using Wallymathieu.Auctions.DomainModels.Bids;
 using Wallymathieu.Auctions.Services;
 
-namespace Wallymathieu.Auctions.Api.Models;
+namespace Wallymathieu.Auctions.Infrastructure.Models;
 
 /// <summary>
 /// Map to API models from domain models. We could use such a library as AutoMapper instead.
@@ -20,7 +20,7 @@ public class AuctionMapper
         var now = _time.Now;
         var amountAndWinner = auction.TryGetAmountAndWinner(now);
         var hasEnded = auction.HasEnded(now);
-        var bidUserMapper = BidUserMapper(auction);
+        var bidUserMapper = auction.BidUserMapper();
         return new AuctionModel(
             Id: auction.AuctionId.Id,
             StartsAt :auction.StartsAt,
@@ -35,14 +35,6 @@ public class AuctionMapper
                 MapToBidModel(auction, bid, bidUserMapper)).ToArray() ?? Array.Empty<BidModel>());
     }
 
-    private static IBidUserMapper BidUserMapper(Auction auction)
-    {
-        IBidUserMapper bidUserMapper = auction.OpenBidders
-            ? new BidUserMapper()
-            : new NumberedBidUserMapper(auction.Bids);
-        return bidUserMapper;
-    }
-
     private static BidModel MapToBidModel(Auction auction, Bid bid, IBidUserMapper bidUserMapper)
     {
         return new BidModel(bid.Amount,
@@ -52,7 +44,7 @@ public class AuctionMapper
 
     public BidModel MapBidToModel(Auction auction, Bid bid)
     {
-        var bidUserMapper = BidUserMapper(auction);
+        var bidUserMapper = auction.BidUserMapper();
         return MapToBidModel(auction, bid, bidUserMapper);
     }
 }

@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Wallymathieu.Auctions.Api.Middleware.Auth;
+namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
 public interface IClaimsPrincipalParser
 {

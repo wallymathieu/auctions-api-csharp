@@ -15,4 +15,5 @@ public enum Errors
     MustPlaceBidOverHighestBid=1<<8,
     AlreadyPlacedBid=1<<9,
     MustRaiseWithAtLeast=1<<10,
+    MustSpecifyAmount=1<<11,
 }

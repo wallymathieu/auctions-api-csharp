@@ -1,6 +1,6 @@
-using Wallymathieu.Auctions.DomainModels;
+using Wallymathieu.Auctions.Services;
 
-namespace Wallymathieu.Auctions.Api.Models;
+namespace Wallymathieu.Auctions.DomainModels.Bids;
 
 public class NumberedBidUserMapper:IBidUserMapper
 {

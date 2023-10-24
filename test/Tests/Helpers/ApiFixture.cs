@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Wallymathieu.Auctions.Api.Middleware.Auth;
 using Wallymathieu.Auctions.Infrastructure.Data;
+using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
@@ -35,7 +35,7 @@ public class JwtApiAuth: IApiAuth
     {
         if (!string.IsNullOrWhiteSpace(auth))
         {
-            r.Headers.Add(JwtPayloadClaimsPrincipalParser.Header, auth);
+            r.Headers.Add(JwtPayloadClaimsPrincipal.Header, auth);
         }
     }
 

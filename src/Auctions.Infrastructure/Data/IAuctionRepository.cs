@@ -5,6 +5,6 @@ namespace Wallymathieu.Auctions.Infrastructure.Data;
 /// </summary>
 public interface IAuctionRepository
 {
-    Task<Auction?> GetAuctionAsync(AuctionId auctionId, CancellationToken cancellationToken);
-    Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken);
+    Task<Auction?> GetAuctionAsync(AuctionId auctionId, CancellationToken cancellationToken=default);
+    Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken=default);
 }
