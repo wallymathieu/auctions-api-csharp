@@ -5,6 +5,10 @@ COPY mssql/installSQLtools.sh installSQLtools.sh
 RUN bash ./installSQLtools.sh \
      && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts
 
+RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+RUN chmod +x ./dotnet-install.sh
+RUN sudo ./dotnet-install.sh --channel 8.0 --install-dir /usr/share/dotnet
+
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
