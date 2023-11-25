@@ -3,115 +3,13 @@ using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Wallymathieu.Auctions.Infrastructure.Data;
-using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
-public enum AuthToken
-{
-    None,
-    Seller1,
-    Buyer1,
-}
-public interface IApiAuth
-{
-    bool TryAddAuth(HttpRequestMessage r, AuthToken auth);
-    void Configure(IWebHostBuilder builder);
-}
-public class JwtApiAuth: IApiAuth
-{
-    private static string GetToken(string sub, string email)
-    {
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes( @"{
-""sub"":"""+sub+@""", ""name"":"""+email+@""", ""u_typ"":""0""
-}"));
-    }
-    private readonly string Seller1 = GetToken("a1", "seller1@hotmail.com");
-    private readonly string Buyer1 =  GetToken("a2", "buyer1@hotmail.com");
-    private static void AddXJwtPayload(HttpRequestMessage r, string auth)
-    {
-        if (!string.IsNullOrWhiteSpace(auth))
-        {
-            r.Headers.Add(JwtPayloadClaimsPrincipal.Header, auth);
-        }
-    }
-
-    public bool TryAddAuth(HttpRequestMessage r, AuthToken auth)
-    {
-        switch(auth){
-            case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true;
-            case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true;
-            default: return false;
-        }
-    }
-
-    public void Configure(IWebHostBuilder builder)
-    {
-    }
-}
-public class MsClientPrincipalApiAuth: IApiAuth
-{
-    private const string XMsClientPrincipal = "X-MS-CLIENT-PRINCIPAL";
-
-    private static string GetToken(string email)
-    {
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes( @"{
-    ""auth_typ"":""aad"",""claims"":[
-        {""typ"":""ver"",""val"":""2.0""},
-        {""typ"":""iss"",""val"":""https:\/\/login.microsoftonline.com\/sdsdsd\/v2.0""},
-        {""typ"":""http:\/\/schemas.xmlsoap.org\/ws\/2005\/05\/identity\/claims\/nameidentifier"",""val"":""00000000-0000-0000-0000-000000000000""},
-        {""typ"":""aud"",""val"":""868585685""},
-        {""typ"":""exp"",""val"":""1681816329""},
-        {""typ"":""iat"",""val"":""1681729629""},
-        {""typ"":""nbf"",""val"":""1681729629""},
-        {""typ"":""name"",""val"":""Oskar Gewalli""},{""typ"":""preferred_username"",""val"":"""+email+@"""},
-        {""typ"":""http:\/\/schemas.microsoft.com\/identity\/claims\/objectidentifier"",""val"":""00000000-0000-0000-0000-000000000000""},
-        {""typ"":""http:\/\/schemas.xmlsoap.org\/ws\/2005\/05\/identity\/claims\/emailaddress"",""val"":"""+email+@"""},
-        {""typ"":""http:\/\/schemas.microsoft.com\/identity\/claims\/tenantid"",""val"":""00000000-0000-0000-0000-000000000000""},
-        {""typ"":""c_hash"",""val"":""-""},
-        {""typ"":""nonce"",""val"":""_""},
-        {""typ"":""aio"",""val"":""*""}],
-    ""name_typ"":""http:\/\/schemas.xmlsoap.org\/ws\/2005\/05\/identity\/claims\/emailaddress"",
-    ""role_typ"":""http:\/\/schemas.microsoft.com\/ws\/2008\/06\/identity\/claims\/role""}"));
-    }
-    private readonly string Seller1 = GetToken("seller1@hotmail.com");
-    private readonly string Buyer1 =GetToken("buyer1@hotmail.com");
-    private static void AddXJwtPayload(HttpRequestMessage r, string auth)
-    {
-        if (!string.IsNullOrWhiteSpace(auth))
-        {
-            r.Headers.Add(XMsClientPrincipal, auth);
-        }
-    }
-
-    public bool TryAddAuth(HttpRequestMessage r, AuthToken auth)
-    {
-        switch(auth){
-            case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true;
-            case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true;
-            default: return false;
-        }
-    }
-
-    public void Configure(IWebHostBuilder builder)
-    {
-        builder.UseSetting("PrincipalHeader", XMsClientPrincipal);
-    }
-}
-
-public interface IApiFixture:IDisposable
-{
-    Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken auth);
-    Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken auth);
-    Task<HttpResponseMessage> GetAuction(long id, AuthToken auth);
-    void SetTime(DateTimeOffset now);
-}
 public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
 {
-    private readonly FakeTime _fakeTime= new(InitialNow);
+    private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
     private readonly IDatabaseContextSetup _databaseContextSetup;
     TestServer Create()
     {
@@ -122,8 +20,8 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
                 builder.ConfigureServices(services =>
                 {
                     _databaseContextSetup.Use(services);
-                    services.Remove(services.First(s => s.ServiceType == typeof(ITime)));
-                    services.AddSingleton<ITime>(_fakeTime);
+                    services.Remove(services.First(s => s.ServiceType == typeof(ISystemClock)));
+                    services.AddSingleton<ISystemClock>(_fakeSystemClock);
                     ConfigureServices(services);
                 });
                 builder.UseEnvironment("Test");
@@ -179,5 +77,5 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
         }).GetAsync();
     private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-    public void SetTime(DateTimeOffset now) => _fakeTime.Now = now;
+    public void SetTime(DateTimeOffset now) => _fakeSystemClock.Now = now;
 }

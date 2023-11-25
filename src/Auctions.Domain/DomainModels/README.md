@@ -96,5 +96,5 @@ public abstract class Auction : IEntity
 }
 ```
 
-Note that we do not try to make the try add bid method be pure (IUserContext and ITime are both impure),
+Note that we do not try to make the try add bid method be pure (IUserContext and ISystemClock are both impure),
 but we do make it easy to test.

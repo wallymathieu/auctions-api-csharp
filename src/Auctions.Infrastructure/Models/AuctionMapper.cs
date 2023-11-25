@@ -8,16 +8,16 @@ namespace Wallymathieu.Auctions.Infrastructure.Models;
 /// </summary>
 public class AuctionMapper
 {
-    private readonly ITime _time;
+    private readonly ISystemClock _systemClock;
 
-    public AuctionMapper(ITime time)
+    public AuctionMapper(ISystemClock systemClock)
     {
-        _time = time;
+        _systemClock = systemClock;
     }
 
     public AuctionModel MapAuctionToModel(Auction auction)
     {
-        var now = _time.Now;
+        var now = _systemClock.Now;
         var amountAndWinner = auction.TryGetAmountAndWinner(now);
         var hasEnded = auction.HasEnded(now);
         var bidUserMapper = auction.BidUserMapper();

@@ -59,10 +59,10 @@ public abstract class Auction: IState
                     }
                 };
     }
-    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
+    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
     {
-        var bid = new Bid(userContext.UserId, model.Amount, time.Now);
-        return TryAddBid(time.Now, bid, out var error)
+        var bid = new Bid(userContext.UserId, model.Amount, systemClock.Now);
+        return TryAddBid(systemClock.Now, bid, out var error)
             ? Result<Bid, Errors>.Ok(bid)
             : Result<Bid, Errors>.Error(error);
     }
