@@ -11,9 +11,10 @@ public class SqlLiteDatabaseContextSetup : IDatabaseContextSetup
 {
     private string? _db;
 
-    public void Init(Type testClass, string testName)
+    public Task Init(Type testClass, string testName)
     {
         _db = $"{testClass.Name}_{testName}.db";
+        return Task.CompletedTask;
     }
 
     public void Use(IServiceCollection services)
@@ -35,7 +36,7 @@ public class SqlLiteDatabaseContextSetup : IDatabaseContextSetup
         context.Database.EnsureCreated();
     }
 
-    public void TryRemove()
+    public Task TryRemove()
     {
         if (File.Exists(_db))
         {
@@ -48,5 +49,6 @@ public class SqlLiteDatabaseContextSetup : IDatabaseContextSetup
                 // ignored
             }
         }
+        return Task.CompletedTask;
     }
 }

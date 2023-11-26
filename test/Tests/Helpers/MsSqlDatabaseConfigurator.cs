@@ -12,7 +12,7 @@ public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
 {
     private MsSqlContainer? _dbContainer ;
 
-    public void Init(Type testClass, string testName)
+    public Task Init(Type testClass, string testName)
     {
         var db = $"{testClass.Name}{testName}";
         _dbContainer = new MsSqlBuilder()
@@ -20,10 +20,7 @@ public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
             .WithPassword("Strong_password_123!")
             .WithHostname(db)
             .Build();
-        _dbContainer.StartAsync()
-            .ConfigureAwait(false)
-            .GetAwaiter()
-            .GetResult();
+        return _dbContainer.StartAsync();
     }
 
     public void Use(IServiceCollection services)
@@ -41,11 +38,9 @@ public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
         context.Database.Migrate();
     }
 
-    public void TryRemove()
+    public async Task TryRemove()
     {
-        _dbContainer?.DisposeAsync()
-            .ConfigureAwait(false)
-            .GetAwaiter()
-            .GetResult();
+        if (_dbContainer!=null)
+            await _dbContainer.DisposeAsync();
     }
 }
