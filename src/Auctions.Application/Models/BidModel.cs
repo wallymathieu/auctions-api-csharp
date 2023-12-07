@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Infrastructure.Models;
+namespace Wallymathieu.Auctions.Application.Models;
 /// <summary>
 /// Note that the <see cref="Bidder"/> is supposed to be a auction specific number or description.
 /// </summary>

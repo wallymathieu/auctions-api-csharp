@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Wallymathieu.Auctions.Application.Services;
 using Wallymathieu.Auctions.Infrastructure.Cache.Data;
 using Wallymathieu.Auctions.Infrastructure.Cache.Services;
 using Wallymathieu.Auctions.Infrastructure.Data;

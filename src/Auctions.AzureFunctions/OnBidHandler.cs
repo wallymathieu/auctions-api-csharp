@@ -1,3 +1,5 @@
+using Wallymathieu.Auctions.Application.Queues;
+
 namespace Wallymathieu.Auctions.Functions;
 public class OnBidHandler
 {

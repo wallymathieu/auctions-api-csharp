@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Distributed;
+using Wallymathieu.Auctions.Application.Services;
 using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Cache.Services;

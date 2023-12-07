@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Azure.Storage.Queues;
+using Wallymathieu.Auctions.Application.Queues;
 using Wallymathieu.Auctions.Infrastructure.Json;
-using Wallymathieu.Auctions.Infrastructure.Queues;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web.Queues;
 

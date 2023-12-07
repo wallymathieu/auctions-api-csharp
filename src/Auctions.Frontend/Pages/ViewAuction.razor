@@ -1,7 +1,8 @@
 ﻿@page "/auctions/{Id:long}"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
-@using Wallymathieu.Auctions.Infrastructure.Models
+@using Wallymathieu.Auctions.Application.Models
+@using Wallymathieu.Auctions.Application.Services
 @inject IAuctionRepository Repository
 @inject ICreateBidCommandHandler CreateBidCommandHandler
 @inject AuctionMapper Mapper

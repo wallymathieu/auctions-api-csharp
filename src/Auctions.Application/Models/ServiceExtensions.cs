@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Wallymathieu.Auctions.Infrastructure.Models;
+namespace Wallymathieu.Auctions.Application.Models;
 
 public static class ServiceExtensions
 {

@@ -1,7 +1,8 @@
 ﻿@page "/auctions"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
-@using Wallymathieu.Auctions.Infrastructure.Models
+@using Wallymathieu.Auctions.Application.Models
+@using Wallymathieu.Auctions.Application.Services
 @inject IAuctionRepository Repository
 @inject ICreateAuctionCommandHandler CreateAuctionCommandHandler
 @inject AuctionMapper Mapper
