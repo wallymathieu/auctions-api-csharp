@@ -6,7 +6,7 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 
 /// <summary>
-/// Glue class
+/// Glue class: Some would prefer to put these classes in a "Application" layer
 /// </summary>
 internal class CreateAuctionCommandHandler:ICreateAuctionCommandHandler
 {
@@ -21,7 +21,7 @@ internal class CreateAuctionCommandHandler:ICreateAuctionCommandHandler
         _messageQueue = messageQueue;
     }
 
-    public async Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken)
+    public async Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken = default)
     {
         var auction = Auction.Create(model, _userContext);
         await _auctionDbContext.AddAsync(auction, cancellationToken);
