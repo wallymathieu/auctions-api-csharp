@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wallymathieu.Auctions.Application.Services;
 using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 public static class ServiceExtensions

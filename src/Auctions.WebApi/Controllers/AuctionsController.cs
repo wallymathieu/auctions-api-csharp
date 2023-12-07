@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Wallymathieu.Auctions.Application.Models;
+using Wallymathieu.Auctions.Application.Services;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Data;
-using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers;

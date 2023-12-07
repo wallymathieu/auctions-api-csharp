@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Wallymathieu.Auctions.Application.Data;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 
-public class AuctionDbContext: DbContext
+public class AuctionDbContext: DbContext, IAuctionDbContext
 {
     public AuctionDbContext()
     {

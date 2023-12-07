@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Wallymathieu.Auctions.Application.Models;
 using Wallymathieu.Auctions.Frontend.Data;
-using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Infrastructure.Web;
 
