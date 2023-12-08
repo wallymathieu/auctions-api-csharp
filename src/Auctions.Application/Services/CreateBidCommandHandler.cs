@@ -1,32 +1,30 @@
-using Wallymathieu.Auctions.Infrastructure.Data;
-using Wallymathieu.Auctions.Infrastructure.Queues;
+using Wallymathieu.Auctions.Application.Data;
+using Wallymathieu.Auctions.Application.Queues;
 using Wallymathieu.Auctions.Services;
 
-namespace Wallymathieu.Auctions.Infrastructure.Services;
+namespace Wallymathieu.Auctions.Application.Services;
 
 /// <summary>
-/// Glue class
+/// Glue class : Some would prefer to put these classes in a "Application" layer
 /// </summary>
 internal class CreateBidCommandHandler : ICreateBidCommandHandler
 {
-    private readonly IAuctionRepository _auctionRepository;
-    private readonly AuctionDbContext _auctionDbContext;
+    private readonly IAuctionDbContext _auctionDbContext;
     private readonly IUserContext _userContext;
     private readonly ISystemClock _systemClock;
     private readonly IMessageQueue _messageQueue;
 
-    public CreateBidCommandHandler(IAuctionRepository auctionRepository, AuctionDbContext auctionDbContext, IUserContext userContext, ISystemClock systemClock, IMessageQueue messageQueue)
+    public CreateBidCommandHandler(IAuctionDbContext auctionDbContext, IUserContext userContext, ISystemClock systemClock, IMessageQueue messageQueue)
     {
-        _auctionRepository = auctionRepository;
         _auctionDbContext = auctionDbContext;
         _userContext = userContext;
         _systemClock = systemClock;
         _messageQueue = messageQueue;
     }
 
-    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken)
+    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
     {
-        var auction = await _auctionRepository.GetAuctionAsync(model.AuctionId, cancellationToken);
+        var auction = await _auctionDbContext.GetAuction(model.AuctionId, cancellationToken);
         if (auction is null) return Result<Bid, Errors>.Error(Errors.UnknownAuction);
         var result = auction.TryAddBid(model, _userContext, _systemClock);
         if (result.IsOk)

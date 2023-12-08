@@ -2,9 +2,9 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Wallymathieu.Auctions.Application.Models;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Json;
-using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Web;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 

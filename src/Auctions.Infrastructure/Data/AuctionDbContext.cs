@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Wallymathieu.Auctions.Application.Data;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 
-public class AuctionDbContext: DbContext
+public class AuctionDbContext: DbContext, IAuctionDbContext
 {
     public AuctionDbContext()
     {
@@ -21,14 +22,22 @@ public class AuctionDbContext: DbContext
     private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
 
+    /// <summary>
+    /// Returns a detached list of auctions
+    /// </summary>
     public async ValueTask<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken)
     {
-        return await Auctions.AsNoTracking().Include(a => a.Bids).ToListAsync(cancellationToken);
+        return await Auctions.AsNoTracking()
+            .Include(a => a.Bids)
+            .ToListAsync(cancellationToken);
     }
 
-    public async ValueTask<Auction?> GetAuction(AuctionId auctionId, CancellationToken cancellationToken)
+    /// <summary>
+    /// Get an attached entity if found
+    /// </summary>
+    public async ValueTask<Auction?> GetAuction(AuctionId auctionId, CancellationToken cancellationToken = default)
     {
-        var auction = await Auctions.FindAsync(auctionId, cancellationToken);
+        var auction = await Auctions.FindAsync(keyValues:new object?[]{auctionId}, cancellationToken:cancellationToken);
         if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync(cancellationToken);
         return auction;
     }

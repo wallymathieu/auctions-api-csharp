@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Infrastructure.Queues;
+namespace Wallymathieu.Auctions.Application.Queues;
 
 public interface IMessageQueue
 {

@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Infrastructure.Services;
+namespace Wallymathieu.Auctions.Application.Services;
 
 /// <summary>
 /// Reference interface in order to be able to name the handler in the controller.

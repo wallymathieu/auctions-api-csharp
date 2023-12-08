@@ -5,6 +5,12 @@ namespace Wallymathieu.Auctions.Infrastructure.Data;
 /// </summary>
 public interface IAuctionRepository
 {
+    /// <summary>
+    /// Returns a potentially disconnected entity
+    /// </summary>
     Task<Auction?> GetAuctionAsync(AuctionId auctionId, CancellationToken cancellationToken=default);
+    /// <summary>
+    /// Return a list of disconnected entities
+    /// </summary>
     Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken=default);
 }
