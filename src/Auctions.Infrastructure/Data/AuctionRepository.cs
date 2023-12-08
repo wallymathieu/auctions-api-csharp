@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 /// <summary>
 /// Since <see cref="AuctionRepository"/> is implemented purely in terms of <see cref="AuctionDbContext"/> it can be seen
@@ -10,9 +12,9 @@ public class AuctionRepository : IAuctionRepository
 
     public AuctionRepository(AuctionDbContext dbContext) => _dbContext = dbContext;
 
-    public virtual async Task<Auction?> GetAuctionAsync(AuctionId auctionId, CancellationToken cancellationToken) =>
+    public virtual async Task<Auction?> GetAuctionAsync(AuctionId auctionId, CancellationToken cancellationToken = default) =>
         await _dbContext.GetAuction(auctionId, cancellationToken);
 
-    public virtual async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken) =>
+    public virtual async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken = default) =>
         await _dbContext.GetAuctionsAsync(cancellationToken);
 }
