@@ -49,7 +49,7 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
     public void Dispose()
     {
         _testServer.Dispose();
-        _databaseContextSetup.TryRemove();
+        _databaseContextSetup.TryRemove().ConfigureAwait(false).GetAwaiter().GetResult();
     }
     public TestServer Server=>_testServer;
 
