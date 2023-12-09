@@ -15,17 +15,17 @@ public class AuctionsController : ControllerBase
     private readonly AuctionMapper _auctionMapper;
     private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
     private readonly ICreateBidCommandHandler _createBidCommandHandler;
-    private readonly IAuctionRepository _auctionRepository;
+    private readonly IAuctionQuery _auctionQuery;
 
     public AuctionsController(AuctionMapper auctionMapper,
         ICreateAuctionCommandHandler createAuctionCommandHandler,
         ICreateBidCommandHandler createBidCommandHandler,
-        IAuctionRepository auctionRepository)
+        IAuctionQuery auctionQuery)
     {
         _auctionMapper = auctionMapper;
         _createAuctionCommandHandler = createAuctionCommandHandler;
         _createBidCommandHandler = createBidCommandHandler;
-        _auctionRepository = auctionRepository;
+        _auctionQuery = auctionQuery;
     }
     /// <summary>
     /// Get all auctions
@@ -35,7 +35,7 @@ public class AuctionsController : ControllerBase
     /// </remarks>
     [HttpGet(Name = "get_auctions")]
     public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
-        from auction in await _auctionRepository.GetAuctionsAsync(cancellationToken)
+        from auction in await _auctionQuery.GetAuctionsAsync(cancellationToken)
         select _auctionMapper.MapAuctionToModel(auction);
     /// <summary>
     /// Get a single auction
@@ -43,7 +43,7 @@ public class AuctionsController : ControllerBase
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
     {
-        var auction = await _auctionRepository.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
+        var auction = await _auctionQuery.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
         return auction is null ? NotFound() : _auctionMapper.MapAuctionToModel(auction);
     }
     /// <summary>

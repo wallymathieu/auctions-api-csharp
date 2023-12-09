@@ -2,7 +2,7 @@
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
 @using Wallymathieu.Auctions.Infrastructure.Models
-@inject IAuctionRepository Repository
+@inject IAuctionQuery Query
 @inject ICreateAuctionCommandHandler CreateAuctionCommandHandler
 @inject AuctionMapper Mapper
 
@@ -64,7 +64,7 @@ else if (_auctions.Data!=null)
     private async Task LoadAuctions()
     {
         _auctions.OnLoad( (
-            from auction in await Repository.GetAuctionsAsync()
+            from auction in await Query.GetAuctionsAsync()
             select Mapper.MapAuctionToModel(auction)).ToArray());
     }
 

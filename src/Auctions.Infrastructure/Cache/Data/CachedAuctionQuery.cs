@@ -7,10 +7,10 @@ namespace Wallymathieu.Auctions.Infrastructure.Cache.Data;
 /// <summary>
 /// https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside
 /// </summary>
-public class CachedAuctionRepository:AuctionRepository
+public class CachedAuctionQuery:AuctionQuery
 {
     private readonly IDistributedCache _cache;
-    public CachedAuctionRepository(IDistributedCache cache, AuctionDbContext dbContext): base(dbContext)
+    public CachedAuctionQuery(IDistributedCache cache, AuctionDbContext dbContext): base(dbContext)
     {
         _cache = cache;
     }
