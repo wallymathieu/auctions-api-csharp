@@ -2,12 +2,12 @@ using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Wallymathieu.Auctions.Infrastructure.Cache.Services;
-internal class CacheAwareCreateBidCommandHandler:
+internal class CreateBidCachePipeLineBehavior:
     IPipelineBehavior<CreateBidCommand, Result<Bid,Errors>>
 {
     private readonly IDistributedCache _cache;
 
-    public CacheAwareCreateBidCommandHandler(IDistributedCache cache)
+    public CreateBidCachePipeLineBehavior(IDistributedCache cache)
     {
         _cache = cache;
     }

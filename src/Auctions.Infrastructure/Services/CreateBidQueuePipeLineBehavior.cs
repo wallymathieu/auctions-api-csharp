@@ -8,12 +8,12 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 /// <summary>
 /// Glue class : Some would prefer to put these classes in an "Application" layer
 /// </summary>
-internal class CreateBidQueueDecoratedCommandHandler :
+internal class CreateBidQueuePipeLineBehavior :
     IPipelineBehavior<CreateBidCommand, Result<Bid,Errors>>
 {
     private readonly IMessageQueue _messageQueue;
     private readonly IUserContext _userContext;
-    public CreateBidQueueDecoratedCommandHandler(IMessageQueue messageQueue, IUserContext userContext)
+    public CreateBidQueuePipeLineBehavior(IMessageQueue messageQueue, IUserContext userContext)
     {
         _messageQueue = messageQueue;
         _userContext = userContext;

@@ -2,11 +2,11 @@ using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Wallymathieu.Auctions.Infrastructure.Cache.Services;
-internal class CacheAwareCreateAuctionCommandHandler:
+internal class CreateAuctionCachePipeLineBehavior:
     IPipelineBehavior<CreateAuctionCommand, Auction>
 {
     private readonly IDistributedCache _cache;
-    public CacheAwareCreateAuctionCommandHandler(IDistributedCache cache)
+    public CreateAuctionCachePipeLineBehavior(IDistributedCache cache)
     {
         _cache = cache;
     }

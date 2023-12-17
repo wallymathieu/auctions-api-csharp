@@ -21,11 +21,11 @@ public static class CacheExtensions
         services.AddAuctionServicesImplementation();
         services.AddMediatR(c =>
         {
-            c.RegisterServicesFromAssemblyContaining<CacheAwareCreateAuctionCommandHandler>();
-            c.AddBehavior<CreateAuctionQueueDecoratedCommandHandler>();
-            c.AddBehavior<CreateBidQueueDecoratedCommandHandler>();
-            c.AddBehavior<CacheAwareCreateAuctionCommandHandler>();
-            c.AddBehavior<CacheAwareCreateBidCommandHandler>();
+            c.RegisterServicesFromAssemblyContaining<CreateAuctionCachePipeLineBehavior>();
+            c.AddBehavior<CreateAuctionQueuePipeLineBehavior>();
+            c.AddBehavior<CreateBidQueuePipeLineBehavior>();
+            c.AddBehavior<CreateAuctionCachePipeLineBehavior>();
+            c.AddBehavior<CreateBidCachePipeLineBehavior>();
         });
         return services;
     }
