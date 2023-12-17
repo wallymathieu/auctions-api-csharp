@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Cache.Data;
 using Wallymathieu.Auctions.Infrastructure.Cache.Services;
 using Wallymathieu.Auctions.Infrastructure.Data;
+using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Infrastructure.Services;
+using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Cache;
 
