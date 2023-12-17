@@ -6,7 +6,7 @@ public static class ServiceExtensions
 {
     internal static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
     {
-        services.TryAddSingleton<ITime, Time>();
+        services.TryAddSingleton<ISystemClock, SystemClock>();
         services.TryAddScoped<CreateAuctionCommandHandler>();
         services.TryAddScoped<CreateBidCommandHandler>();
         services.TryAddScoped<InnerService<ICreateAuctionCommandHandler>>(c=>

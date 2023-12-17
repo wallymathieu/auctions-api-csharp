@@ -15,13 +15,13 @@ public class OnAuctionHandler
     }
 
     [Function("OnAuction")]
-    public async Task Run(
+    public Task Run(
         [QueueTrigger(QueuesModule.AuctionResultQueueName, Connection = "AzureWebJobsStorage")]
         string commandString, CancellationToken cancellationToken)
     {
         var result = JsonSerializer.Deserialize<UserIdDecorator<Auction>>(commandString, _serializerOptions);
-        if (result == null) throw new NullReferenceException(nameof(result));
-        _userContext.UserId = result.UserId;
+        _userContext.UserId = result!.UserId;
         _logger.LogInformation("Create auction result processed {Auction}", result.Value.AuctionId);
+        return Task.CompletedTask;
     }
 }

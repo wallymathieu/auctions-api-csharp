@@ -12,7 +12,7 @@ var host = new HostBuilder()
     .ConfigureServices((builder,services) =>
     {
         services
-            .AddAuctionRepositoryCached()
+            .AddAuctionQueryCached()
             .AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);

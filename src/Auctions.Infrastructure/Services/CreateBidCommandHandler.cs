@@ -5,30 +5,28 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 
 /// <summary>
-/// Glue class
+/// Glue class : Some would prefer to put these classes in an "Application" layer
 /// </summary>
 internal class CreateBidCommandHandler : ICreateBidCommandHandler
 {
-    private readonly IAuctionRepository _auctionRepository;
     private readonly AuctionDbContext _auctionDbContext;
     private readonly IUserContext _userContext;
-    private readonly ITime _time;
+    private readonly ISystemClock _systemClock;
     private readonly IMessageQueue _messageQueue;
 
-    public CreateBidCommandHandler(IAuctionRepository auctionRepository, AuctionDbContext auctionDbContext, IUserContext userContext, ITime time, IMessageQueue messageQueue)
+    public CreateBidCommandHandler(AuctionDbContext auctionDbContext, IUserContext userContext, ISystemClock systemClock, IMessageQueue messageQueue)
     {
-        _auctionRepository = auctionRepository;
         _auctionDbContext = auctionDbContext;
         _userContext = userContext;
-        _time = time;
+        _systemClock = systemClock;
         _messageQueue = messageQueue;
     }
 
-    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken)
+    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
     {
-        var auction = await _auctionRepository.GetAuctionAsync(model.AuctionId, cancellationToken);
+        var auction = await _auctionDbContext.GetAuction(model.AuctionId, cancellationToken);
         if (auction is null) return Result<Bid, Errors>.Error(Errors.UnknownAuction);
-        var result = auction.TryAddBid(model, _userContext, _time);
+        var result = auction.TryAddBid(model, _userContext, _systemClock);
         if (result.IsOk)
         {
             await _auctionDbContext.SaveChangesAsync(cancellationToken);
