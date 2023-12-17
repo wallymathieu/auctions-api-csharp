@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 /// <summary>
 /// Since <see cref="AuctionQuery"/> is implemented purely in terms of <see cref="AuctionDbContext"/> it can be seen
@@ -13,10 +11,4 @@ public class AuctionQuery(AuctionDbContext dbContext) : IAuctionQuery
 
     public virtual async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken = default) =>
         await dbContext.GetAuctionsAsync(cancellationToken);
-
-    public async ValueTask AddAsync(Auction entity, CancellationToken cancellationToken) =>
-        await dbContext.AddAsync(entity, cancellationToken);
-
-    public async Task<Auction?> FindAsync(object identifier, CancellationToken cancellationToken) =>
-        await dbContext.FindAsync<Auction>(identifier, cancellationToken);
 }
