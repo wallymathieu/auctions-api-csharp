@@ -1,20 +1,19 @@
+using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
-using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Cache.Services;
-internal class CacheAwareCreateAuctionCommandHandler: ICreateAuctionCommandHandler
+internal class CacheAwareCreateAuctionCommandHandler:
+    IPipelineBehavior<CreateAuctionCommand, Auction>
 {
-    private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
     private readonly IDistributedCache _cache;
-    public CacheAwareCreateAuctionCommandHandler(ICreateAuctionCommandHandler createAuctionCommandHandler, IDistributedCache cache)
+    public CacheAwareCreateAuctionCommandHandler(IDistributedCache cache)
     {
-        _createAuctionCommandHandler = createAuctionCommandHandler;
         _cache = cache;
     }
 
-    public async Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken)
+    public async Task<Auction> Handle(CreateAuctionCommand request, RequestHandlerDelegate<Auction> next, CancellationToken cancellationToken)
     {
-        var res = await _createAuctionCommandHandler.Handle(model, cancellationToken);
+        var res = await next();
         await _cache.RemoveAsync(CacheKeys.Auctions, cancellationToken);
         return res;
     }

@@ -1,3 +1,4 @@
+using MediatR;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Services;
@@ -5,23 +6,22 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 
 /// <summary>
-/// Glue class : Some would prefer to put these classes in a "Application" layer
+/// Glue class : Some would prefer to put these classes in an "Application" layer
 /// </summary>
-internal class CreateBidQueueDecoratedCommandHandler : ICreateBidCommandHandler
+internal class CreateBidQueueDecoratedCommandHandler :
+    IPipelineBehavior<CreateBidCommand, Result<Bid,Errors>>
 {
-    private readonly ICreateBidCommandHandler _commandHandler;
     private readonly IMessageQueue _messageQueue;
     private readonly IUserContext _userContext;
-    public CreateBidQueueDecoratedCommandHandler(ICreateBidCommandHandler commandHandler, IMessageQueue messageQueue, IUserContext userContext)
+    public CreateBidQueueDecoratedCommandHandler(IMessageQueue messageQueue, IUserContext userContext)
     {
-        _commandHandler = commandHandler;
         _messageQueue = messageQueue;
         _userContext = userContext;
     }
 
-    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
+    public async Task<Result<Bid,Errors>> Handle(CreateBidCommand request, RequestHandlerDelegate<Result<Bid,Errors>> next, CancellationToken cancellationToken)
     {
-        var result = await _commandHandler.Handle(model, cancellationToken);
+        var result = await next();
         if (_messageQueue.Enabled)
         {
             await _messageQueue.SendMessageAsync(QueuesModule.BidResultQueueName,

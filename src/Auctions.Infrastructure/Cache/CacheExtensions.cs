@@ -16,14 +16,17 @@ public static class CacheExtensions
                 c.GetRequiredService<IDistributedCache>(),
                 c.GetRequiredService<AuctionDbContext>()));
     }
-    public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
-        services.AddAuctionServicesImplementation()
-            .AddScoped<ICreateAuctionCommandHandler>(c=>
-                new CacheAwareCreateAuctionCommandHandler(
-                    c.GetRequiredService<InnerService<ICreateAuctionCommandHandler>>().Service,
-                    c.GetRequiredService<IDistributedCache>()))
-            .AddScoped<ICreateBidCommandHandler>(c=>
-                new CacheAwareCreateBidCommandHandler(
-                    c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service,
-                    c.GetRequiredService<IDistributedCache>()));
+    public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services)
+    {
+        services.AddAuctionServicesImplementation();
+        services.AddMediatR(c =>
+        {
+            c.RegisterServicesFromAssemblyContaining<CacheAwareCreateAuctionCommandHandler>();
+            c.AddBehavior<CreateAuctionQueueDecoratedCommandHandler>();
+            c.AddBehavior<CreateBidQueueDecoratedCommandHandler>();
+            c.AddBehavior<CacheAwareCreateAuctionCommandHandler>();
+            c.AddBehavior<CacheAwareCreateBidCommandHandler>();
+        });
+        return services;
+    }
 }
