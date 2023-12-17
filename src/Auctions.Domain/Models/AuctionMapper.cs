@@ -1,7 +1,8 @@
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.DomainModels.Bids;
 using Wallymathieu.Auctions.Services;
 
-namespace Wallymathieu.Auctions.Application.Models;
+namespace Wallymathieu.Auctions.Models;
 
 /// <summary>
 /// Map to API models from domain models. We could use such a library as AutoMapper instead.

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Wallymathieu.Auctions.Models;
 
 namespace Wallymathieu.Auctions.Application.Models;
 
