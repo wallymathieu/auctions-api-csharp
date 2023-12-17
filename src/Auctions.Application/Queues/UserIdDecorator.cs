@@ -1,12 +1,6 @@
 namespace Wallymathieu.Auctions.Application.Queues;
-public class UserIdDecorator<T>
+public class UserIdDecorator<T>(T value, UserId? userId)
 {
-    public UserIdDecorator(T value, UserId? userId)
-    {
-        Value = value;
-        UserId = userId;
-    }
-
-    public T Value { get; }
-    public UserId? UserId { get; }
+    public T Value { get; } = value;
+    public UserId? UserId { get; } = userId;
 }
