@@ -6,33 +6,25 @@ namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 /// An infrastructure command handler. Used in order to be able to implement mutation command handlers.
 /// Intention is to have a class that accepts a compiled lambda.
 /// </summary>
-class FuncMutateCommandHandler<TEntity, TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
-    where TCommand : ICommand<TResponse> where TEntity : IEntity
+class FuncMutateCommandHandler<TEntity, TCommand, TResponse>(
+    Func<TEntity, TCommand, IServiceProvider, TResponse> func,
+    IServiceProvider serviceProvider):
+    ICommandHandler<TCommand, TResponse>
+        where TCommand : ICommand<TResponse> where TEntity : IEntity
 {
-    private readonly Func<TEntity, TCommand, IServiceProvider, TResponse> _func;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IRepository<TEntity> _repository;
-    private readonly AuctionDbContext _db;
+    private readonly IRepository<TEntity> _repository=serviceProvider.GetRequiredService<IRepository<TEntity>>();
+    private readonly AuctionDbContext _db=serviceProvider.GetRequiredService<AuctionDbContext>();
 
-    public FuncMutateCommandHandler(Func<TEntity, TCommand, IServiceProvider, TResponse> func,
-        IServiceProvider serviceProvider)
+    public async Task<TResponse?> Handle(TCommand cmd, CancellationToken cancellationToken = default)
     {
-        _func = func;
-        _serviceProvider = serviceProvider;
-        _repository = _serviceProvider.GetRequiredService<IRepository<TEntity>>();
-        _db = serviceProvider.GetRequiredService<AuctionDbContext>();
-    }
-
-    public async Task<TResponse?> Handle(TCommand cmd, CancellationToken cancellationToken)
-    {
-        var keyValueFactory = _serviceProvider.GetRequiredService<IKeyValueFactory<TCommand>>();
+        var keyValueFactory = serviceProvider.GetRequiredService<IKeyValueFactory<TCommand>>();
         var entity = await _repository.FindAsync(keyValueFactory.Key(cmd), cancellationToken);
         if (entity is null)
         {
             return default;
         }
 
-        var r = _func(entity, cmd, _serviceProvider);
+        var r = func(entity, cmd, serviceProvider);
         await _db.SaveChangesAsync(cancellationToken);
 
         return r;

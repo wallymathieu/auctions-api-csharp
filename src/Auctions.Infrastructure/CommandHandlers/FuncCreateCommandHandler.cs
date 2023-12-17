@@ -2,26 +2,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
 namespace Wallymathieu.Auctions.Infrastructure.CommandHandlers;
-class FuncCreateCommandHandler<TEntity, TCommand> : ICommandHandler<TCommand, TEntity>
-    where TCommand : ICommand<TEntity> where TEntity : IEntity
+class FuncCreateCommandHandler<TEntity, TCommand>(
+    Func<TCommand, IServiceProvider, TEntity> func,
+    IServiceProvider serviceProvider):
+    ICommandHandler<TCommand, TEntity>
+        where TCommand : ICommand<TEntity> where TEntity : IEntity
 {
-    private readonly Func<TCommand, IServiceProvider, TEntity> _func;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IRepository<TEntity> _repository;
-    private readonly AuctionDbContext _db;
+    private readonly IRepository<TEntity> _repository= serviceProvider.GetRequiredService<IRepository<TEntity>>();
+    private readonly AuctionDbContext _db=serviceProvider.GetRequiredService<AuctionDbContext>();
 
-    public FuncCreateCommandHandler(Func<TCommand, IServiceProvider, TEntity> func,
-        IServiceProvider serviceProvider)
+    public async Task<TEntity?> Handle(TCommand cmd, CancellationToken cancellationToken = default)
     {
-        _func = func;
-        _serviceProvider = serviceProvider;
-        _repository = _serviceProvider.GetRequiredService<IRepository<TEntity>>();
-        _db = serviceProvider.GetRequiredService<AuctionDbContext>();
-    }
-
-    public async Task<TEntity?> Handle(TCommand cmd, CancellationToken cancellationToken)
-    {
-        var entity = _func(cmd, _serviceProvider);
+        var entity = func(cmd, serviceProvider);
         await _repository.AddAsync(entity, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         return entity;
