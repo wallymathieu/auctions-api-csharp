@@ -5,9 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "main", "command-handlers-infrastructure" ]
+    branches: [ "main", "application-layer", "command-handlers-infrastructure", "command-handlers-mediatr"]
   pull_request:
-    branches: [ "main", "command-handlers-infrastructure" ]
+    branches: [ "main", "application-layer", "command-handlers-infrastructure", "command-handlers-mediatr"]
 
 jobs:
   build:
