@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Auctions Frontend</a>
+        <button title="Navigation menu" class="navbar-toggler" x-onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="nav-scrollable" x-onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <a class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </a>
+        </div>
+
+        <div class="nav-item px-3">
+            <a class="nav-link" href="/auctions">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Auctions
+            </a>
+        </div>
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <div class="nav-item px-3">
+                <a class="nav-link" href="/Identity/Account/Manage" title="Manage"><span class="oi oi-home" aria-hidden="true"></span>Hello @User.Identity?.Name!</a>
+            </div>
+            <div class="nav-item px-3">
+                <a class="nav-link" href="/Identity/Account/Logout" title="Logout"><span class="oi oi-key" aria-hidden="true"></span>Logout</a>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <a class="nav-link" href="/Identity/Account/Register"><span class="oi oi-key" aria-hidden="true"></span>Register</a>
+            </div>
+            <div class="nav-item px-3">
+                <a class="nav-link" href="/Identity/Account/Login"><span class="oi oi-lock-unlocked" aria-hidden="true"></span>Login</a>
+            </div>
+        }
+    </nav>
+</div>

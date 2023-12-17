@@ -6,22 +6,24 @@ namespace Wallymathieu.Auctions.Infrastructure.Data;
 
 public static class DataExtensions
 {
-    internal static IServiceCollection AddAuctionRepositoryImplementation(this IServiceCollection services)
+    internal static IServiceCollection AddAuctionQueryImplementation(this IServiceCollection services)
     {
-        services.TryAddScoped<AuctionRepository>();
+        services.TryAddScoped<AuctionQuery>();
         return services;
     }
 
-    public static IServiceCollection AddAuctionRepositoryNoCache(this IServiceCollection services)
+
+    public static IServiceCollection AddAuctionQueryNoCache(this IServiceCollection services)
     {
-        return AddAuctionRepositoryImplementation(services)
-            .AddScoped<IAuctionRepository>(c=>
-                c.GetRequiredService<AuctionRepository>())
-            .AddScoped<IRepository<Auction>>(c=>c.GetRequiredService<IAuctionRepository>());
+        return AddAuctionQueryImplementation(services)
+            .AddScoped<IAuctionQuery>(c=>
+                c.GetRequiredService<AuctionQuery>());
     }
 
     public static IServiceCollection AddAuctionDbContextSqlServer(this IServiceCollection services, string? connection)
     {
+        services.TryAddScoped<IRepository<Auction>>(c =>
+            c.GetRequiredService<AuctionDbContext>());
         return services.AddDbContext<AuctionDbContext>(e =>
             e.UseSqlServer(connection,
                 opt => opt.MigrationsAssembly(Migrations.AssemblyName)));

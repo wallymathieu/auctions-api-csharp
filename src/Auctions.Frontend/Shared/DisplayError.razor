@@ -1,0 +1,10 @@
+﻿@if (!string.IsNullOrEmpty(Description) )
+{
+    <div class="alert alert-secondary">
+        <strong>@Description</strong>
+    </div>
+}
+@code {
+    [Parameter]
+    public string? Description { get; set; }
+}

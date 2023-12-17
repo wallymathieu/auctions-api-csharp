@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Auctions</title>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/Auctions.Frontend.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+<div class="page">
+    <div class="sidebar">
+        @await Html.PartialAsync("_LayoutNavMenu")
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://github.com/wallymathieu/auctions-api-csharp" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @RenderBody()
+        </article>
+    </main>
+</div>
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

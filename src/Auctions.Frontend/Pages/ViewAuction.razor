@@ -1,0 +1,126 @@
+﻿@page "/auctions/{Id:long}"
+@using Wallymathieu.Auctions.Commands
+@using Wallymathieu.Auctions.Frontend.Data
+@using Wallymathieu.Auctions.Infrastructure.Models
+@inject IAuctionQuery Query
+@inject ICreateBidCommandHandler CreateBidCommandHandler
+@inject AuctionMapper Mapper
+
+<PageTitle>Auction</PageTitle>
+
+<h1>Auction</h1>
+
+<p>This page display an auction.</p>
+
+@if ( !_auction.Loaded)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else if (_auction.Data == null)
+{
+    <p>
+        <em>Not found</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Starts at</th>
+            <th>Expires at</th>
+            <th>Title</th>
+            <th>Seller</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>@_auction.Data.StartsAt.Date.ToShortDateString()</td>
+            <td>@_auction.Data.Expiry.Date.ToShortDateString()</td>
+            <td>@_auction.Data.Title</td>
+            <td>@_auction.Data.Seller</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Amount</th>
+            <th>Bidder</th>
+            <th>At</th>
+        </tr>
+        </thead>
+        <tbody>
+        @{
+            foreach (var bid in _auction.Data.Bids)
+            {
+                <tr>
+                    <td>@bid.Amount</td>
+                    <td>@bid.Bidder</td>
+                    <td>@bid.At.ToString()</td>
+                </tr>
+            }
+        }
+        <tr>
+            <td>
+                <input placeholder="Amount" type="number" @bind="_newBid"/>
+            </td>
+            <td>
+            </td>
+            <td>
+                <DisplayError Description="@_errorDescription" />
+                <button @onclick="AddBid">Add bid</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+
+    [Parameter]
+    public long Id { get; set; }
+
+    private readonly RemoteData<AuctionModel> _auction=new();
+    private int? _newBid;
+    private string? _errorDescription;
+
+    private async Task LoadAuction()
+    {
+        var auction = await Query.GetAuctionAsync(new AuctionId(this.Id));
+        _auction.OnLoad(
+            auction is not null
+            ? Mapper.MapAuctionToModel(auction)
+            : null);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAuction();
+    }
+
+    private async Task AddBid()
+    {
+        if (_newBid != null)
+        {
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), new(_auction.Data.Id)));
+            result?.Match(_ =>
+            {
+                _newBid = null;
+            }, err =>
+            {
+                _errorDescription = err.ToString();
+            });
+            if (result?.IsOk ?? false)
+            {
+                await LoadAuction();
+            }
+        }
+        else
+        {
+            _errorDescription = Errors.MustSpecifyAmount.ToString();
+        }
+    }
+}

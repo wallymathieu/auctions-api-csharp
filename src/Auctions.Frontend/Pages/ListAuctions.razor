@@ -1,0 +1,98 @@
+﻿@page "/auctions"
+@using Wallymathieu.Auctions.Commands
+@using Wallymathieu.Auctions.Frontend.Data
+@using Wallymathieu.Auctions.Infrastructure.Models
+@inject IAuctionQuery Query
+@inject ICreateAuctionCommandHandler CreateAuctionCommandHandler
+@inject AuctionMapper Mapper
+
+<PageTitle>Auctions</PageTitle>
+
+<h1>Auctions</h1>
+
+<p>This page display all of the auctions.</p>
+
+@if (!_auctions.Loaded)
+{
+    <p><em>Loading...</em></p>
+}
+else if (_auctions.Data!=null)
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Starts at</th>
+            <th>Expires at</th>
+            <th>Seller</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var auction in _auctions.Data)
+        {
+            <tr>
+                <td><a href="/auctions/@auction.Id">@auction.Title</a> </td>
+                <td>@auction.StartsAt.Date.ToShortDateString()</td>
+                <td>@auction.Expiry.Date.ToShortDateString()</td>
+                <td>@auction.Seller</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <input placeholder="Title" @bind="_title" required="required" />
+    <label>
+        Currency
+        <select @bind="_currency" required="required">
+            <option value="@CurrencyCode.VAC">VAC</option>
+            <option value="@CurrencyCode.SEK">SEK</option>
+            <option value="@CurrencyCode.DKK">DKK</option>
+        </select>
+    </label>
+    <input placeholder="Starts at" @bind="_startsAt" type="datetime-local" required="required" />
+    <input placeholder="Ends at" @bind="_endsAt" type="datetime-local" required="required" />
+    <button @onclick="AddAuction">Add Auction</button>
+}
+
+@code {
+    private readonly RemoteData<IReadOnlyCollection<AuctionModel>> _auctions=new();
+    private string? _title;
+    private string? _currency=CurrencyCode.VAC.ToString();
+    private DateTime? _startsAt;
+    private DateTime? _endsAt;
+
+    private async Task LoadAuctions()
+    {
+        _auctions.OnLoad( (
+            from auction in await Query.GetAuctionsAsync()
+            select Mapper.MapAuctionToModel(auction)).ToArray());
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAuctions();
+    }
+    private async Task AddAuction()
+    {
+        if (!string.IsNullOrWhiteSpace(value: _title)
+            && Enum.TryParse<CurrencyCode>( value: _currency, result: out var c)
+            && _startsAt!=null
+            && _endsAt!=null)
+        {
+            var result = await CreateAuctionCommandHandler.Handle(new CreateAuctionCommand(
+                Title: _title,
+                Currency: c,
+                StartsAt: _startsAt.Value,
+                EndsAt: _endsAt.Value,
+                MinRaise: null,
+                ReservePrice: null,
+                TimeFrame: null,
+                SingleSealedBidOptions: null));
+            await LoadAuctions();
+            _title = string.Empty;
+            _startsAt = null;
+            _endsAt = null;
+            _currency = CurrencyCode.VAC.ToString();
+        }
+    }
+}
