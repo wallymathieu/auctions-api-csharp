@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Commands;
@@ -15,18 +16,15 @@ namespace Wallymathieu.Auctions.Api.Controllers;
 public class AuctionsController : ControllerBase
 {
     private readonly AuctionMapper _auctionMapper;
-    private readonly ICreateAuctionCommandHandler _createAuctionCommandHandler;
-    private readonly ICreateBidCommandHandler _createBidCommandHandler;
+    private readonly IMediator _mediator;
     private readonly IAuctionQuery _auctionQuery;
 
     public AuctionsController(AuctionMapper auctionMapper,
-        ICreateAuctionCommandHandler createAuctionCommandHandler,
-        ICreateBidCommandHandler createBidCommandHandler,
+        IMediator mediator,
         IAuctionQuery auctionQuery)
     {
         _auctionMapper = auctionMapper;
-        _createAuctionCommandHandler = createAuctionCommandHandler;
-        _createBidCommandHandler = createBidCommandHandler;
+        _mediator = mediator;
         _auctionQuery = auctionQuery;
     }
     /// <summary>
@@ -62,7 +60,7 @@ public class AuctionsController : ControllerBase
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
     {
-        var auction = await _createAuctionCommandHandler.Handle(model, cancellationToken);
+        var auction = await _mediator.Send(model, cancellationToken);
         var auctionModel =
             _auctionMapper.MapAuctionToModel(auction);
         return CreatedAtAction(nameof(GetSingle), new { auctionId = auctionModel.Id }, auctionModel);
@@ -79,7 +77,7 @@ public class AuctionsController : ControllerBase
     {
         var id = new AuctionId(auctionId);
         var cmd =  new CreateBidCommand(model.Amount, id);
-        var result = await _createBidCommandHandler.Handle(cmd, cancellationToken);
+        var result = await _mediator.Send(cmd, cancellationToken);
         if (result is null) return NotFound();
         return result.Match<ActionResult>(ok => Ok(), err => err == Errors.UnknownAuction
             ? NotFound()

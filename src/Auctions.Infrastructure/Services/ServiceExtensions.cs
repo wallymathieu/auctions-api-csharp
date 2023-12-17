@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
@@ -7,10 +8,13 @@ public static class ServiceExtensions
 {
     internal static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
     {
-
         services.TryAddSingleton<ISystemClock, SystemClock>();
         services.RegisterAttributesForType<Auction>();
         services.AddSingleton(typeof(IKeyValueFactory<>), typeof(KeyValueFactory<>));
+        services.AddScoped<IRequestHandler<CreateAuctionCommand, Auction>>(c =>
+            c.GetRequiredService<ICommandHandler<CreateAuctionCommand, Auction>>());
+        services.AddScoped<IRequestHandler<CreateBidCommand, Result<Bid, Errors>>>(c =>
+            c.GetRequiredService<ICommandHandler<CreateBidCommand, Result<Bid, Errors>>>());
         return services;
     }
 

@@ -2,8 +2,9 @@
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
 @using Wallymathieu.Auctions.Infrastructure.Models
+@using MediatR
 @inject IAuctionQuery Query
-@inject ICreateBidCommandHandler CreateBidCommandHandler
+@inject IMediator MediatR
 @inject AuctionMapper Mapper
 
 <PageTitle>Auction</PageTitle>
@@ -105,7 +106,7 @@ else
     {
         if (_newBid != null)
         {
-            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), new(_auction.Data.Id)), default);
+            var result = await MediatR.Send(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), new(_auction.Data.Id)), default);
             result?.Match(_ =>
             {
                 _newBid = null;
