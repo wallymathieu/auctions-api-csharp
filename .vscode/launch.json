@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/Auctions.WebApi/bin/Debug/net7.0/Auctions.WebApi.dll",
+      "program": "${workspaceFolder}/src/Auctions.WebApi/bin/Debug/net8.0/Auctions.WebApi.dll",
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
