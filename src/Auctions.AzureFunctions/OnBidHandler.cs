@@ -15,15 +15,15 @@ public class OnBidHandler
     }
 
     [Function("OnBid")]
-    public async Task Run(
+    public Task Run(
         [QueueTrigger(QueuesModule.BidResultQueueName, Connection = "AzureWebJobsStorage")]
         string commandString, CancellationToken cancellationToken)
     {
         var result = JsonSerializer.Deserialize<UserIdDecorator<Result<Bid,Errors>?>>(commandString, _serializerOptions);
-        if (result == null) throw new NullReferenceException(nameof(result));
-        _userContext.UserId = result.UserId;
+        _userContext.UserId = result!.UserId;
         _logger.LogInformation($"bid result received");
-        result.Value.Match(ok => _logger.LogInformation("bid processed successfully {Result}", ok),
+        result.Value!.Match(ok => _logger.LogInformation("bid processed successfully {Result}", ok),
             error => _logger.LogInformation("bid processed {Error}", error));
+        return Task.CompletedTask;
     }
 }

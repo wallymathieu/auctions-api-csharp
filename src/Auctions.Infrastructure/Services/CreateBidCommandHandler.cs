@@ -5,7 +5,7 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 
 /// <summary>
-/// Glue class : Some would prefer to put these classes in a "Application" layer
+/// Glue class : Some would prefer to put these classes in an "Application" layer
 /// </summary>
 internal class CreateBidCommandHandler : ICreateBidCommandHandler
 {
