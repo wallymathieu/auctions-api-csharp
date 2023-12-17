@@ -43,10 +43,10 @@ internal class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
 
     internal class JwtPayload
     {
-        [JsonPropertyName("sub")] public string Sub { get; set; }
+        [JsonPropertyName("sub")] public string? Sub { get; set; }
 
-        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonPropertyName("name")] public string? Name { get; set; }
 
-        [JsonPropertyName("u_typ")] public string UTyp { get; set; }
+        [JsonPropertyName("u_typ")] public string? UTyp { get; set; }
     }
 }

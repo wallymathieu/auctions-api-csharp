@@ -16,9 +16,8 @@ internal class PayloadAuthenticationHandler : AuthenticationHandler<PayloadAuthe
     public PayloadAuthenticationHandler(IOptionsMonitor<PayloadAuthenticationOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock,
         ClaimsPrincipalParser claimsPrincipalParser,
-        JwtPayloadClaimsPrincipalParser jwtPayloadClaimsPrincipalParser) : base(options, logger, encoder, clock)
+        JwtPayloadClaimsPrincipalParser jwtPayloadClaimsPrincipalParser) : base(options, logger, encoder)
     {
         _claimsPrincipalParser = claimsPrincipalParser;
         _jwtPayloadClaimsPrincipalParser = jwtPayloadClaimsPrincipalParser;

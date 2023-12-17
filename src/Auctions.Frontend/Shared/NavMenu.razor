@@ -27,10 +27,10 @@
             </NavLink>
         </div>
 
-@if (User!=null && SignInManager.IsSignedIn(User))
+@if (_user!=null && SignInManager.IsSignedIn(_user))
 {
     <div class="nav-item px-3">
-        <NavLink class="nav-link" href="/Identity/Account/Manage" title="Manage"><span class="oi oi-home" aria-hidden="true"></span>Hello @User.Identity?.Name!</NavLink>
+        <NavLink class="nav-link" href="/Identity/Account/Manage" title="Manage"><span class="oi oi-home" aria-hidden="true"></span>Hello @_user.Identity?.Name!</NavLink>
     </div>
     <div class="nav-item px-3">
         <NavLink class="nav-link" href="/Identity/Account/Logout" title="Logout"><span class="oi oi-key" aria-hidden="true"></span>Logout</NavLink>
@@ -48,24 +48,25 @@ else
     </nav>
 </div>
 @code {
-    private bool collapseNavMenu = true;
+    private bool _collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        _collapseNavMenu = !_collapseNavMenu;
     }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
-    ClaimsPrincipal? User;
-    protected override async Task OnInitializedAsync()
+    ClaimsPrincipal? _user;
+    protected override Task OnInitializedAsync()
     {
         if (HttpContext.HttpContext?.User!=null)
         {
-            User = HttpContext.HttpContext?.User;
+            _user = HttpContext.HttpContext?.User;
         }
+        return Task.CompletedTask;
     }
 }
