@@ -42,8 +42,10 @@ public class LocalhostDatabaseContextSetup : IDatabaseContextSetup
     private static string DefaultConnection(string database = "auctions")
     {
         var password = Environment.GetEnvironmentVariable("SA_PASSWORD");
+        var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+        var port = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
         var username = Environment.GetEnvironmentVariable("SA_USERNAME") ?? "auctions-user";
-        return $"Host=localhost;Database={database};Port=5432;Username={username};Password={password};Pooling=false";
+        return $"Host={host};Database={database};Port={port};Username={username};Password={password};Pooling=false";
     }
 
     private void ExecuteInConnection(string commandText) =>
