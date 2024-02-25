@@ -43,6 +43,6 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       env:
-        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=auctions;Username=auctions-user;Password=0c52788f-770c-4ddc-a6e3-19c324e1fb24"
+        SA_PASSWORD: "0c52788f-770c-4ddc-a6e3-19c324e1fb24"
     - name: SecurityCodeScan
       uses: security-code-scan/security-code-scan-results-action@v1.3
