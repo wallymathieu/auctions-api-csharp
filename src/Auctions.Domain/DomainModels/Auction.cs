@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels.Bids;
@@ -18,7 +19,13 @@ public abstract class Auction: IState
     }
 
     public ICollection<BidEntity> Bids { get; init; } = new List<BidEntity>();
-    public AuctionId AuctionId { get; set; }
+    public AuctionId AuctionId
+    {
+        get => new(Id);
+        init => Id = value.Id;
+    }
+    [JsonIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+    public long Id { get; set; }
 
     public DateTimeOffset StartsAt { get; init; }
     public string Title { get; init; }

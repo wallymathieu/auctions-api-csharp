@@ -18,7 +18,7 @@ var host = new HostBuilder()
                 options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
                 options.InstanceName = CacheKeys.Prefix;
             })
-            .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+            .AddAuctionMartenStore(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection)!)
             .AddAuctionServicesCached()
             .AddScoped<ScopedUserContext>()
             .AddScoped<IUserContext>(c=>c.GetRequiredService<ScopedUserContext>());

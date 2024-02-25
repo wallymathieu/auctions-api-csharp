@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Marten;
 using Microsoft.Extensions.Caching.Distributed;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
@@ -7,7 +8,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Cache.Data;
 /// <summary>
 /// https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside
 /// </summary>
-public class CachedAuctionQuery(IDistributedCache cache, AuctionDbContext dbContext): AuctionQuery(dbContext)
+public class CachedAuctionQuery(IDistributedCache cache, IDocumentSession dbContext): AuctionQuery(dbContext)
 {
     public override async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken=default)
     {
