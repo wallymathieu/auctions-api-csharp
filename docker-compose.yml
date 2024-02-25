@@ -1,13 +1,5 @@
 version: "3.4"
 services:
-  db:
-    image: mcr.microsoft.com/mssql/server
-    ports:
-      - "1433:1433"
-    environment:
-      SA_PASSWORD: ${SA_PASSWORD:-Auction_PASSWORD123}
-      ACCEPT_EULA: "Y"
-
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     restart: unless-stopped
@@ -26,6 +18,24 @@ services:
       - '6379:6379'
     volumes:
       - 'redis_data:/bitnami/redis/data'
+
+  db:
+    restart: always
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - DEBUG=false
+      - PGDATA=/vm_pg/data
+      - POSTGRES_PASSWORD=${SA_PASSWORD:-Auction_PASSWORD123}
+      - POSTGRES_USER=auctions-user
+      - POSTGRES_DB=auctions
+    volumes:
+    - './tmp/:/vm_pg/'
+
+  # psql -c 'CREATE DATABASE "auctions";' -U postgres -h 127.0.0.1
+  # psql -c "CREATE USER \"auctions-user\" WITH ENCRYPTED PASSWORD 'Auction_PASSWORD123';" -U postgres -h 127.0.0.1
+  # psql -c "GRANT ALL PRIVILEGES ON DATABASE \"auctions\" TO \"auctions-user\" ;"  -U postgres -h 127.0.0.1
 
   app:
     image: wallymathieu/auctions-api-csharp:1.0.0

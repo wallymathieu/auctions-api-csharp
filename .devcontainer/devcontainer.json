@@ -21,27 +21,10 @@
       // Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
         "ms-dotnettools.csharp",
-        "ms-mssql.mssql",
         "EditorConfig.EditorConfig",
         "ms-azuretools.vscode-azurefunctions",
         "ms-dotnettools.csdevkit"
-      ],
-      			// Set *default* container specific settings.json values on container create.
-			"settings": {
-				"mssql.connections": [
-					{
-						"server": "db",
-						"database": "",
-						"authenticationType": "SqlLogin",
-						"user": "sa",
-						"password": "Auction_PASSWORD123",
-						"emptyPasswordInput": false,
-						"savePassword": true,
-						"profileName": "mssql-container",
-            "trustServerCertificate": true
-					}
-				]
-			}
+      ]
     }
   },
   // Features to add to the dev container. More info: https://containers.dev/features.

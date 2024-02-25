@@ -5,8 +5,8 @@ using Wallymathieu.Auctions.Tests.Helpers;
 
 namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
-public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqlLiteDatabaseContextSetup>{}
-public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqlLiteDatabaseContextSetup>{}
+public class ApiSyncSpecJwtTokenLocalhostDatabase:ApiSyncSpec<JwtApiAuth, LocalhostDatabaseContextSetup>{}
+public class ApiSyncSpecMsClientPrincipalLocalhostDatabase:ApiSyncSpec<MsClientPrincipalApiAuth, LocalhostDatabaseContextSetup>{}
 
 public abstract class BaseApiSpec
 {

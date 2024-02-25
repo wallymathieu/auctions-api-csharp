@@ -5,9 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "main", "application-layer", "command-handlers-infrastructure", "command-handlers-mediatr"]
+    branches: [ "main", "application-layer", "command-handlers-infrastructure", "command-handlers-mediatr", "wolverine"]
   pull_request:
-    branches: [ "main", "application-layer", "command-handlers-infrastructure", "command-handlers-mediatr"]
+    branches: [ "main", "application-layer", "command-handlers-infrastructure", "command-handlers-mediatr", "wolverine"]
 
 jobs:
   build:
@@ -15,6 +15,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Start PostgreSQL on Ubuntu
+      run: |
+        sudo systemctl start postgresql.service
+        pg_isready
+
+    - name: Create database
+      run: sudo -u postgres psql -c 'CREATE DATABASE "auctions";'
+    - name: Create user
+      run: |
+        sudo -u postgres psql -c "CREATE USER \"auctions-user\" WITH ENCRYPTED PASSWORD '0c52788f-770c-4ddc-a6e3-19c324e1fb24' CREATEDB LOGIN;"
+    - name: Grant all to user for DB
+      run: |
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE \"auctions\" TO \"auctions-user\" ;"
+
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -28,5 +42,8 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      env:
+        SA_PASSWORD: "0c52788f-770c-4ddc-a6e3-19c324e1fb24"
+        SA_USERNAME: "auctions-user"
     - name: SecurityCodeScan
       uses: security-code-scan/security-code-scan-results-action@v1.3

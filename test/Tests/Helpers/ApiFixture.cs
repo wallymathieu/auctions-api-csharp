@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Services;
 
@@ -25,6 +26,7 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
                     ConfigureServices(services);
                 });
                 builder.UseEnvironment("Test");
+                _databaseContextSetup.Configure(builder);
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         _databaseContextSetup.Migrate(serviceScope);

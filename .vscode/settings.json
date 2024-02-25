@@ -5,6 +5,7 @@
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "publish (functions)",
     "cSpell.words": [
+        "Npgsql",
         "Wallymathieu"
     ],
     "azureFunctions.projectSubpath": "src/AzureFunctions"

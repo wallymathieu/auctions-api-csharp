@@ -48,7 +48,8 @@ To run api/func/migrations locally you need the following env:
 
 ```bash
 source .env
-export ConnectionStrings__DefaultConnection="Server=localhost;Database=master;TrustServerCertificate=true;MultipleActiveResultSets=true;User Id=sa;Password=${SA_PASSWORD}"
+export SA_PASSWORD="${SA_PASSWORD}"
+export ConnectionStrings__DefaultConnection="Host=localhost;Database=auctions;Port=5432;Username=auctions-user;password=${SA_PASSWORD}"
 export ConnectionStrings__Redis="localhost"
 export ConnectionStrings__AzureStorage="UseDevelopmentStorage=true"
 
@@ -61,20 +62,17 @@ If you want to run inside dev containers then the setup will be slightly differe
 . .devcontainer/env.sh
 ```
 
-To run migrations and api using above environment:
+To start the api using above environment:
 
 ```bash
-dotnet tool restore
-cd src/Auctions.WebApi
-dotnet ef database update
-dotnet run
+(cd src/Auctions.WebApi; dotnet run)
 ```
 
 In the frontend app you need to specify the frontend db context
 
 ```bash
 cd src/Auctions.Frontend
-dotnet ef database update --context Wallymathieu.Auctions.Frontend.Data.FrontendDbContext
+dotnet ef database update
 ```
 
 To run Azure Functions locally using above environment:
@@ -89,12 +87,6 @@ func start
 The API assumes that you have auth middleware in front of the app.
 
 Either the decoded JWT in the `x-jwt-payload` header or specify an encoded claims principal by using configuration value in `PrincipalHeader`, such as `x-ms-client-principal`.
-
-## Add migration
-
-```bash
-dotnet ef migrations add NewMigration --project ./src/Auctions.Infrastructure/Auctions.Infrastructure.csproj --startup-project ./src/Auctions.WebApi/Auctions.WebApi.csproj
-```
 
 ## Inspiration
 

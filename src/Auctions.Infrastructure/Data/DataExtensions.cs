@@ -1,6 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+using Marten;
+using Marten.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Data;
 
@@ -12,6 +15,16 @@ public static class DataExtensions
         return services;
     }
 
+    public static async Task<Auction?> GetAuction(this IDocumentSession session, AuctionId auctionId, CancellationToken token= default)
+    {
+        return await session.LoadAsync<Auction>(
+            id: auctionId.Id,
+            token: token);
+    }
+    public static async Task<IReadOnlyList<Auction>> GetAuctionsAsync(this IDocumentSession session, CancellationToken token= default)
+    {
+        return await session.Query<Auction>().ToListAsync<Auction>(token);
+    }
 
     public static IServiceCollection AddAuctionQueryNoCache(this IServiceCollection services)
     {
@@ -19,12 +32,15 @@ public static class DataExtensions
             .AddScoped<IAuctionQuery>(c=>
                 c.GetRequiredService<AuctionQuery>());
     }
-
-    public static IServiceCollection AddAuctionDbContextSqlServer(this IServiceCollection services, string? connection)
+    public static IServiceCollection AddAuctionMartenStore(this IServiceCollection serviceCollection, string connectionString)
     {
-        return services.AddDbContext<AuctionDbContext>(e =>
-            e.UseSqlServer(connection,
-                opt => opt.MigrationsAssembly(Migrations.AssemblyName)));
+        serviceCollection.AddMarten(options =>
+        {
+            options.Schema.For<Auction>().Identity(x => x.Id)
+                .AddSubClass<SingleSealedBidAuction>()
+                .AddSubClass<TimedAscendingAuction>();
+            options.Connection(connectionString);
+        }).UseDirtyTrackedSessions();
+        return serviceCollection;
     }
-
 }

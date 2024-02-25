@@ -1,3 +1,4 @@
+using Marten;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Services;
@@ -8,7 +9,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 /// Glue class: Some would prefer to put these classes in an "Application" layer
 /// </summary>
 internal class CreateAuctionCommandHandler(
-    AuctionDbContext auctionDbContext,
+    IDocumentSession documentSession,
     IUserContext userContext,
     IMessageQueue messageQueue)
     : ICreateAuctionCommandHandler
@@ -16,8 +17,8 @@ internal class CreateAuctionCommandHandler(
     public async Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken = default)
     {
         var auction = Auction.Create(model, userContext);
-        await auctionDbContext.AddAsync(auction, cancellationToken);
-        await auctionDbContext.SaveChangesAsync(cancellationToken);
+        documentSession.Insert(auction);
+        await documentSession.SaveChangesAsync(cancellationToken);
         if (messageQueue.Enabled)
         {
             await messageQueue.SendMessageAsync(QueuesModule.AuctionResultQueueName,

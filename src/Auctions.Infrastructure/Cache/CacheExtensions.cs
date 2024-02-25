@@ -1,3 +1,4 @@
+using Marten;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Cache.Data;
@@ -14,7 +15,7 @@ public static class CacheExtensions
         return services.AddAuctionQueryImplementation()
             .AddScoped<IAuctionQuery>(c=>new CachedAuctionQuery(
                 c.GetRequiredService<IDistributedCache>(),
-                c.GetRequiredService<AuctionDbContext>()));
+                c.GetRequiredService<IDocumentSession>()));
     }
     public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
         services.AddAuctionServicesImplementation()

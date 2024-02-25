@@ -15,13 +15,13 @@ namespace Wallymathieu.Auctions.Infrastructure.Web;
 
 public static class Extensions
 {
+
     public static void AddAuctionsWebInfrastructure(this WebApplicationBuilder builder)
     {
-        if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
+        if (!string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString(ConnectionStrings.Redis)))
         {
             builder.Services.AddAuctionQueryCached()
-                .AddAuctionDbContextSqlServer(
-                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                .AddAuctionMartenStore(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection)!)
                 .AddStackExchangeRedisCache(options =>
                 {
                     options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
@@ -32,13 +32,12 @@ public static class Extensions
         else
         {
             builder.Services.AddAuctionQueryNoCache()
-                .AddAuctionDbContextSqlServer(
-                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                .AddAuctionMartenStore(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection)!)
                 .AddAuctionServicesNoCache();
         }
 
         var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");
-        if (azureStorageConnectionString != null)
+        if (!string.IsNullOrWhiteSpace(azureStorageConnectionString))
         {
             // Register Azure Clients
             builder.Services.AddAzureClients(azureClientsBuilder =>

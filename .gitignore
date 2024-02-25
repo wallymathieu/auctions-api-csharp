@@ -353,3 +353,6 @@ MigrationBackup/
 .env
 *.DotSettings
 .DS_Store
+
+# Docker postgresql data
+/tmp
