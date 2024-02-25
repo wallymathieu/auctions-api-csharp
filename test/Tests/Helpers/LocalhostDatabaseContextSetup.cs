@@ -14,9 +14,9 @@ public class LocalhostDatabaseContextSetup : IDatabaseContextSetup
 
     public void Init(Type testClass, string testName)
     {
-        _dbName = $"{testClass.Name}_{testName}";
-        ExecuteInConnection($@"CREATE DATABASE ""{_dbName}"";
-            GRANT ALL PRIVILEGES ON DATABASE ""{_dbName}"" TO ""auctions-user"" ;");
+        var hash = string.Format("{0:X}", testClass.Name.GetHashCode());
+        _dbName = $"D{hash}_{testName}";
+        ExecuteInConnection($@"DROP DATABASE IF EXISTS ""{_dbName}""; CREATE DATABASE ""{_dbName}"";");
     }
 
     public void Use(IServiceCollection services)
@@ -29,7 +29,7 @@ public class LocalhostDatabaseContextSetup : IDatabaseContextSetup
 
     public void TryRemove()
     {
-        ExecuteInConnection($@"DROP DATABASE {_dbName};");
+        ExecuteInConnection($@"DROP DATABASE ""{_dbName}"";");
     }
 
     public void Configure(IWebHostBuilder builder) => builder.UseConfiguration(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
@@ -43,7 +43,7 @@ public class LocalhostDatabaseContextSetup : IDatabaseContextSetup
     {
         var password = Environment.GetEnvironmentVariable("SA_PASSWORD");
         var username = Environment.GetEnvironmentVariable("SA_USERNAME") ?? "auctions-user";
-        return $"Host=localhost;Database={database};Port=5432;Username={username};Password={password}";
+        return $"Host=localhost;Database={database};Port=5432;Username={username};Password={password};Pooling=false";
     }
 
     private void ExecuteInConnection(string commandText) =>
