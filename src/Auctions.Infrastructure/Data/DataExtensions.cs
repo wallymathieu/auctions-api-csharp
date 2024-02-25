@@ -36,6 +36,9 @@ public static class DataExtensions
     {
         serviceCollection.AddMarten(options =>
         {
+            var schemaName = "auctions";
+            options.Events.DatabaseSchemaName = schemaName;
+            options.DatabaseSchemaName = schemaName;
             options.Schema.For<Auction>().Identity(x => x.Id)
                 .AddSubClass<SingleSealedBidAuction>()
                 .AddSubClass<TimedAscendingAuction>();
