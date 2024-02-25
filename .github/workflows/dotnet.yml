@@ -24,7 +24,7 @@ jobs:
       run: sudo -u postgres psql -c 'CREATE DATABASE "auctions";'
     - name: Create user
       run: |
-        sudo -u postgres psql -c "CREATE USER \"auctions-user\" WITH ENCRYPTED PASSWORD '0c52788f-770c-4ddc-a6e3-19c324e1fb24';"
+        sudo -u postgres psql -c "CREATE USER \"auctions-user\" WITH ENCRYPTED PASSWORD '0c52788f-770c-4ddc-a6e3-19c324e1fb24' CREATEDB LOGIN;"
     - name: Grant all to user for DB
       run: |
         sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE \"auctions\" TO \"auctions-user\" ;"
@@ -43,7 +43,7 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       env:
-        SA_PASSWORD: ""
-        SA_USERNAME: "postgres"
+        SA_PASSWORD: "0c52788f-770c-4ddc-a6e3-19c324e1fb24"
+        SA_USERNAME: "auctions-user"
     - name: SecurityCodeScan
       uses: security-code-scan/security-code-scan-results-action@v1.3
