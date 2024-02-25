@@ -43,6 +43,7 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       env:
-        SA_PASSWORD: "0c52788f-770c-4ddc-a6e3-19c324e1fb24"
+        SA_PASSWORD: ""
+        SA_USERNAME: "postgres"
     - name: SecurityCodeScan
       uses: security-code-scan/security-code-scan-results-action@v1.3

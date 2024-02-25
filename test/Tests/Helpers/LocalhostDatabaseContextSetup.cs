@@ -32,20 +32,18 @@ public class LocalhostDatabaseContextSetup : IDatabaseContextSetup
         ExecuteInConnection($@"DROP DATABASE {_dbName};");
     }
 
-    public void Configure(IWebHostBuilder builder)
-    {
-        builder.UseConfiguration(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+    public void Configure(IWebHostBuilder builder) => builder.UseConfiguration(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            {"ConnectionStrings:DefaultConnection", DefaultConnection(_dbName)},
+            {"ConnectionStrings:DefaultConnection", DefaultConnection(_dbName!)},
             {"ConnectionStrings:Redis", ""},
             {"ConnectionStrings:AzureStorage",""}
         }).Build());
-    }
 
-    private static string DefaultConnection(string database="auctions")
+    private static string DefaultConnection(string database = "auctions")
     {
         var password = Environment.GetEnvironmentVariable("SA_PASSWORD");
-        return $"Host=localhost;Database={database};Port=5432;Username=auctions-user;Password={password}";
+        var username = Environment.GetEnvironmentVariable("SA_USERNAME") ?? "auctions-user";
+        return $"Host=localhost;Database={database};Port=5432;Username={username};Password={password}";
     }
 
     private void ExecuteInConnection(string commandText) =>
