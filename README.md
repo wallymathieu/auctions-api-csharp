@@ -72,7 +72,7 @@ In the frontend app you need to specify the frontend db context
 
 ```bash
 cd src/Auctions.Frontend
-dotnet ef database update --context Wallymathieu.Auctions.Frontend.Data.FrontendDbContext
+dotnet ef database update
 ```
 
 To run Azure Functions locally using above environment:
