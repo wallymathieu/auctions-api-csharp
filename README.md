@@ -88,12 +88,6 @@ The API assumes that you have auth middleware in front of the app.
 
 Either the decoded JWT in the `x-jwt-payload` header or specify an encoded claims principal by using configuration value in `PrincipalHeader`, such as `x-ms-client-principal`.
 
-## Add migration
-
-```bash
-dotnet ef migrations add NewMigration --project ./src/Auctions.Infrastructure/Auctions.Infrastructure.csproj --startup-project ./src/Auctions.WebApi/Auctions.WebApi.csproj
-```
-
 ## Inspiration
 
 The main inspiration for the architecture of the API is found in this book:
