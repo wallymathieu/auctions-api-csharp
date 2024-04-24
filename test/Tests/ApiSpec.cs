@@ -5,16 +5,22 @@ using Wallymathieu.Auctions.Tests.Helpers;
 
 namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
+[Collection("Sqlite")]
 public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqlLiteDatabaseContextSetup>{}
+[Collection("Sqlite")]
 public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqlLiteDatabaseContextSetup>{}
+[Collection("MsSql")]
+public class ApiSyncSpecJwtTokenMsSql:ApiSyncSpec<JwtApiAuth, MsSqlDatabaseContextSetup>{}
+[Collection("MsSql")]
+public class ApiSyncSpecMsClientPrincipalMsSql:ApiSyncSpec<MsClientPrincipalApiAuth, MsSqlDatabaseContextSetup>{}
 
 public abstract class BaseApiSpec
 {
-    public abstract IApiFixture CreateApiFixture(string testName);
+    public abstract Task<IApiFixture> CreateApiFixture(string testName);
     [Fact]
     public async Task Create_auction_1()
     {
-        using var application = CreateApiFixture(nameof(Create_auction_1));
+        using var application = await CreateApiFixture(nameof(Create_auction_1));
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var auction1 = await application.GetAuction(1, AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
@@ -30,7 +36,7 @@ public abstract class BaseApiSpec
     [Fact]
     public async Task Create_auction_2()
     {
-        using var application = CreateApiFixture(nameof(Create_auction_2));
+        using var application = await CreateApiFixture(nameof(Create_auction_2));
         var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
         var auction1 = await application.GetAuction(1, AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
@@ -44,7 +50,7 @@ public abstract class BaseApiSpec
     [Fact]
     public async Task Cannot_find_unknown_auction()
     {
-        using var application = CreateApiFixture(nameof(Cannot_find_unknown_auction));
+        using var application = await CreateApiFixture(nameof(Cannot_find_unknown_auction));
         var auctionResponse = await application.GetAuction(99, AuthToken.Seller1);
         Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
     }
@@ -70,7 +76,7 @@ public abstract class BaseApiSpec
     ]
     public async Task Fail_to_create_auction(string sample, int index)
     {
-        using var application = CreateApiFixture(nameof(Fail_to_create_auction)+"_"+index);
+        using var application = await CreateApiFixture(nameof(Fail_to_create_auction)+"_"+index);
         var response = await application.PostAuction(sample, AuthToken.Seller1);
         Assert.Multiple(() =>
         {
@@ -80,7 +86,7 @@ public abstract class BaseApiSpec
     [Fact]
     public async Task Place_bid_as_buyer_on_auction_1()
     {
-        using var application = CreateApiFixture(nameof(Place_bid_as_buyer_on_auction_1));
+        using var application = await CreateApiFixture(nameof(Place_bid_as_buyer_on_auction_1));
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         application.SetTime(StartsAt.AddHours(2));
         var bidResponse = await application.PostBidToAuction(1, """{"amount":"VAC11"}""", AuthToken.Buyer1);
@@ -106,17 +112,17 @@ public abstract class ApiSyncSpec<TAuth, TDatabaseContextSetup>: BaseApiSpec
     where TAuth:IApiAuth, new()
     where TDatabaseContextSetup: IDatabaseContextSetup, new()
 {
-    public override IApiFixture CreateApiFixture(string testName)
+    public override async Task<IApiFixture> CreateApiFixture(string testName)
     {
         var dbContext = new TDatabaseContextSetup();
-        dbContext.Init(GetType(), testName);
+        await dbContext.Init(GetType(), testName);
         return new ApiFixture<TAuth>(dbContext, new TAuth());
     }
 
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()
     {
-        using var application = CreateApiFixture(nameof(Cannot_place_bid_on_unknown_auction));
+        using var application = await CreateApiFixture(nameof(Cannot_place_bid_on_unknown_auction));
         var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
     }

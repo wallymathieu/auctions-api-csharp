@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Testcontainers.MsSql;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
@@ -7,14 +8,20 @@ namespace Wallymathieu.Auctions.Tests.Helpers;
 /// <summary>
 /// Database context setup used to configure and setup the database context
 /// </summary>
-public class SqlLiteDatabaseContextSetup : IDatabaseContextSetup
+public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
 {
-    private string? _db;
+    private MsSqlContainer? _dbContainer ;
 
     public Task Init(Type testClass, string testName)
     {
-        _db = $"{testClass.Name}_{testName}.db";
-        return Task.CompletedTask;
+        var tinyhash = string.Format("{0:X}", testName.GetHashCode());
+        var db = $"{testClass.Name}{tinyhash}";
+        _dbContainer = new MsSqlBuilder()
+            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+            .WithPassword("Strong_password_123!")
+            .WithHostname(db)
+            .Build();
+        return _dbContainer.StartAsync();
     }
 
     public void Use(IServiceCollection services)
@@ -23,32 +30,18 @@ public class SqlLiteDatabaseContextSetup : IDatabaseContextSetup
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
         services.AddDbContext<AuctionDbContext>(c =>
-            c.UseSqlite("Data Source=" + _db, opt => opt.MigrationsAssembly(Migrations.AssemblyName)));
+            c.UseSqlServer(_dbContainer!.GetConnectionString(), opt => opt.MigrationsAssembly(Migrations.AssemblyName)));
     }
 
     public void Migrate(IServiceScope serviceScope)
     {
         var context = serviceScope.ServiceProvider.GetRequiredService<AuctionDbContext>();
-        // NOTE, we would like to use :
-        // context.Database.Migrate();
-        // however we get the error
-        // SQLite Error 1: 'AUTOINCREMENT is only allowed on an INTEGER PRIMARY KEY'.
-        context.Database.EnsureCreated();
+        context.Database.Migrate();
     }
 
-    public Task TryRemove()
+    public async Task TryRemove()
     {
-        if (File.Exists(_db))
-        {
-            try
-            {
-                File.Delete(_db);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-        return Task.CompletedTask;
+        if (_dbContainer!=null)
+            await _dbContainer.DisposeAsync();
     }
 }
