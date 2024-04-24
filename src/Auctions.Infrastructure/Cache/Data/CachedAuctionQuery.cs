@@ -7,21 +7,15 @@ namespace Wallymathieu.Auctions.Infrastructure.Cache.Data;
 /// <summary>
 /// https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside
 /// </summary>
-public class CachedAuctionRepository:AuctionRepository
+public class CachedAuctionQuery(IDistributedCache cache, AuctionDbContext dbContext): AuctionQuery(dbContext)
 {
-    private readonly IDistributedCache _cache;
-    public CachedAuctionRepository(IDistributedCache cache, AuctionDbContext dbContext): base(dbContext)
+    public override async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken=default)
     {
-        _cache = cache;
-    }
-
-    public override async Task<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken)
-    {
-        var auctionsJson = await _cache.GetStringAsync(CacheKeys.Auctions);
+        var auctionsJson = await cache.GetStringAsync(CacheKeys.Auctions, token:cancellationToken);
         if (auctionsJson != null)
         {
             // We have cached data, deserialize the JSON data.
-            return JsonSerializer.Deserialize<List<Auction>>(auctionsJson);
+            return JsonSerializer.Deserialize<List<Auction>>(auctionsJson)!;
         }
         else
         {
@@ -32,7 +26,9 @@ public class CachedAuctionRepository:AuctionRepository
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
             };
-            await this._cache.SetStringAsync(CacheKeys.Auctions, auctionsJson, cacheOptions);
+            await cache.SetStringAsync(key:CacheKeys.Auctions,
+                value:auctionsJson,
+                options:cacheOptions, token:cancellationToken);
             return auctions;
         }
     }

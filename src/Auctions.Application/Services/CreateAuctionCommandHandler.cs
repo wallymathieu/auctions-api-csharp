@@ -5,30 +5,23 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Application.Services;
 
 /// <summary>
-/// Glue class: Some would prefer to put these classes in a "Application" layer
+/// Glue class: Some would prefer to put these classes in an "Application" layer
 /// </summary>
-internal class CreateAuctionCommandHandler:ICreateAuctionCommandHandler
+internal class CreateAuctionCommandHandler(
+    AuctionDbContext auctionDbContext,
+    IUserContext userContext,
+    IMessageQueue messageQueue)
+    : ICreateAuctionCommandHandler
 {
-    private readonly IAuctionDbContext _auctionDbContext;
-    private readonly IUserContext _userContext;
-    private readonly IMessageQueue _messageQueue;
-
-    public CreateAuctionCommandHandler(IAuctionDbContext auctionDbContext, IUserContext userContext, IMessageQueue messageQueue)
-    {
-        _auctionDbContext = auctionDbContext;
-        _userContext = userContext;
-        _messageQueue = messageQueue;
-    }
-
     public async Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken = default)
     {
-        var auction = Auction.Create(model, _userContext);
-        await _auctionDbContext.AddAsync(auction, cancellationToken);
-        await _auctionDbContext.SaveChangesAsync(cancellationToken);
-        if (_messageQueue.Enabled)
+        var auction = Auction.Create(model, userContext);
+        await auctionDbContext.AddAsync(auction, cancellationToken);
+        await auctionDbContext.SaveChangesAsync(cancellationToken);
+        if (messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.AuctionResultQueueName,
-                new UserIdDecorator<Auction>(auction, _userContext.UserId), cancellationToken);
+            await messageQueue.SendMessageAsync(QueuesModule.AuctionResultQueueName,
+                new UserIdDecorator<Auction>(auction, userContext.UserId), cancellationToken);
         }
         return auction;
     }

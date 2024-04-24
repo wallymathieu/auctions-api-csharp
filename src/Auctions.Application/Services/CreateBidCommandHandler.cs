@@ -5,36 +5,28 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Application.Services;
 
 /// <summary>
-/// Glue class : Some would prefer to put these classes in a "Application" layer
+/// Glue class : Some would prefer to put these classes in an "Application" layer
 /// </summary>
-internal class CreateBidCommandHandler : ICreateBidCommandHandler
+internal class CreateBidCommandHandler(
+    AuctionDbContext auctionDbContext,
+    IUserContext userContext,
+    ISystemClock systemClock,
+    IMessageQueue messageQueue)
+    : ICreateBidCommandHandler
 {
-    private readonly IAuctionDbContext _auctionDbContext;
-    private readonly IUserContext _userContext;
-    private readonly ISystemClock _systemClock;
-    private readonly IMessageQueue _messageQueue;
-
-    public CreateBidCommandHandler(IAuctionDbContext auctionDbContext, IUserContext userContext, ISystemClock systemClock, IMessageQueue messageQueue)
-    {
-        _auctionDbContext = auctionDbContext;
-        _userContext = userContext;
-        _systemClock = systemClock;
-        _messageQueue = messageQueue;
-    }
-
     public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
     {
-        var auction = await _auctionDbContext.GetAuction(model.AuctionId, cancellationToken);
+        var auction = await auctionDbContext.GetAuction(model.AuctionId, cancellationToken);
         if (auction is null) return Result<Bid, Errors>.Error(Errors.UnknownAuction);
-        var result = auction.TryAddBid(model, _userContext, _systemClock);
+        var result = auction.TryAddBid(model, userContext, systemClock);
         if (result.IsOk)
         {
-            await _auctionDbContext.SaveChangesAsync(cancellationToken);
+            await auctionDbContext.SaveChangesAsync(cancellationToken);
         }
-        if (_messageQueue.Enabled)
+        if (messageQueue.Enabled)
         {
-            await _messageQueue.SendMessageAsync(QueuesModule.BidResultQueueName,
-                new UserIdDecorator<Result<Bid,Errors>?>(result, _userContext.UserId), cancellationToken);
+            await messageQueue.SendMessageAsync(QueuesModule.BidResultQueueName,
+                new UserIdDecorator<Result<Bid,Errors>?>(result, userContext.UserId), cancellationToken);
         }
         return result;
     }
