@@ -5,9 +5,13 @@ using Wallymathieu.Auctions.Tests.Helpers;
 
 namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
+[Collection("Sqlite")]
 public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqlLiteDatabaseContextSetup>{}
+[Collection("Sqlite")]
 public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqlLiteDatabaseContextSetup>{}
+[Collection("MsSql")]
 public class ApiSyncSpecJwtTokenMsSql:ApiSyncSpec<JwtApiAuth, MsSqlDatabaseContextSetup>{}
+[Collection("MsSql")]
 public class ApiSyncSpecMsClientPrincipalMsSql:ApiSyncSpec<MsClientPrincipalApiAuth, MsSqlDatabaseContextSetup>{}
 
 public abstract class BaseApiSpec

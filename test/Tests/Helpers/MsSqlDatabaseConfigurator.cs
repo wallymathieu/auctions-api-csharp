@@ -14,7 +14,8 @@ public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
 
     public Task Init(Type testClass, string testName)
     {
-        var db = $"{testClass.Name}{testName}";
+        var tinyhash = string.Format("{0:X}", testName.GetHashCode());
+        var db = $"{testClass.Name}{tinyhash}";
         _dbContainer = new MsSqlBuilder()
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
             .WithPassword("Strong_password_123!")
