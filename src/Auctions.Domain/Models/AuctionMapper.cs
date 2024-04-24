@@ -1,23 +1,17 @@
+using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.DomainModels.Bids;
 using Wallymathieu.Auctions.Services;
 
-namespace Wallymathieu.Auctions.Infrastructure.Models;
+namespace Wallymathieu.Auctions.Models;
 
 /// <summary>
 /// Map to API models from domain models. We could use such a library as AutoMapper instead.
 /// </summary>
-public class AuctionMapper
+public class AuctionMapper(ISystemClock systemClock)
 {
-    private readonly ISystemClock _systemClock;
-
-    public AuctionMapper(ISystemClock systemClock)
-    {
-        _systemClock = systemClock;
-    }
-
     public AuctionModel MapAuctionToModel(Auction auction)
     {
-        var now = _systemClock.Now;
+        var now = systemClock.Now;
         var amountAndWinner = auction.TryGetAmountAndWinner(now);
         var hasEnded = auction.HasEnded(now);
         var bidUserMapper = auction.BidUserMapper();

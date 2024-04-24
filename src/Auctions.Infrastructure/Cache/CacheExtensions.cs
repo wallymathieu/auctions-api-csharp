@@ -9,10 +9,10 @@ namespace Wallymathieu.Auctions.Infrastructure.Cache;
 
 public static class CacheExtensions
 {
-    public static IServiceCollection AddAuctionRepositoryCached(this IServiceCollection services)
+    public static IServiceCollection AddAuctionQueryCached(this IServiceCollection services)
     {
-        return services.AddAuctionRepositoryImplementation()
-            .AddScoped<IAuctionRepository>(c=>new CachedAuctionRepository(
+        return services.AddAuctionQueryImplementation()
+            .AddScoped<IAuctionQuery>(c=>new CachedAuctionQuery(
                 c.GetRequiredService<IDistributedCache>(),
                 c.GetRequiredService<AuctionDbContext>()));
     }

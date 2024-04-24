@@ -29,7 +29,7 @@ internal class ClaimsPrincipalParser : IClaimsPrincipalParser
             if (principal == null) return false;
             var identity = new ClaimsIdentity(principal.IdentityProvider, principal.NameClaimType,
                 principal.RoleClaimType);
-            identity.AddClaims(principal.Claims.Select(c => new Claim(c.Type, c.Value)));
+            identity.AddClaims(principal.Claims!.Select(c => new Claim(c.Type!, c.Value!)));
 
             claimsIdentity = new ClaimsPrincipal(identity);
             return true;
@@ -44,20 +44,20 @@ internal class ClaimsPrincipalParser : IClaimsPrincipalParser
     private class ClientPrincipalClaim
     {
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        [JsonPropertyName("typ")] public string Type { get; set; }
+        [JsonPropertyName("typ")] public string? Type { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        [JsonPropertyName("val")] public string Value { get; set; }
+        [JsonPropertyName("val")] public string? Value { get; set; }
     }
 
     private class ClientPrincipal
     {
-        [JsonPropertyName("auth_typ")] public string IdentityProvider { get; set; }
+        [JsonPropertyName("auth_typ")] public string? IdentityProvider { get; set; }
 
-        [JsonPropertyName("name_typ")] public string NameClaimType { get; set; }
+        [JsonPropertyName("name_typ")] public string? NameClaimType { get; set; }
 
-        [JsonPropertyName("role_typ")] public string RoleClaimType { get; set; }
+        [JsonPropertyName("role_typ")] public string? RoleClaimType { get; set; }
 
-        [JsonPropertyName("claims")] public ClientPrincipalClaim[] Claims { get; set; }
+        [JsonPropertyName("claims")] public ClientPrincipalClaim[]? Claims { get; set; }
     }
 }

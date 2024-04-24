@@ -19,7 +19,7 @@ public static class Extensions
     {
         if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
         {
-            builder.Services.AddAuctionRepositoryCached()
+            builder.Services.AddAuctionQueryCached()
                 .AddAuctionDbContextSqlServer(
                     builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
                 .AddStackExchangeRedisCache(options =>
@@ -31,7 +31,7 @@ public static class Extensions
         }
         else
         {
-            builder.Services.AddAuctionRepositoryNoCache()
+            builder.Services.AddAuctionQueryNoCache()
                 .AddAuctionDbContextSqlServer(
                     builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
                 .AddAuctionServicesNoCache();

@@ -4,8 +4,10 @@ Simple Auction API
 
 There are currently these main implementations:
 
-- [main](https://github.com/wallymathieu/auctions-api-csharp/tree/main) is the core main implementation
+- [main](https://github.com/wallymathieu/auctions-api-csharp/tree/main) is the core simple implementation
+- [application-layer](https://github.com/wallymathieu/auctions-api-csharp/tree/application-layer) is the implementation with an application layer
 - [command-handlers-infrastructure](https://github.com/wallymathieu/auctions-api-csharp/tree/command-handlers-infrastructure) is the implementation but without hand written command handlers that binds to the entity methods
+- [command-handlers-mediatr](https://github.com/wallymathieu/auctions-api-csharp/tree/command-handlers-mediatr) is an extension of the command-handlers-infrastructure but with MediatR pipeline behavior instead of decorators
 
 ## Getting started
 
