@@ -46,8 +46,10 @@ public class AuctionsController(
     /// [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction). It can also be a
     /// [Timed ascending auction also known as an English auction](https://en.wikipedia.org/wiki/English_auction).
     /// </remarks>
-    [HttpPost(Name = "create_auction") , Authorize,
-     ProducesResponseType(typeof(void),StatusCodes.Status200OK)]
+    /// <returns>Returns 201 if the auction was created otherwise a 400 result.</returns>
+    [HttpPost(Name = "create_auction")]
+    [Authorize]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
     {
@@ -56,8 +58,9 @@ public class AuctionsController(
             auctionMapper.MapAuctionToModel(auction);
         return CreatedAtAction(nameof(GetSingle), new { auctionId = auctionModel.Id }, auctionModel);
     }
+
     /// <summary>
-    /// Add a bid on an auction
+    /// Add a bid on an auction.
     /// </summary>
     [HttpPost("{auctionId}/bids",Name = "add_bid"), Authorize,
      ProducesResponseType(typeof(void),StatusCodes.Status200OK),
