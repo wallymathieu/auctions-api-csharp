@@ -2,7 +2,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Cache.Services;
-internal class CacheAwareCreateBidCommandHandler(
+internal sealed class CacheAwareCreateBidCommandHandler(
     ICreateBidCommandHandler createBidCommandHandler,
     IDistributedCache cache)
     : ICreateBidCommandHandler

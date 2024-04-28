@@ -30,10 +30,12 @@ public abstract class Auction: IState
     public CurrencyCode Currency { get; init; }
     public AuctionType AuctionType { get; set; }
 
-    public bool OpenBidders { get; set; } = false;
+    public bool OpenBidders { get; set; }
 
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
+        if (userContext.UserId == null)
+            throw new InvalidOperationException("User must be logged in to create an auction.");
         return cmd.SingleSealedBidOptions!=null
             ? new SingleSealedBidAuction
                 {
@@ -61,6 +63,8 @@ public abstract class Auction: IState
     }
     public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
     {
+        if (userContext.UserId == null)
+            throw new InvalidOperationException("User must be logged in to place a bid.");
         var bid = new Bid(userContext.UserId, model.Amount, systemClock.Now);
         return TryAddBid(systemClock.Now, bid, out var error)
             ? Result<Bid, Errors>.Ok(bid)

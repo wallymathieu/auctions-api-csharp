@@ -20,14 +20,14 @@ public class Can_parse_user
 
 public class Auction_bid
 {
-    Bid ValidBid(Auction auction) => 
+    static Bid ValidBid(Auction auction) =>
         new(User: Buyer,
             Amount: Amount.Parse("SEK10"),
             At: auction.StartsAt.AddHours(1.0));
 
-    Bid BidWithSameUser(Auction auction) => ValidBid(auction) with { User = Seller };
-    Bid BidAfterAuctionEnded(Auction auction) => ValidBid(auction) with { At = auction.Expiry.AddHours(1.0) };
-    Bid BidBeforeAuctionStarted(Auction auction) => ValidBid(auction) with { At = auction.StartsAt.AddHours(-1.0) };
+    static Bid BidWithSameUser(Auction auction) => ValidBid(auction) with { User = Seller };
+    static Bid BidAfterAuctionEnded(Auction auction) => ValidBid(auction) with { At = auction.Expiry.AddHours(1.0) };
+    static Bid BidBeforeAuctionStarted(Auction auction) => ValidBid(auction) with { At = auction.StartsAt.AddHours(-1.0) };
 
     [Fact]
     public void valid_bid()
@@ -35,7 +35,7 @@ public class Auction_bid
         var auction = GetEnglishAuction();
         Assert.Equal(Errors.None, ValidBid(auction).Validate(auction));
     }
-    
+
     [Fact]
     public void seller_bidding_on_auction()
     {

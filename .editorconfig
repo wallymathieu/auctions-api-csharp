@@ -13,6 +13,9 @@ insert_final_newline = false
 indent_style = space
 indent_size = 4
 
+# CA1848: Use the LoggerMessage delegates
+dotnet_diagnostic.CA1848.severity = none
+
 [*.json]
 indent_style = space
 indent_size = 2

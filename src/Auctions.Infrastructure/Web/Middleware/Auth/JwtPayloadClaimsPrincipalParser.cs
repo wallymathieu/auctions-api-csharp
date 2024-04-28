@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
-internal class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
+internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
 {
     private readonly ILogger<JwtPayloadClaimsPrincipalParser> _logger;
 
@@ -26,10 +26,9 @@ internal class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
             claimsIdentity = new ClaimsPrincipal(new[]
             {
                 new ClaimsIdentity(
-                    new Claim[]
-                    {
+                    [
                         new(ClaimTypes.Name, deserialized.Name)
-                    }, "proxy", ClaimTypes.Name, ClaimTypes.Role)
+                    ], "proxy", ClaimTypes.Name, ClaimTypes.Role)
             });
             return true;
         }
@@ -40,7 +39,7 @@ internal class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
         }
     }
 
-    internal class JwtPayload
+    internal sealed class JwtPayload
     {
         [JsonPropertyName("sub")] public string? Sub { get; set; }
 

@@ -7,7 +7,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 /// <summary>
 /// Glue class: Some would prefer to put these classes in an "Application" layer
 /// </summary>
-internal class CreateAuctionCommandHandler(
+internal sealed class CreateAuctionCommandHandler(
     AuctionDbContext auctionDbContext,
     IUserContext userContext,
     IMessageQueue messageQueue)

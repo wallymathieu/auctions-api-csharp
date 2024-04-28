@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.MsSql;
@@ -14,7 +15,7 @@ public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
 
     public Task Init(Type testClass, string testName)
     {
-        var tinyhash = string.Format("{0:X}", testName.GetHashCode());
+        var tinyhash = string.Format(CultureInfo.InvariantCulture,"{0:X}", testName.GetHashCode());
         var db = $"{testClass.Name}{tinyhash}";
         _dbContainer = new MsSqlBuilder()
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")

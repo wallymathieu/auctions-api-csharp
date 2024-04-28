@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Wallymathieu.Auctions.DomainModels;
@@ -19,9 +20,9 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
         {
             var currencyString = match.Groups["currency"].Value;
             var v = match.Groups["value"].Value;
-            if (global::Wallymathieu.Auctions.DomainModels.Currency.TryParse(currencyString, out var currency) && currency != null)
+            if (DomainModels.Currency.TryParse(currencyString, out var currency) && currency != null)
             {
-                value = new Amount(long.Parse(v), currency);
+                value = new Amount(long.Parse(v, CultureInfo.InvariantCulture), currency);
                 return true;
             }
         }
@@ -55,7 +56,7 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
         var currency2 = a2.Currency;
         if (!currency.Equals(currency2))
         {
-            throw new Exception("not defined for two different currencies");
+            throw new ArgumentException("not defined for two different currencies");
         }
     }
 
@@ -93,7 +94,7 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
             return amount!;
         }
 
-        throw new ArgumentException();
+        throw new ArgumentException("Could not parse value");
     }
 
     [GeneratedRegex("(?<currency>[A-Z]+)(?<value>[0-9]+)")]

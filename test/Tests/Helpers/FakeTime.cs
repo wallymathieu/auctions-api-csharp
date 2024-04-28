@@ -2,7 +2,7 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-internal class FakeSystemClock : ISystemClock
+internal sealed class FakeSystemClock : ISystemClock
 {
     public FakeSystemClock(DateTimeOffset now)
     {

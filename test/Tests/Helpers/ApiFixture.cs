@@ -51,6 +51,7 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
         _testServer.Dispose();
         _databaseContextSetup.TryRemove().ConfigureAwait(false).GetAwaiter().GetResult();
     }
+
     public TestServer Server=>_testServer;
 
     public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken auth) =>
