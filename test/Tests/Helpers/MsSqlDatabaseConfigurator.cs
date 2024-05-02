@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.MsSql;
@@ -14,7 +15,10 @@ public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
 
     public Task Init(Type testClass, string testName)
     {
-        var tinyhash = string.Format("{0:X}", testName.GetHashCode());
+        ArgumentNullException.ThrowIfNull(testName, nameof(testName));
+        ArgumentNullException.ThrowIfNull(testClass, nameof(testClass));
+
+        var tinyhash = string.Format(CultureInfo.InvariantCulture, "{0:X}", testName.GetHashCode(StringComparison.Ordinal));
         var db = $"{testClass.Name}{tinyhash}";
         _dbContainer = new MsSqlBuilder()
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
@@ -26,15 +30,18 @@ public class MsSqlDatabaseContextSetup : IDatabaseContextSetup
 
     public void Use(IServiceCollection services)
     {
+        ArgumentNullException.ThrowIfNull(services);
+
         services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
         services.AddDbContext<AuctionDbContext>(c =>
-            c.UseSqlServer(_dbContainer!.GetConnectionString(), opt => opt.MigrationsAssembly(Migrations.AssemblyName)));
+            c.UseSqlServer(_dbContainer!.GetConnectionString(), opt => opt.MigrationsAssembly(MigrationAssembly.Name)));
     }
 
     public void Migrate(IServiceScope serviceScope)
     {
+        ArgumentNullException.ThrowIfNull(serviceScope);
         var context = serviceScope.ServiceProvider.GetRequiredService<AuctionDbContext>();
         context.Database.Migrate();
     }

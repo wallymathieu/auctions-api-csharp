@@ -13,21 +13,28 @@ public class SqlLiteDatabaseContextSetup : IDatabaseContextSetup
 
     public Task Init(Type testClass, string testName)
     {
+        ArgumentNullException.ThrowIfNull(testClass, nameof(testClass));
+        ArgumentNullException.ThrowIfNull(testName, nameof(testName));
+
         _db = $"{testClass.Name}_{testName}.db";
         return Task.CompletedTask;
     }
 
     public void Use(IServiceCollection services)
     {
+        ArgumentNullException.ThrowIfNull(services, nameof(services));
+
         services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
         services.AddDbContext<AuctionDbContext>(c =>
-            c.UseSqlite("Data Source=" + _db, opt => opt.MigrationsAssembly(Migrations.AssemblyName)));
+            c.UseSqlite("Data Source=" + _db, opt => opt.MigrationsAssembly(MigrationAssembly.Name)));
     }
 
     public void Migrate(IServiceScope serviceScope)
     {
+        ArgumentNullException.ThrowIfNull(serviceScope, nameof(serviceScope));
+
         var context = serviceScope.ServiceProvider.GetRequiredService<AuctionDbContext>();
         // NOTE, we would like to use :
         // context.Database.Migrate();

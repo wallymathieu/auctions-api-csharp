@@ -7,13 +7,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
+
 public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
 {
     private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
     private readonly IDatabaseContextSetup _databaseContextSetup;
-    TestServer Create()
+    TestServerContext Create()
     {
-        var application = new WebApplicationFactory<Program>()
+        var webAppFactory = new WebApplicationFactory<Program>();
+        var application = webAppFactory
             .WithWebHostBuilder(builder =>
             {
                 _auth.Configure(builder);
@@ -28,7 +30,7 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         _databaseContextSetup.Migrate(serviceScope);
-        return application.Server;
+        return new TestServerContext(application.Server, webAppFactory);
     }
 
 
@@ -36,22 +38,32 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
 
 
 
-    private readonly TestServer _testServer;
+    private readonly TestServerContext _testServerContext;
     private readonly TAuth _auth;
 
     public ApiFixture(IDatabaseContextSetup databaseContextSetup, TAuth auth)
     {
         _databaseContextSetup = databaseContextSetup;
         _auth = auth;
-        _testServer = Create();
+        _testServerContext = Create();
     }
 
     public void Dispose()
     {
-        _testServer.Dispose();
-        _databaseContextSetup.TryRemove().ConfigureAwait(false).GetAwaiter().GetResult();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
-    public TestServer Server=>_testServer;
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _testServerContext.Dispose();
+            _databaseContextSetup.TryRemove().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+    }
+
+    public TestServer Server => _testServerContext.Server;
 
     public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken auth) =>
         await Server.CreateRequest("/auctions").And(r =>
@@ -78,4 +90,23 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
     private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
     public void SetTime(DateTimeOffset now) => _fakeSystemClock.Now = now;
+
+    private sealed class TestServerContext:IDisposable
+    {
+        internal TestServerContext(TestServer server, WebApplicationFactory<Program> webApplicationFactory)
+        {
+            Server = server;
+            _webApplicationFactory = webApplicationFactory;
+        }
+
+        public TestServer Server { get; }
+
+        private WebApplicationFactory<Program> _webApplicationFactory;
+
+        public void Dispose()
+        {
+            Server.Dispose();
+            _webApplicationFactory.Dispose();
+        }
+    }
 }

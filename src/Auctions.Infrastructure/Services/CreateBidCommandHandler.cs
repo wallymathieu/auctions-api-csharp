@@ -7,7 +7,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 /// <summary>
 /// Glue class : Some would prefer to put these classes in an "Application" layer
 /// </summary>
-internal class CreateBidCommandHandler(
+internal sealed class CreateBidCommandHandler(
     AuctionDbContext auctionDbContext,
     IUserContext userContext,
     ISystemClock systemClock,
@@ -17,7 +17,7 @@ internal class CreateBidCommandHandler(
     public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
     {
         var auction = await auctionDbContext.GetAuction(model.AuctionId, cancellationToken);
-        if (auction is null) return Result<Bid, Errors>.Error(Errors.UnknownAuction);
+        if (auction is null) return Result.Error<Bid, Errors>(Errors.UnknownAuction);
         var result = auction.TryAddBid(model, userContext, systemClock);
         if (result.IsOk)
         {

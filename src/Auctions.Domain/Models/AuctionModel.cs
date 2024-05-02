@@ -11,7 +11,9 @@ public record AuctionModel(
     DateTimeOffset Expiry,
     string? Seller,
     CurrencyCode Currency,
+#pragma warning disable CA1819 // Properties should not return arrays
     BidModel[] Bids,
+#pragma warning restore CA1819 // Properties should not return arrays
     Amount? Price,
     string? Winner,
     bool HasEnded);

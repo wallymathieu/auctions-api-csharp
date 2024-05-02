@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Wallymathieu.Auctions.Infrastructure;
 
 /// <summary>
@@ -5,6 +7,6 @@ namespace Wallymathieu.Auctions.Infrastructure;
 /// </summary>
 public static class TimeFormatter
 {
-    public static string Format(DateTimeOffset dateTime) => dateTime.ToString(TimeFormat);
+    public static string Format(DateTimeOffset dateTime) => dateTime.ToString(TimeFormat, CultureInfo.InvariantCulture);
     private const string TimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZ";
 }

@@ -4,6 +4,7 @@ public record Bid(UserId User, Amount Amount, DateTimeOffset At)
 {
     public Errors Validate(Auction auction)
     {
+        ArgumentNullException.ThrowIfNull(auction, nameof(auction));
         var errors = Errors.None;
         if (User == auction.User) errors |= Errors.SellerCannotPlaceBids;
         if (Amount.Currency != auction.Currency) errors |= Errors.BidCurrencyConversion;
