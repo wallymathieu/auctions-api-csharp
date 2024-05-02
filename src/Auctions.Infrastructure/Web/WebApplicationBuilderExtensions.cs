@@ -7,16 +7,16 @@ using Wallymathieu.Auctions.Infrastructure.Cache;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Infrastructure.Services;
-using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 using Wallymathieu.Auctions.Infrastructure.Web.Queues;
-using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web;
 
-public static class Extensions
+public static class WebApplicationBuilderExtensions
 {
     public static void AddAuctionsWebInfrastructure(this WebApplicationBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+
         if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
         {
             builder.Services.AddAuctionQueryCached()
@@ -54,12 +54,4 @@ public static class Extensions
 
         builder.Services.AddScoped<IMessageQueue, AzureMessageQueue>();
     }
-
-    public static IServiceCollection AddAuctionsWebJwt(this IServiceCollection services) =>
-        services
-            .AddSingleton<ClaimsPrincipalParser>()
-            .AddSingleton<JwtPayloadClaimsPrincipalParser>();
-
-    public static IServiceCollection AddHttpContextUserContext(this IServiceCollection services) =>
-        services.AddScoped<IUserContext, UserContext>();
 }

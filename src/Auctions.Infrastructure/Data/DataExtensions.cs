@@ -24,7 +24,7 @@ public static class DataExtensions
     {
         return services.AddDbContext<AuctionDbContext>(e =>
             e.UseSqlServer(connection,
-                opt => opt.MigrationsAssembly(Migrations.AssemblyName)));
+                opt => opt.MigrationsAssembly(MigrationAssembly.Name)));
     }
 
 }

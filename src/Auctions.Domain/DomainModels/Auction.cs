@@ -34,6 +34,8 @@ public abstract class Auction: IState
 
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
+        ArgumentNullException.ThrowIfNull(cmd, nameof(cmd));
+        ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));
         if (userContext.UserId == null)
             throw new InvalidOperationException("User must be logged in to create an auction.");
         return cmd.SingleSealedBidOptions!=null
@@ -63,6 +65,9 @@ public abstract class Auction: IState
     }
     public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
     {
+        ArgumentNullException.ThrowIfNull(model, nameof(model));
+        ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));
+        ArgumentNullException.ThrowIfNull(systemClock, nameof(systemClock));
         if (userContext.UserId == null)
             throw new InvalidOperationException("User must be logged in to place a bid.");
         var bid = new Bid(userContext.UserId, model.Amount, systemClock.Now);

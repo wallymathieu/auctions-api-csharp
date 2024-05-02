@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Wallymathieu.Auctions.DomainModels;
 /// <summary>
 /// The responsibility of this class is to handle the domain model of "single sealed bid" auction model.
@@ -33,8 +35,9 @@ public class SingleSealedBidAuction: Auction, IState
         DisclosingBids,
     }
 
-    public override bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
+    public override bool TryAddBid(DateTimeOffset time, Bid bid, [NotNullWhen(true)] out Errors errors)
     {
+        ArgumentNullException.ThrowIfNull(bid, nameof(bid));
         var state = GetState(time);
         switch (state)
         {
@@ -71,13 +74,11 @@ public class SingleSealedBidAuction: Auction, IState
 
     public override IEnumerable<Bid> GetBids(DateTimeOffset time)
     {
-        switch (GetState(time))
+        return GetState(time) switch
         {
-            case State.AcceptingBids:
-            case State.DisclosingBids: return Bids.Select(b=>new Bid(b.User, b.Amount, b.At));
-        }
-
-        return Array.Empty<Bid>();
+            State.AcceptingBids or State.DisclosingBids => Bids.Select(b => new Bid(b.User, b.Amount, b.At)),
+            _ => Array.Empty<Bid>(),
+        };
     }
 
     public override (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)

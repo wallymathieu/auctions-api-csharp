@@ -13,7 +13,8 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
     private readonly IDatabaseContextSetup _databaseContextSetup;
     TestServer Create()
     {
-        var application = new WebApplicationFactory<Program>()
+        using var webAppFactory = new WebApplicationFactory<Program>();
+        var application = webAppFactory
             .WithWebHostBuilder(builder =>
             {
                 _auth.Configure(builder);

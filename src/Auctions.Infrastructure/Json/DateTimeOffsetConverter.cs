@@ -18,6 +18,7 @@ public class DateTimeOffsetConverter: JsonConverter<DateTimeOffset>
 
     public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
     {
+        ArgumentNullException.ThrowIfNull(writer, nameof(writer));
         writer.WriteStringValue(TimeFormatter.Format(value.ToUniversalTime()));
     }
 }

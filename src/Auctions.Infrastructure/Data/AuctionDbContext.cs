@@ -36,13 +36,15 @@ public class AuctionDbContext: DbContext
     /// </summary>
     public async ValueTask<Auction?> GetAuction(AuctionId auctionId, CancellationToken cancellationToken = default)
     {
-        var auction = await Auctions.FindAsync(keyValues:new object?[]{auctionId}, cancellationToken:cancellationToken);
+        var auction = await Auctions.FindAsync(keyValues:[auctionId], cancellationToken:cancellationToken);
         if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync(cancellationToken);
         return auction;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+
         modelBuilder.Entity<Auction>(entity =>
             {
                 entity.HasDiscriminator(b => b.AuctionType).IsComplete(false);

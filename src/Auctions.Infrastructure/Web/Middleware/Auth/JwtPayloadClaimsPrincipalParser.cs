@@ -23,13 +23,13 @@ internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(apiKey));
             var deserialized = JsonSerializer.Deserialize<JwtPayload>(json);
             if (deserialized == null || string.IsNullOrEmpty(deserialized.Name)) return false;
-            claimsIdentity = new ClaimsPrincipal(new[]
-            {
+            claimsIdentity = new ClaimsPrincipal(
+            [
                 new ClaimsIdentity(
                     [
                         new(ClaimTypes.Name, deserialized.Name)
                     ], "proxy", ClaimTypes.Name, ClaimTypes.Role)
-            });
+            ]);
             return true;
         }
         catch (Exception e)

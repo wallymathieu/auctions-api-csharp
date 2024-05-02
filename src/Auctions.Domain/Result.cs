@@ -45,32 +45,30 @@ public sealed class Result<TOk, TError> : IResult
 
     public Result<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map)
     {
-        switch (_tag)
+        ArgumentNullException.ThrowIfNull(map, nameof(map));
+        return _tag switch
         {
-            case Tag.Ok:
-                return Result.Ok<TOkResult, TError>(map(_ok!));
-            case Tag.Error:
-                return Result.Error<TOkResult, TError>(_error!);
-            default:
-                throw new InvalidOperationException();
-        }
+            Tag.Ok => Result.Ok<TOkResult, TError>(map(_ok!)),
+            Tag.Error => Result.Error<TOkResult, TError>(_error!),
+            _ => throw new InvalidOperationException(),
+        };
     }
 
     public Result<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map)
     {
-        switch (_tag)
+        ArgumentNullException.ThrowIfNull(map, nameof(map));
+        return _tag switch
         {
-            case Tag.Ok:
-                return Result.Ok<TOk, TErrorResult>(_ok!);
-            case Tag.Error:
-                return Result.Error<TOk, TErrorResult>(map(_error!));
-            default:
-                throw new InvalidOperationException();
-        }
+            Tag.Ok => Result.Ok<TOk, TErrorResult>(_ok!),
+            Tag.Error => Result.Error<TOk, TErrorResult>(map(_error!)),
+            _ => throw new InvalidOperationException(),
+        };
     }
 
     public void Match(Action<TOk> ok, Action<TError> error)
     {
+        ArgumentNullException.ThrowIfNull(ok, nameof(ok));
+        ArgumentNullException.ThrowIfNull(error, nameof(error));
         switch (_tag)
         {
             case Tag.Ok:
@@ -83,15 +81,14 @@ public sealed class Result<TOk, TError> : IResult
     }
     public TResult Match<TResult>(Func<TOk,TResult> ok, Func<TError,TResult> error)
     {
-        switch (_tag)
+        ArgumentNullException.ThrowIfNull(ok, nameof(ok));
+        ArgumentNullException.ThrowIfNull(error, nameof(error));
+        return _tag switch
         {
-            case Tag.Ok:
-                return ok(_ok!);
-            case Tag.Error:
-                return error(_error!);
-            default:
-                throw new InvalidOperationException();
-        }
+            Tag.Ok => ok(_ok!),
+            Tag.Error => error(_error!),
+            _ => throw new InvalidOperationException(),
+        };
     }
 
     public bool IsOk => _tag == Tag.Ok;
