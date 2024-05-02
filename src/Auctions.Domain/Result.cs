@@ -1,4 +1,15 @@
 namespace Wallymathieu.Auctions;
+public static class Result
+{
+    public static Result<TOk, TError> Ok<TOk, TError>(TOk ok)
+    {
+        return new Result<TOk, TError>(ok);
+    }
+    public static Result<TOk, TError> Error<TOk, TError>(TError error)
+    {
+        return new Result<TOk, TError>(error);
+    }
+}
 
 /// <summary>
 /// This is the same type of class as can be found <a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-core-fsharpresult-2.html">in F#</a> and <a href="https://github.com/mcintyre321/OneOf">in C#</a>.
@@ -25,22 +36,21 @@ public sealed class Result<TOk, TError> : IResult
         _error = error;
     }
 
-    public static Result<TOk, TError> Ok(TOk ok)
+    public Result(TOk ok): this(Tag.Ok, ok, default)
     {
-        return new Result<TOk, TError>(Tag.Ok, ok, default);
     }
-    public static Result<TOk, TError> Error(TError error)
+    public Result(TError error): this(Tag.Error, default, error)
     {
-        return new Result<TOk, TError>(Tag.Error, default, error);
     }
+
     public Result<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map)
     {
         switch (_tag)
         {
             case Tag.Ok:
-                return Result<TOkResult, TError>.Ok(map(_ok!));
+                return Result.Ok<TOkResult, TError>(map(_ok!));
             case Tag.Error:
-                return Result<TOkResult, TError>.Error(_error!);
+                return Result.Error<TOkResult, TError>(_error!);
             default:
                 throw new InvalidOperationException();
         }
@@ -51,9 +61,9 @@ public sealed class Result<TOk, TError> : IResult
         switch (_tag)
         {
             case Tag.Ok:
-                return Result<TOk, TErrorResult>.Ok(_ok!);
+                return Result.Ok<TOk, TErrorResult>(_ok!);
             case Tag.Error:
-                return Result<TOk, TErrorResult>.Error(map(_error!));
+                return Result.Error<TOk, TErrorResult>(map(_error!));
             default:
                 throw new InvalidOperationException();
         }

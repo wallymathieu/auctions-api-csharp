@@ -67,8 +67,8 @@ public abstract class Auction: IState
             throw new InvalidOperationException("User must be logged in to place a bid.");
         var bid = new Bid(userContext.UserId, model.Amount, systemClock.Now);
         return TryAddBid(systemClock.Now, bid, out var error)
-            ? Result<Bid, Errors>.Ok(bid)
-            : Result<Bid, Errors>.Error(error);
+            ? Result.Ok<Bid, Errors>(bid)
+            : Result.Error<Bid, Errors>(error);
     }
 
     public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);

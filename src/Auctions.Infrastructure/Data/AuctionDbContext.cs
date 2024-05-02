@@ -17,7 +17,7 @@ public class AuctionDbContext: DbContext
     private static PropertyBuilder<T> WithAuctionIdConversion<T>(PropertyBuilder<T> self) =>
         self.HasConversion(new ValueConverter<AuctionId, long>(v => v.Id, v => new AuctionId(v)));
     private static PropertyBuilder<T> WithUserId<T>(PropertyBuilder<T> self) =>
-        self.HasConversion(new ValueConverter<UserId, string>(v => v.Id, v => new UserId(v))).HasMaxLength(2000);
+        self.HasConversion(new ValueConverter<UserId, string>(v => v.Id!, v => new UserId(v))).HasMaxLength(2000);
     private static PropertyBuilder<CurrencyCode> HasCurrencyCodeConversion(PropertyBuilder<CurrencyCode> propertyBuilder) =>
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
 

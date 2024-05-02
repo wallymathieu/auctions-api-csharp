@@ -22,7 +22,7 @@ internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
         {
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(apiKey));
             var deserialized = JsonSerializer.Deserialize<JwtPayload>(json);
-            if (deserialized == null) return false;
+            if (deserialized == null || string.IsNullOrEmpty(deserialized.Name)) return false;
             claimsIdentity = new ClaimsPrincipal(new[]
             {
                 new ClaimsIdentity(

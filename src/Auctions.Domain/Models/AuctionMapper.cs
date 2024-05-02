@@ -1,5 +1,4 @@
 using Wallymathieu.Auctions.DomainModels;
-using Wallymathieu.Auctions.DomainModels.Bids;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Models;
@@ -26,19 +25,6 @@ public class AuctionMapper(ISystemClock systemClock)
             Winner: bidUserMapper.GetUserString(amountAndWinner?.Winner),
             HasEnded: hasEnded,
             Bids: auction.GetBids(now)?.Select(bid =>
-                MapToBidModel(auction, bid, bidUserMapper)).ToArray() ?? Array.Empty<BidModel>());
-    }
-
-    private static BidModel MapToBidModel(Auction auction, Bid bid, IBidUserMapper bidUserMapper)
-    {
-        return new BidModel(bid.Amount,
-            bidUserMapper.GetUserString(bid.User),
-            bid.At-auction.StartsAt);
-    }
-
-    public BidModel MapBidToModel(Auction auction, Bid bid)
-    {
-        var bidUserMapper = auction.BidUserMapper();
-        return MapToBidModel(auction, bid, bidUserMapper);
+                BidMapper.MapToBidModel(auction, bid, bidUserMapper)).ToArray() ?? Array.Empty<BidModel>());
     }
 }
