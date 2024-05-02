@@ -12,7 +12,7 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
 {
     private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
     private readonly IDatabaseContextSetup _databaseContextSetup;
-    TestServerContext Create()
+    (TestServer,WebApplicationFactory<Program>) Create()
     {
         var webAppFactory = new WebApplicationFactory<Program>();
         var application = webAppFactory
@@ -30,7 +30,7 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         _databaseContextSetup.Migrate(serviceScope);
-        return new TestServerContext(application.Server, webAppFactory);
+        return (application.Server, webAppFactory);
     }
 
 
@@ -38,14 +38,15 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
 
 
 
-    private readonly TestServerContext _testServerContext;
+    private readonly TestServer _testServer;
+    private readonly WebApplicationFactory<Program> _webApplicationFactory;
     private readonly TAuth _auth;
 
     public ApiFixture(IDatabaseContextSetup databaseContextSetup, TAuth auth)
     {
         _databaseContextSetup = databaseContextSetup;
         _auth = auth;
-        _testServerContext = Create();
+        (_testServer, _webApplicationFactory) = Create();
     }
 
     public void Dispose()
@@ -58,12 +59,13 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
     {
         if (disposing)
         {
-            _testServerContext.Dispose();
+            _testServer.Dispose();
+            _webApplicationFactory.Dispose();
             _databaseContextSetup.TryRemove().ConfigureAwait(false).GetAwaiter().GetResult();
         }
     }
 
-    public TestServer Server => _testServerContext.Server;
+    public TestServer Server => _testServer;
 
     public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken auth) =>
         await Server.CreateRequest("/auctions").And(r =>
@@ -90,23 +92,4 @@ public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
     private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
     public void SetTime(DateTimeOffset now) => _fakeSystemClock.Now = now;
-
-    private sealed class TestServerContext:IDisposable
-    {
-        internal TestServerContext(TestServer server, WebApplicationFactory<Program> webApplicationFactory)
-        {
-            Server = server;
-            _webApplicationFactory = webApplicationFactory;
-        }
-
-        public TestServer Server { get; }
-
-        private WebApplicationFactory<Program> _webApplicationFactory;
-
-        public void Dispose()
-        {
-            Server.Dispose();
-            _webApplicationFactory.Dispose();
-        }
-    }
 }
