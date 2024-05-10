@@ -4,5 +4,5 @@
     Currency: SEK
   },
   Bidder: #1,
-  At: 22:00:00
+  At: 1.00:00:00
 }

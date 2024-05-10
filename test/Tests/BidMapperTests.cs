@@ -9,7 +9,7 @@ public class BidMapperTests
     public async Task MapBidToModel_ShouldReturnExpectedModel()
     {
         // Arrange
-        var clock = new FakeSystemClock(new DateTime(2016, 1, 2));
+        var clock = new FakeSystemClock(StartsAt.AddHours(1.0));
         var auction = GetEnglishAuction();
         auction.TryAddBid(clock.Now, BidOf100, out _);
         var sut = new BidMapper(auction, auction.BidUserMapper());

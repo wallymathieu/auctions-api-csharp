@@ -9,7 +9,7 @@ public class AuctionMapperTests
 
     public AuctionMapperTests()
     {
-        _sut = new AuctionMapper(new FakeSystemClock(DateTimeOffset.FromUnixTimeSeconds(0)));
+        _sut = new AuctionMapper(new FakeSystemClock(StartsAt.AddHours(1)));
     }
 
     [Fact]

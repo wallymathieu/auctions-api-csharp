@@ -48,7 +48,7 @@ public static class TestData
         new(
             User: Buyer,
             Amount: Sek(100L),
-            At: new DateTime(2016, 1, 2));
+            At: new DateTime(2016, 1, 2, 0,0,0,DateTimeKind.Utc));
     public static Bid BidOf200 => BidOf100 with { Amount = Sek(200L) };
     public static readonly UserId Buyer1 = new("x2");
     public static readonly UserId Buyer2 = new("x3");
