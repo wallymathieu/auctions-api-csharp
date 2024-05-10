@@ -1,7 +1,7 @@
 using Wallymathieu.Auctions.Models;
 using Wallymathieu.Auctions.Tests.Helpers;
 
-namespace YourNamespace.Tests;
+namespace Wallymathieu.Auctions.Tests;
 
 public class BidMapperTests
 {
