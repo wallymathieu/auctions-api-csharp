@@ -1,7 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 echo "Ensure that there is an .env file"
-pushd $(dirname "${0}") > /dev/null
-cd ../
 if [ ! -f ./.env ]
 then
     echo "Copies sample env to .env"
