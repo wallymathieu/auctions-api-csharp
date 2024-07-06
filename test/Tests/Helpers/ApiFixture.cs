@@ -21,7 +21,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IApiF
         GC.SuppressFinalize(this);
     }
 
-    private void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!disposing) return;
         _testServer?.Dispose();
@@ -53,8 +53,9 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IApiF
     private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
     public void SetTime(DateTimeOffset now) => _fakeSystemClock.Now = now;
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
+        await databaseFixture.InitializeAsync();
         var application = _webApplicationFactory
             .WithWebHostBuilder(builder =>
             {
@@ -68,10 +69,12 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IApiF
                 builder.UseEnvironment("Test");
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        databaseFixture.Migrator.Migrate(serviceScope);
+        await databaseFixture.Migrator.Migrate(serviceScope);
         _testServer = application.Server;
-        return Task.CompletedTask;
     }
 
-    public async Task DisposeAsync() => await databaseFixture.DisposeAsync().ConfigureAwait(false);
+    public async Task DisposeAsync()
+    {
+        await databaseFixture.DisposeAsync().ConfigureAwait(false);
+    }
 }

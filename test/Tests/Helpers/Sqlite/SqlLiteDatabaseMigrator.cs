@@ -5,7 +5,7 @@ namespace Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
 public class SqliteDatabaseMigrator : IDatabaseMigrator
 {
-    public void Migrate(IServiceScope serviceScope)
+    public async Task Migrate(IServiceScope serviceScope)
     {
         ArgumentNullException.ThrowIfNull(serviceScope, nameof(serviceScope));
 
@@ -14,6 +14,6 @@ public class SqliteDatabaseMigrator : IDatabaseMigrator
         // context.Database.Migrate();
         // however we get the error
         // SQLite Error 1: 'AUTOINCREMENT is only allowed on an INTEGER PRIMARY KEY'.
-        context.Database.EnsureCreated();
+        await context.Database.EnsureCreatedAsync();
     }
 }
