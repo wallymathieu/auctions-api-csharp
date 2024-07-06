@@ -7,17 +7,19 @@ public static class JsonHelper
 {
     public static int GetId(JToken parsed)
     {
-        Debug.Assert(parsed != null, nameof(parsed) + " != null");
+        ArgumentNullException.ThrowIfNull(parsed, nameof(parsed));
         var id = parsed["id"];
         Assert.NotNull(id);
         return id.ToObject<int>();
     }
+
     public static JToken WithId(JToken parsed, int id)
     {
-        Debug.Assert(parsed != null, nameof(parsed) + " != null");
+        ArgumentNullException.ThrowIfNull(parsed, nameof(parsed));
         parsed["id"] = id;
         return parsed;
     }
+
     public static JToken WithBid(JToken token, string amount, string bidder, string at)
     {
         ArgumentNullException.ThrowIfNull(token, nameof(token));
