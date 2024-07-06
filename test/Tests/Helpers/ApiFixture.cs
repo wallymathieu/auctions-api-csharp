@@ -8,7 +8,7 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IApiFixture, IDisposable
+public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisposable, IAsyncLifetime
 {
     private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
 
