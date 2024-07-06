@@ -2,10 +2,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-public interface IDatabaseContextSetup
+public interface IDatabaseFixture: IAsyncLifetime
 {
-    Task Init(Type testClass, string testName);
+    IDatabaseConfigurator Configurator { get; }
+    IDatabaseMigrator Migrator { get; }
+}
+
+public interface IDatabaseConfigurator
+{
     void Use(IServiceCollection services);
+}
+
+public interface IDatabaseMigrator
+{
     void Migrate(IServiceScope serviceScope);
-    Task TryRemove();
 }

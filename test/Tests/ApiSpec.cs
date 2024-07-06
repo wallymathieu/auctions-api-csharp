@@ -2,25 +2,27 @@ using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Wallymathieu.Auctions.Tests.Helpers;
+using Wallymathieu.Auctions.Tests.Helpers.MsSql;
+using Wallymathieu.Auctions.Tests.Helpers.SqlLite;
 
 namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
 [Collection("Sqlite")]
-public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqlLiteDatabaseContextSetup>{}
+public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqlLiteDatabaseFixture>{}
 [Collection("Sqlite")]
-public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqlLiteDatabaseContextSetup>{}
+public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqlLiteDatabaseFixture>{}
 [Collection("MsSql")]
-public class ApiSyncSpecJwtTokenMsSql:ApiSyncSpec<JwtApiAuth, MsSqlDatabaseContextSetup>{}
+public class ApiSyncSpecJwtTokenMsSql:ApiSyncSpec<JwtApiAuth, MsSqlDatabaseFixture>{}
 [Collection("MsSql")]
-public class ApiSyncSpecMsClientPrincipalMsSql:ApiSyncSpec<MsClientPrincipalApiAuth, MsSqlDatabaseContextSetup>{}
+public class ApiSyncSpecMsClientPrincipalMsSql:ApiSyncSpec<MsClientPrincipalApiAuth, MsSqlDatabaseFixture>{}
 
 public abstract class BaseApiSpec
 {
-    public abstract Task<IApiFixture> CreateApiFixture(string testName);
+    public abstract Task<IApiFixture> CreateApiFixture();
     [Fact]
     public async Task Create_auction_1()
     {
-        using var application = await CreateApiFixture(nameof(Create_auction_1));
+        await using var application = await CreateApiFixture();
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var auction1 = await application.GetAuction(1, AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
@@ -36,7 +38,7 @@ public abstract class BaseApiSpec
     [Fact]
     public async Task Create_auction_2()
     {
-        using var application = await CreateApiFixture(nameof(Create_auction_2));
+        await using var application = await CreateApiFixture();
         var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
         var auction1 = await application.GetAuction(1, AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
@@ -50,7 +52,7 @@ public abstract class BaseApiSpec
     [Fact]
     public async Task Cannot_find_unknown_auction()
     {
-        using var application = await CreateApiFixture(nameof(Cannot_find_unknown_auction));
+        await using var application = await CreateApiFixture();
         var auctionResponse = await application.GetAuction(99, AuthToken.Seller1);
         Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
     }
@@ -76,7 +78,7 @@ public abstract class BaseApiSpec
     ]
     public async Task Fail_to_create_auction(string sample, int index)
     {
-        using var application = await CreateApiFixture(nameof(Fail_to_create_auction)+"_"+index);
+        await using var application = await CreateApiFixture();
         var response = await application.PostAuction(sample, AuthToken.Seller1);
         Assert.Multiple(() =>
         {
@@ -86,7 +88,7 @@ public abstract class BaseApiSpec
     [Fact]
     public async Task Place_bid_as_buyer_on_auction_1()
     {
-        using var application = await CreateApiFixture(nameof(Place_bid_as_buyer_on_auction_1));
+        await using var application = await CreateApiFixture();
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         application.SetTime(StartsAt.AddHours(2));
         var bidResponse = await application.PostBidToAuction(1, """{"amount":"VAC11"}""", AuthToken.Buyer1);
@@ -108,21 +110,23 @@ public abstract class BaseApiSpec
         });
     }
 }
-public abstract class ApiSyncSpec<TAuth, TDatabaseContextSetup>: BaseApiSpec
+public abstract class ApiSyncSpec<TAuth, TDatabaseContextSetup>(): BaseApiSpec
     where TAuth:IApiAuth, new()
-    where TDatabaseContextSetup: IDatabaseContextSetup, new()
+    where TDatabaseContextSetup: IDatabaseFixture, new()
 {
-    public override async Task<IApiFixture> CreateApiFixture(string testName)
+    public override async Task<IApiFixture> CreateApiFixture()
     {
         var dbContext = new TDatabaseContextSetup();
-        await dbContext.Init(GetType(), testName);
-        return new ApiFixture<TAuth>(dbContext, new TAuth());
+        await dbContext.InitializeAsync();
+        var fixture = new ApiFixture(dbContext, new TAuth());
+        await fixture.InitializeAsync();
+        return fixture;
     }
 
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()
     {
-        using var application = await CreateApiFixture(nameof(Cannot_place_bid_on_unknown_auction));
+        await using var application = await CreateApiFixture();
         var bidResponse = await application.PostBidToAuction(1, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
     }

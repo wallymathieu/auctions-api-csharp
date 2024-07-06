@@ -8,88 +8,66 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-public class ApiFixture<TAuth>:IApiFixture where TAuth:IApiAuth
+public sealed class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IApiFixture, IDisposable
 {
     private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
-    private readonly IDatabaseContextSetup _databaseContextSetup;
-    (TestServer,WebApplicationFactory<Program>) Create()
+
+    private TestServer? _testServer;
+    private readonly WebApplicationFactory<Program> _webApplicationFactory = new();
+
+    public void Dispose() => Dispose(true);
+
+    private void Dispose(bool disposing)
     {
-        var webAppFactory = new WebApplicationFactory<Program>();
-        var application = webAppFactory
-            .WithWebHostBuilder(builder =>
-            {
-                _auth.Configure(builder);
-                builder.ConfigureServices(services =>
-                {
-                    _databaseContextSetup.Use(services);
-                    services.Remove(services.First(s => s.ServiceType == typeof(ISystemClock)));
-                    services.AddSingleton<ISystemClock>(_fakeSystemClock);
-                    ConfigureServices(services);
-                });
-                builder.UseEnvironment("Test");
-            });
-        using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        _databaseContextSetup.Migrate(serviceScope);
-        return (application.Server, webAppFactory);
+        if (!disposing) return;
+        _testServer?.Dispose();
+        _webApplicationFactory.Dispose();
     }
 
-
-    protected virtual void ConfigureServices(IServiceCollection services) {}
-
-
-
-    private readonly TestServer _testServer;
-    private readonly WebApplicationFactory<Program> _webApplicationFactory;
-    private readonly TAuth _auth;
-
-    public ApiFixture(IDatabaseContextSetup databaseContextSetup, TAuth auth)
-    {
-        _databaseContextSetup = databaseContextSetup;
-        _auth = auth;
-        (_testServer, _webApplicationFactory) = Create();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _testServer.Dispose();
-            _webApplicationFactory.Dispose();
-            _databaseContextSetup.TryRemove().ConfigureAwait(false).GetAwaiter().GetResult();
-        }
-    }
-
-    public TestServer Server => _testServer;
-
-    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken auth) =>
-        await Server.CreateRequest("/auctions").And(r =>
+    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken) =>
+        await _testServer!.CreateRequest("/auctions").And(r =>
         {
             r.Content = Json(auctionRequest);
             AcceptJson(r);
-            _auth.TryAddAuth(r, auth);
+            auth.TryAddAuth(r, authToken);
         }).PostAsync();
 
-    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken auth) =>
-        await Server.CreateRequest($"/auctions/{id}/bids").And(r =>
+    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken) =>
+        await _testServer!.CreateRequest($"/auctions/{id}/bids").And(r =>
         {
             r.Content = Json(bidRequest);
             AcceptJson(r);
-            _auth.TryAddAuth(r, auth);
+            auth.TryAddAuth(r, authToken);
         }).PostAsync();
     private static StringContent Json(string bidRequest) => new(bidRequest, Encoding.UTF8, "application/json");
-    public async Task<HttpResponseMessage> GetAuction(long id, AuthToken auth)=>
-        await Server.CreateRequest($"/auctions/{id}").And(r =>
+    public async Task<HttpResponseMessage> GetAuction(long id, AuthToken authToken)=>
+        await _testServer!.CreateRequest($"/auctions/{id}").And(r =>
         {
             AcceptJson(r);
-            _auth.TryAddAuth(r, auth);
+            auth.TryAddAuth(r, authToken);
         }).GetAsync();
     private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
     public void SetTime(DateTimeOffset now) => _fakeSystemClock.Now = now;
+    public Task InitializeAsync()
+    {
+        var application = _webApplicationFactory
+            .WithWebHostBuilder(builder =>
+            {
+                auth.Configure(builder);
+                builder.ConfigureServices(services =>
+                {
+                    databaseFixture.Configurator.Use(services);
+                    services.Remove(services.First(s => s.ServiceType == typeof(ISystemClock)));
+                    services.AddSingleton<ISystemClock>(_fakeSystemClock);
+                });
+                builder.UseEnvironment("Test");
+            });
+        using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        databaseFixture.Migrator.Migrate(serviceScope);
+        _testServer = application.Server;
+        return Task.CompletedTask;
+    }
+
+    public async Task DisposeAsync() => await databaseFixture.DisposeAsync().ConfigureAwait(false);
 }
