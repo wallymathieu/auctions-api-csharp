@@ -3,14 +3,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Wallymathieu.Auctions.Tests.Helpers;
 using Wallymathieu.Auctions.Tests.Helpers.MsSql;
-using Wallymathieu.Auctions.Tests.Helpers.SqlLite;
+using Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
 namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
 [Collection("Sqlite")]
-public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqlLiteDatabaseFixture>{}
+public class ApiSyncSpecJwtTokenSqlLite:ApiSyncSpec<JwtApiAuth, SqliteDatabaseFixture>{}
 [Collection("Sqlite")]
-public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqlLiteDatabaseFixture>{}
+public class ApiSyncSpecMsClientPrincipalSqlLite:ApiSyncSpec<MsClientPrincipalApiAuth, SqliteDatabaseFixture>{}
 [Collection("MsSql")]
 public class ApiSyncSpecJwtTokenMsSql:ApiSyncSpec<JwtApiAuth, MsSqlDatabaseFixture>{}
 [Collection("MsSql")]

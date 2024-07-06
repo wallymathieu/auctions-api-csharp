@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
-namespace Wallymathieu.Auctions.Tests.Helpers.SqlLite;
+namespace Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
-public class SqlLiteDatabaseMigrator : IDatabaseMigrator
+public class SqliteDatabaseMigrator : IDatabaseMigrator
 {
     public void Migrate(IServiceScope serviceScope)
     {

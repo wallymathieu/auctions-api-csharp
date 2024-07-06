@@ -8,14 +8,18 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-public sealed class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IApiFixture, IDisposable
+public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IApiFixture, IDisposable
 {
     private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
 
     private TestServer? _testServer;
     private readonly WebApplicationFactory<Program> _webApplicationFactory = new();
 
-    public void Dispose() => Dispose(true);
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
     private void Dispose(bool disposing)
     {

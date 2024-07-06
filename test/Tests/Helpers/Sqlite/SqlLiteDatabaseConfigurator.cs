@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
-namespace Wallymathieu.Auctions.Tests.Helpers.SqlLite;
+namespace Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
-public class SqlLiteDatabaseConfigurator(string connectionString) : IDatabaseConfigurator
+public class SqliteDatabaseConfigurator(string connectionString) : IDatabaseConfigurator
 {
     public void Use(IServiceCollection services)
     {
