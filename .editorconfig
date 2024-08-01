@@ -19,7 +19,8 @@ dotnet_diagnostic.CA1848.severity = none
 dotnet_diagnostic.CA2007.severity = none
 # CA1812: Avoid uninstantiated internal classes
 dotnet_diagnostic.CA1812.severity = none
-
+# MA0004: Use the 'ConfigureAwait(false)' method
+dotnet_diagnostic.MA0004.severity = none
 
 [*.json]
 indent_style = space
