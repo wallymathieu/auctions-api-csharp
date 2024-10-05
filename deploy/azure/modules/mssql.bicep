@@ -10,6 +10,7 @@ param appname string
 param environmentName string
 var sqlServerName = 'sqldb-${appname}-${environmentName}'
 var databaseName = '${sqlServerName}/db'
+
 resource mySqlServer 'Microsoft.Sql/servers@2022-08-01-preview' = {
   name: sqlServerName
   location: location
@@ -18,27 +19,30 @@ resource mySqlServer 'Microsoft.Sql/servers@2022-08-01-preview' = {
     administratorLoginPassword: sqlAdminPassword
     publicNetworkAccess: 'Enabled'
   }
-}
 
-resource myDatabase 'Microsoft.Sql/servers/databases@2022-08-01-preview' = {
-  name: databaseName
-  location: location
-  sku: {
-    name: 'Basic'
-    tier: 'Basic'
-    capacity: 5
+  resource database 'databases' = {
+    name: databaseName
+    location: location
+    sku: {
+      name: 'Basic'
+      tier: 'Basic'
+      capacity: 5
+    }
+    tags: {
+      displayName: databaseName
+    }
   }
-  tags: {
-    displayName: databaseName
-  }
-}
-//var firewallRuleName = '${sqlServerName}/AllowAllWindowsAzureIps'
-resource firewallRule 'Microsoft.Sql/servers/firewallRules@2022-08-01-preview' = {
-  parent:mySqlServer
-  name:'AllowAllWindowsAzureIps'
-  properties: {
-    startIpAddress: '0.0.0.0'
-    endIpAddress: '0.0.0.0'
+
+
+  resource firewall 'firewallRules' = {
+    name: 'Azure Services'
+    properties: {
+      // Allow all clients
+      // Note: range [0.0.0.0-0.0.0.0] means "allow all Azure-hosted clients only".
+      // This is not sufficient, because we also want to allow direct access from developer machine, for debugging purposes.
+      startIpAddress: '0.0.0.1'
+      endIpAddress: '255.255.255.254'
+    }
   }
 }
 

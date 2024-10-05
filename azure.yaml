@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: auctions-csharp-sql
+workflows:
+  up:
+    steps:
+      - azd: provision
+      - azd: deploy --all
+services:
+  api:
+    project: ./src/Auctions.WebApi
+    language: csharp
+    host: appservice
