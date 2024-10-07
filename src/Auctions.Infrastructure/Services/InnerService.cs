@@ -5,4 +5,4 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 /// </summary>
 /// <param name="Service">instance of service</param>
 /// <typeparam name="T">Service type</typeparam>
-internal record InnerService<T>(T Service);
+internal sealed record InnerService<T>(T Service);

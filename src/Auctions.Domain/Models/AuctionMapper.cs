@@ -1,5 +1,4 @@
 using Wallymathieu.Auctions.DomainModels;
-using Wallymathieu.Auctions.DomainModels.Bids;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Models;
@@ -11,10 +10,12 @@ public class AuctionMapper(ISystemClock systemClock)
 {
     public AuctionModel MapAuctionToModel(Auction auction)
     {
+        ArgumentNullException.ThrowIfNull(auction, nameof(auction));
         var now = systemClock.Now;
         var amountAndWinner = auction.TryGetAmountAndWinner(now);
         var hasEnded = auction.HasEnded(now);
         var bidUserMapper = auction.BidUserMapper();
+        var bidMapper = new BidMapper(auction, bidUserMapper);
         return new AuctionModel(
             Id: auction.AuctionId.Id,
             StartsAt :auction.StartsAt,
@@ -26,19 +27,6 @@ public class AuctionMapper(ISystemClock systemClock)
             Winner: bidUserMapper.GetUserString(amountAndWinner?.Winner),
             HasEnded: hasEnded,
             Bids: auction.GetBids(now)?.Select(bid =>
-                MapToBidModel(auction, bid, bidUserMapper)).ToArray() ?? Array.Empty<BidModel>());
-    }
-
-    private static BidModel MapToBidModel(Auction auction, Bid bid, IBidUserMapper bidUserMapper)
-    {
-        return new BidModel(bid.Amount,
-            bidUserMapper.GetUserString(bid.User),
-            bid.At-auction.StartsAt);
-    }
-
-    public BidModel MapBidToModel(Auction auction, Bid bid)
-    {
-        var bidUserMapper = auction.BidUserMapper();
-        return MapToBidModel(auction, bid, bidUserMapper);
+                bidMapper.MapToBidModel(bid)).ToArray() ?? Array.Empty<BidModel>());
     }
 }

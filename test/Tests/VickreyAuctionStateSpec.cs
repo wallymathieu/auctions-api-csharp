@@ -4,7 +4,7 @@ namespace Wallymathieu.Auctions.Tests;
 
 public class VickreyAuctionStateSpec
 {
-    private static SingleSealedBidAuction GetState() => WithBids(GetVickreyAuction());
+    private static SingleSealedBidAuction GetState() => WithBids(VickreyAuction);
 
     [Fact]
     public void bid_after_auction_has_ended()
@@ -22,7 +22,7 @@ public class VickreyAuctionStateSpec
     [Fact]
     public void vickrey_auction_Cant_place_bid_two_bids()
     {
-        var auction =GetVickreyAuction();
+        var auction =VickreyAuction;
         var at = StartsAt.AddHours(1);
         Assert.True(auction.TryAddBid( at, BidOf100 with { At = at }, out _));
         at = StartsAt.AddHours(2);

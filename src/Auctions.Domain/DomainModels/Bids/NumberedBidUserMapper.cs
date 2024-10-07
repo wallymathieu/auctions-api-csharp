@@ -2,11 +2,11 @@ namespace Wallymathieu.Auctions.DomainModels.Bids;
 
 public class NumberedBidUserMapper:IBidUserMapper
 {
-    private readonly IDictionary<UserId,string> _userIdToStringMap;
+    private readonly Dictionary<UserId,string> _userIdToStringMap;
 
     public NumberedBidUserMapper(ICollection<BidEntity> bids)
     {
-        _userIdToStringMap = new Dictionary<UserId, string>();
+        _userIdToStringMap = [];
         var orderedBids = bids.OrderBy(b => b.At).ToArray();
         for (int i = 0; i < orderedBids.Length; i++)
         {

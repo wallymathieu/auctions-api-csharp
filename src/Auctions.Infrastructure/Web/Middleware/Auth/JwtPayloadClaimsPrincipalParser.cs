@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
-internal class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
+internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
 {
     private readonly ILogger<JwtPayloadClaimsPrincipalParser> _logger;
 
@@ -23,15 +23,14 @@ internal class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
         {
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(apiKey));
             var deserialized = JsonSerializer.Deserialize<JwtPayload>(json);
-            if (deserialized == null) return false;
-            claimsIdentity = new ClaimsPrincipal(new[]
-            {
+            if (deserialized == null || string.IsNullOrEmpty(deserialized.Name)) return false;
+            claimsIdentity = new ClaimsPrincipal(
+            [
                 new ClaimsIdentity(
-                    new Claim[]
-                    {
+                    [
                         new(ClaimTypes.Name, deserialized.Name)
-                    }, "proxy", ClaimTypes.Name, ClaimTypes.Role)
-            });
+                    ], "proxy", ClaimTypes.Name, ClaimTypes.Role)
+            ]);
             return true;
         }
         catch (Exception e)
@@ -41,7 +40,7 @@ internal class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
         }
     }
 
-    internal class JwtPayload
+    internal sealed class JwtPayload
     {
         [JsonPropertyName("sub")] public string? Sub { get; set; }
 

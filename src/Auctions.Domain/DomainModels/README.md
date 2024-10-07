@@ -3,15 +3,11 @@
 Note that in the domain models folder we have the data and business logic of an application.
 
 The auction domain is implementing two different auction models. Typically this is not how it is done
-in business code. You would instead choose one auction type (the most common one being timed ascending auction or also
-sometimes also referred to as English auction).
+in business code. You would instead choose one auction type (the most common one being timed ascending auction, sometimes also referred to as English auction).
 
 For many auction implementations (and in some IRL auctions) you have hidden sellers and bidders.
 
-The intent of the domain core logic is to be as free as possible from any external dependencies (to make the code easier to test).
-This is reminiscent of the concept [pure functions](https://en.wikipedia.org/wiki/Pure_function) but instead
-called [clean](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) as you have objects that can
-in their invocation can be seen as pure if consider the pattern:
+The intent of the domain core logic is to be as free as possible from any external dependencies (to make the code easier to test). This is reminiscent of the concept [pure functions](https://en.wikipedia.org/wiki/Pure_function) but instead called [clean](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) as you have objects that can in their invocation can be seen as pure if consider the pattern:
 
 ```csharp
 public CleanClass

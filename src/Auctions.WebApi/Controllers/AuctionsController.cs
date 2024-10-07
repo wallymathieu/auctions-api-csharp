@@ -64,6 +64,8 @@ public class AuctionsController(
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(model, nameof(model));
+
         var id = new AuctionId(auctionId);
         var cmd =  new CreateBidCommand(model.Amount, id);
         var result = await createBidCommandHandler.Handle(cmd, cancellationToken);
