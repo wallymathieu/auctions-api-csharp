@@ -32,13 +32,15 @@ public class TimedAscendingAuction : Auction, IState
 
     public override bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
     {
-        switch (GetState(time))
+        ArgumentNullException.ThrowIfNull(bid,nameof(bid));
+        var state = GetState(time);
+        switch (state)
         {
             case State.OnGoing:
             {
                 errors = bid.Validate(this);
 
-                if (Bids.Any())
+                if (Bids.Count != 0)
                 {
                     var maxBid = Bids.Max(b => b.Amount)!;
                     if (bid.Amount <= maxBid)
@@ -70,7 +72,7 @@ public class TimedAscendingAuction : Auction, IState
                 return false;
             }
             default:
-                throw new Exception();
+                throw new InvalidDataException(state.ToString());
         }
     }
 

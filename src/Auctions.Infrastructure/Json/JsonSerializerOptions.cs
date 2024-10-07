@@ -7,6 +7,7 @@ public static class JsonSerializerOptionsModule
 {
     public static JsonSerializerOptions AddAuctionConverters(this JsonSerializerOptions options)
     {
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
         options.Converters.Add(new JsonStringEnumConverter());
         options.Converters.Add(new DateTimeOffsetConverter());
         options.Converters.Add(new AmountConverter());

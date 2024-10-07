@@ -10,7 +10,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 ///     See https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities
 ///     and https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
 /// </summary>
-internal class ClaimsPrincipalParser : IClaimsPrincipalParser
+internal sealed class ClaimsPrincipalParser : IClaimsPrincipalParser
 {
     private readonly ILogger<ClaimsPrincipalParser> _logger;
 
@@ -42,7 +42,7 @@ internal class ClaimsPrincipalParser : IClaimsPrincipalParser
         }
     }
 
-    private class ClientPrincipalClaim
+    private sealed class ClientPrincipalClaim
     {
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
         [JsonPropertyName("typ")] public string? Type { get; set; }
@@ -51,7 +51,7 @@ internal class ClaimsPrincipalParser : IClaimsPrincipalParser
         [JsonPropertyName("val")] public string? Value { get; set; }
     }
 
-    private class ClientPrincipal
+    private sealed class ClientPrincipal
     {
         [JsonPropertyName("auth_typ")] public string? IdentityProvider { get; set; }
 

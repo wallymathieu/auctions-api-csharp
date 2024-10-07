@@ -6,7 +6,7 @@ namespace Wallymathieu.Auctions.DomainModels;
 public abstract partial record User(UserId Id)
 {
     [Serializable]
-    public record BuyerOrSeller(UserId Id, string? Name) : User(Id)
+    private record BuyerOrSeller(UserId Id, string? Name) : User(Id)
     {
         public override string ToString()
         {
@@ -16,7 +16,7 @@ public abstract partial record User(UserId Id)
 
 
     [Serializable]
-    public record Support(UserId Id) : User(Id)
+    private record Support(UserId Id) : User(Id)
     {
         public override string ToString() => $"Support|{Id}";
     }

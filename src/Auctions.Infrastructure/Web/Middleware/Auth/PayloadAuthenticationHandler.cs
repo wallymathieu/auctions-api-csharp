@@ -8,7 +8,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 /// <summary>
 ///     See also https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
 /// </summary>
-internal class PayloadAuthenticationHandler : AuthenticationHandler<PayloadAuthenticationOptions>
+internal sealed class PayloadAuthenticationHandler : AuthenticationHandler<PayloadAuthenticationOptions>
 {
     private readonly ClaimsPrincipalParser _claimsPrincipalParser;
     private readonly JwtPayloadClaimsPrincipalParser _jwtPayloadClaimsPrincipalParser;

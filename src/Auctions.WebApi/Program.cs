@@ -36,7 +36,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     //Set the comments path for the swagger json and ui.
-    var xmlPath = webAssembly.Location.Replace(".dll", ".xml").Replace(".exe", ".xml");
+    var xmlPath = webAssembly.Location
+        .Replace(".dll", ".xml", StringComparison.OrdinalIgnoreCase)
+        .Replace(".exe", ".xml", StringComparison.OrdinalIgnoreCase);
     if (File.Exists(xmlPath))
         options.IncludeXmlComments(xmlPath);
     var opts = new JsonSerializerOptions().AddAuctionConverters();

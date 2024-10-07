@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Wallymathieu.Auctions.DomainModels;
@@ -19,9 +20,9 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
         {
             var currencyString = match.Groups["currency"].Value;
             var v = match.Groups["value"].Value;
-            if (global::Wallymathieu.Auctions.DomainModels.Currency.TryParse(currencyString, out var currency) && currency != null)
+            if (DomainModels.Currency.TryParse(currencyString, out var currency) && currency != null)
             {
-                value = new Amount(long.Parse(v), currency);
+                value = new Amount(long.Parse(v, CultureInfo.InvariantCulture), currency);
                 return true;
             }
         }
@@ -30,21 +31,32 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
         return false;
     }
 
-    public static Amount operator +(Amount a1, Amount a2)
+    public static Amount operator +(Amount a1, Amount a2) => Add(a1, a2);
+
+    public static Amount Add(Amount a1, Amount a2)
     {
-        AssertSameCurrency(a1,a2);
+        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
+        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+
+        AssertSameCurrency(a1, a2);
 
         return a1 with { Value = a1.Value + a2.Value };
     }
 
-    public static Amount operator -(Amount a1, Amount a2)
-    {
-        AssertSameCurrency(a1, a2);
+    public static Amount operator -(Amount a1, Amount a2) => Subtract(a1, a2);
 
+    public static Amount Subtract(Amount a1, Amount a2)
+    {
+        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
+        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+        AssertSameCurrency(a1, a2);
         return a1 with { Value = a1.Value - a2.Value };
     }
+
     public static bool operator <=(Amount a1, Amount a2)
     {
+        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
+        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
         AssertSameCurrency(a1, a2);
         return a1.Value<=a2.Value;
     }
@@ -55,18 +67,22 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
         var currency2 = a2.Currency;
         if (!currency.Equals(currency2))
         {
-            throw new Exception("not defined for two different currencies");
+            throw new ArgumentException("not defined for two different currencies");
         }
     }
 
     public static bool operator >=(Amount a1, Amount a2)
     {
+        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
+        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
         AssertSameCurrency(a1, a2);
 
         return a1.Value >= a2.Value;
     }
     public static bool operator >(Amount a1, Amount a2)
     {
+        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
+        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
         AssertSameCurrency(a1, a2);
 
         return a1.Value > a2.Value;
@@ -74,6 +90,8 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
 
     public static bool operator <(Amount a1, Amount a2)
     {
+        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
+        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
         AssertSameCurrency(a1, a2);
 
         return a1.Value < a2.Value;
@@ -93,7 +111,7 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
             return amount!;
         }
 
-        throw new ArgumentException();
+        throw new ArgumentException("Could not parse value");
     }
 
     [GeneratedRegex("(?<currency>[A-Z]+)(?<value>[0-9]+)")]

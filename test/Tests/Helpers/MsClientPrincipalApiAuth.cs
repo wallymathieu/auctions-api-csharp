@@ -40,6 +40,8 @@ public class MsClientPrincipalApiAuth: IApiAuth
 
     public bool TryAddAuth(HttpRequestMessage r, AuthToken auth)
     {
+        ArgumentNullException.ThrowIfNull(r);
+
         switch(auth){
             case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true;
             case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true;
@@ -49,6 +51,8 @@ public class MsClientPrincipalApiAuth: IApiAuth
 
     public void Configure(IWebHostBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+
         builder.UseSetting("PrincipalHeader", XMsClientPrincipal);
     }
 }

@@ -1,9 +1,20 @@
 namespace Wallymathieu.Auctions;
+public static class Result
+{
+    public static Result<TOk, TError> Ok<TOk, TError>(TOk ok)
+    {
+        return new Result<TOk, TError>(ok);
+    }
+    public static Result<TOk, TError> Error<TOk, TError>(TError error)
+    {
+        return new Result<TOk, TError>(error);
+    }
+}
 
 /// <summary>
 /// This is the same type of class as can be found <a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-core-fsharpresult-2.html">in F#</a> and <a href="https://github.com/mcintyre321/OneOf">in C#</a>.
-/// The implementation of this class matches the F# implementation if you were to decompile it into C#.
-/// Main reason why we want a reimplementation is to make it friendly to the C# code in this application.
+/// The implementation of this class matches the F# implementation if you were to de-compile it into C#.
+/// Main reason why we want a re-implementation is to make it friendly to the C# code in this application.
 /// </summary>
 /// <typeparam name="TOk"></typeparam>
 /// <typeparam name="TError"></typeparam>
@@ -25,42 +36,39 @@ public sealed class Result<TOk, TError> : IResult
         _error = error;
     }
 
-    public static Result<TOk, TError> Ok(TOk ok)
+    public Result(TOk ok): this(Tag.Ok, ok, default)
     {
-        return new Result<TOk, TError>(Tag.Ok, ok, default);
     }
-    public static Result<TOk, TError> Error(TError error)
+    public Result(TError error): this(Tag.Error, default, error)
     {
-        return new Result<TOk, TError>(Tag.Error, default, error);
     }
+
     public Result<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map)
     {
-        switch (_tag)
+        ArgumentNullException.ThrowIfNull(map, nameof(map));
+        return _tag switch
         {
-            case Tag.Ok:
-                return Result<TOkResult, TError>.Ok(map(_ok!));
-            case Tag.Error:
-                return Result<TOkResult, TError>.Error(_error!);
-            default:
-                throw new InvalidOperationException();
-        }
+            Tag.Ok => Result.Ok<TOkResult, TError>(map(_ok!)),
+            Tag.Error => Result.Error<TOkResult, TError>(_error!),
+            _ => throw new InvalidOperationException(),
+        };
     }
 
     public Result<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map)
     {
-        switch (_tag)
+        ArgumentNullException.ThrowIfNull(map, nameof(map));
+        return _tag switch
         {
-            case Tag.Ok:
-                return Result<TOk, TErrorResult>.Ok(_ok!);
-            case Tag.Error:
-                return Result<TOk, TErrorResult>.Error(map(_error!));
-            default:
-                throw new InvalidOperationException();
-        }
+            Tag.Ok => Result.Ok<TOk, TErrorResult>(_ok!),
+            Tag.Error => Result.Error<TOk, TErrorResult>(map(_error!)),
+            _ => throw new InvalidOperationException(),
+        };
     }
 
     public void Match(Action<TOk> ok, Action<TError> error)
     {
+        ArgumentNullException.ThrowIfNull(ok, nameof(ok));
+        ArgumentNullException.ThrowIfNull(error, nameof(error));
         switch (_tag)
         {
             case Tag.Ok:
@@ -73,15 +81,14 @@ public sealed class Result<TOk, TError> : IResult
     }
     public TResult Match<TResult>(Func<TOk,TResult> ok, Func<TError,TResult> error)
     {
-        switch (_tag)
+        ArgumentNullException.ThrowIfNull(ok, nameof(ok));
+        ArgumentNullException.ThrowIfNull(error, nameof(error));
+        return _tag switch
         {
-            case Tag.Ok:
-                return ok(_ok!);
-            case Tag.Error:
-                return error(_error!);
-            default:
-                throw new InvalidOperationException();
-        }
+            Tag.Ok => ok(_ok!),
+            Tag.Error => error(_error!),
+            _ => throw new InvalidOperationException(),
+        };
     }
 
     public bool IsOk => _tag == Tag.Ok;
