@@ -17,7 +17,7 @@ internal class CreateBidCommandHandler(
     public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
     {
         var auction = await auctionDbContext.GetAuction(model.AuctionId, cancellationToken);
-        if (auction is null) return Result<Bid, Errors>.Error(Errors.UnknownAuction);
+        if (auction is null) return Result.Error<Bid, Errors>(Errors.UnknownAuction);
         var result = auction.TryAddBid(model, userContext, systemClock);
         if (result.IsOk)
         {

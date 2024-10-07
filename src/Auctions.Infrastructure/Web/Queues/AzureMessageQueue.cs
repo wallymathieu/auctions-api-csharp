@@ -5,7 +5,7 @@ using Wallymathieu.Auctions.Infrastructure.Json;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web.Queues;
 
-internal class AzureMessageQueue : IMessageQueue
+internal sealed class AzureMessageQueue : IMessageQueue
 {
     private readonly QueueServiceClient? _queueServiceClient;
     private readonly JsonSerializerOptions _serializerOptions;

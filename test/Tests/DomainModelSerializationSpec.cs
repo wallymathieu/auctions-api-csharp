@@ -20,6 +20,6 @@ public class DomainModelSerializationSpec
     public static IEnumerable<object[]> Auctions => new List<object[]>()
     {
         new object[] { WithBids(GetEnglishAuction()) },
-        new object[] { WithBids(GetVickreyAuction()) }
+        new object[] { WithBids(VickreyAuction) }
     };
 }

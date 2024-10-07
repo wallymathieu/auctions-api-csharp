@@ -23,11 +23,10 @@ public static class DataExtensions
 
     public static IServiceCollection AddAuctionDbContextSqlServer(this IServiceCollection services, string? connection)
     {
-        return services
-            .AddDbContext<AuctionDbContext>(e =>
+        return services.AddDbContext<AuctionDbContext>(e =>
                 e.UseSqlServer(connection,
-                opt => opt.MigrationsAssembly(Migrations.AssemblyName)))
-            .AddScoped<IAuctionDbContext>(c=>c.GetRequiredService<AuctionDbContext>());
+                    opt => opt.MigrationsAssembly(MigrationAssembly.Name)))
+            .AddScoped<IAuctionDbContext>(c=>c.GetRequiredService<AuctionDbContext>());;
     }
 
 }

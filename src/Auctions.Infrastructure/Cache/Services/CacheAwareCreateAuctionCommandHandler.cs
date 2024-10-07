@@ -3,7 +3,7 @@ using Wallymathieu.Auctions.Application.Services;
 using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Cache.Services;
-internal class CacheAwareCreateAuctionCommandHandler(
+internal sealed class CacheAwareCreateAuctionCommandHandler(
     ICreateAuctionCommandHandler createAuctionCommandHandler,
     IDistributedCache cache)
     : ICreateAuctionCommandHandler
