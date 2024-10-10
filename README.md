@@ -1,6 +1,4 @@
-# auctions-api-simple
-
-Simple Auction API
+# Auction API written in C\#
 
 There are currently these main implementations:
 
