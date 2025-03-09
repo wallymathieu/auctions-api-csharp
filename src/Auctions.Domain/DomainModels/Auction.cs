@@ -32,36 +32,49 @@ public abstract class Auction: IState
 
     public bool OpenBidders { get; set; }
 
+    /// <summary>
+    /// Create either a SingleSealedBidAuction or a TimedAscendingAuction based on the command.
+    /// </summary>
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
         ArgumentNullException.ThrowIfNull(cmd, nameof(cmd));
         ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));
         if (userContext.UserId == null)
             throw new InvalidOperationException("User must be logged in to create an auction.");
-        return cmd.SingleSealedBidOptions!=null
-            ? new SingleSealedBidAuction
-                {
-                    Currency = cmd.Currency,
-                    Expiry = cmd.EndsAt,
-                    StartsAt = cmd.StartsAt,
-                    Title = cmd.Title,
-                    User = userContext.UserId,
-                    Options = cmd.SingleSealedBidOptions.Value
-                }
-            : new TimedAscendingAuction
-                {
-                    Currency = cmd.Currency,
-                    Expiry = cmd.EndsAt,
-                    StartsAt = cmd.StartsAt,
-                    Title = cmd.Title,
-                    User = userContext.UserId,
-                    Options =
+        return cmd.SingleSealedBidOptions != null
+            ? CreateSingleSealedBidAuction(cmd, userContext)
+            : CreateTimedAscendingAuction(cmd, userContext);
+
+        static SingleSealedBidAuction CreateSingleSealedBidAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        {
+            return new SingleSealedBidAuction
+            {
+                Currency = cmd.Currency,
+                Expiry = cmd.EndsAt,
+                StartsAt = cmd.StartsAt,
+                Title = cmd.Title,
+                User = userContext.UserId,
+                Options = cmd.SingleSealedBidOptions.Value
+            };
+        }
+
+        static TimedAscendingAuction CreateTimedAscendingAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        {
+            return new TimedAscendingAuction
+            {
+                Currency = cmd.Currency,
+                Expiry = cmd.EndsAt,
+                StartsAt = cmd.StartsAt,
+                Title = cmd.Title,
+                User = userContext.UserId,
+                Options =
                     {
                         MinRaise = cmd.MinRaise ?? 0,
                         ReservePrice = cmd.ReservePrice ?? 0,
                         TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
                     }
-                };
+            };
+        }
     }
     public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
     {
