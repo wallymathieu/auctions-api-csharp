@@ -14,6 +14,7 @@ public static class CacheExtensions
         return services.AddAuctionQueryImplementation()
             .AddScoped<IAuctionQuery>(c=>new CachedAuctionQuery(
                 c.GetRequiredService<IDistributedCache>(),
+                c.GetRequiredService<IOptions<CacheConfiguration>>().Value ?? new CacheConfiguration(),
                 c.GetRequiredService<AuctionDbContext>()));
     }
     public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
