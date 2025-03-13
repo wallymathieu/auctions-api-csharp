@@ -12,11 +12,11 @@ using static JsonHelper;
 public class JwtAuthAndSqlLiteApiFixture():
     ApiFixture(new SqliteDatabaseFixture(), new JwtApiAuth());
 public class MsClientAuthAndSqlLiteApiFixture():
-    ApiFixture(new SqliteDatabaseFixture(), new JwtApiAuth());
+    ApiFixture(new SqliteDatabaseFixture(), new MsClientPrincipalApiAuth());
 public class JwtAuthAndMsSqlApiFixture():
     ApiFixture(new MsSqlDatabaseFixture(), new JwtApiAuth());
 public class MsClientAuthAndMsSqlApiFixture():
-    ApiFixture(new MsSqlDatabaseFixture(), new JwtApiAuth());
+    ApiFixture(new MsSqlDatabaseFixture(), new MsClientPrincipalApiAuth());
 
 [Collection("Sqlite")]
 public class ApiSyncSpecJwtTokenSqlLite(JwtAuthAndSqlLiteApiFixture fixture):
