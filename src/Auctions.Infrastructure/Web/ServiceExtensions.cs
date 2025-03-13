@@ -6,11 +6,15 @@ namespace Wallymathieu.Auctions.Infrastructure.Web;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddAuctionsWebJwt(this IServiceCollection services) =>
-        services
+    public static IServiceCollection AddAuctionsWebJwt(this IServiceCollection services)
+    {
+        return services
             .AddSingleton<ClaimsPrincipalParser>()
             .AddSingleton<JwtPayloadClaimsPrincipalParser>();
+    }
 
-    public static IServiceCollection AddHttpContextUserContext(this IServiceCollection services) =>
-        services.AddScoped<IUserContext, UserContext>();
+    public static IServiceCollection AddHttpContextUserContext(this IServiceCollection services)
+    {
+        return services.AddScoped<IUserContext, UserContext>();
+    }
 }

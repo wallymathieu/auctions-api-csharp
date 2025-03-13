@@ -26,9 +26,9 @@ internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
             claimsIdentity = new ClaimsPrincipal(
             [
                 new ClaimsIdentity(
-                    [
-                        new(ClaimTypes.Name, deserialized.Name)
-                    ], "proxy", ClaimTypes.Name, ClaimTypes.Role)
+                [
+                    new Claim(ClaimTypes.Name, deserialized.Name)
+                ], "proxy", ClaimTypes.Name, ClaimTypes.Role)
             ]);
             return true;
         }

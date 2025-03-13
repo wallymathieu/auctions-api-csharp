@@ -10,6 +10,7 @@ public class CanParseUserTests
         var user = User.NewBuyerOrSeller(UserId.NewUserId(Guid.NewGuid().ToString("N")), "seller");
         Assert.Equal(user, User.TryParse(user.ToString(), out var userV) ? userV : null);
     }
+
     [Fact]
     public void Support()
     {

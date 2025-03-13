@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Data;
-using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Models;
 
@@ -19,17 +18,20 @@ public class AuctionsController(
     : ControllerBase
 {
     /// <summary>
-    /// Get all auctions
+    ///     Get all auctions
     /// </summary>
     /// <remarks>
-    /// Get a list of auctions.
+    ///     Get a list of auctions.
     /// </remarks>
     [HttpGet(Name = "get_auctions")]
-    public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
-        from auction in await auctionQuery.GetAuctionsAsync(cancellationToken)
-        select auctionMapper.MapAuctionToModel(auction);
+    public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken)
+    {
+        return from auction in await auctionQuery.GetAuctionsAsync(cancellationToken)
+            select auctionMapper.MapAuctionToModel(auction);
+    }
+
     /// <summary>
-    /// Get a single auction
+    ///     Get a single auction
     /// </summary>
     [HttpGet("{auctionId}", Name = "get_auction")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
@@ -37,17 +39,19 @@ public class AuctionsController(
         var auction = await auctionQuery.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
         return auction is null ? NotFound() : auctionMapper.MapAuctionToModel(auction);
     }
+
     /// <summary>
-    /// Create an auction
+    ///     Create an auction
     /// </summary>
     /// <remarks>
-    /// Create an auction. Note that the auction models are restricted to be a closed bid auction either as a
-    /// [First price sealed bid auction](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction) or a
-    /// [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction). It can also be a
-    /// [Timed ascending auction also known as an English auction](https://en.wikipedia.org/wiki/English_auction).
+    ///     Create an auction. Note that the auction models are restricted to be a closed bid auction either as a
+    ///     [First price sealed bid auction](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction) or a
+    ///     [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction). It can also be a
+    ///     [Timed ascending auction also known as an English auction](https://en.wikipedia.org/wiki/English_auction).
     /// </remarks>
-    [HttpPost(Name = "create_auction") , Authorize,
-     ProducesResponseType(typeof(void),StatusCodes.Status200OK)]
+    [HttpPost(Name = "create_auction")]
+    [Authorize]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
     {
@@ -56,20 +60,22 @@ public class AuctionsController(
             auctionMapper.MapAuctionToModel(auction);
         return CreatedAtAction(nameof(GetSingle), new { auctionId = auctionModel.Id }, auctionModel);
     }
+
     /// <summary>
-    /// Add a bid on an auction
+    ///     Add a bid on an auction
     /// </summary>
-    [HttpPost("{auctionId}/bids",Name = "add_bid"), Authorize,
-     ProducesResponseType(typeof(void),StatusCodes.Status200OK),
-     ProducesResponseType(typeof(Errors),StatusCodes.Status400BadRequest),
-     ProducesResponseType(typeof(void),StatusCodes.Status404NotFound)]
+    [HttpPost("{auctionId}/bids", Name = "add_bid")]
+    [Authorize]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Errors), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(model, nameof(model));
 
         var id = new AuctionId(auctionId);
-        var cmd =  new CreateBidCommand(model.Amount, id);
+        var cmd = new CreateBidCommand(model.Amount, id);
         var result = await createBidCommandHandler.Handle(cmd, cancellationToken);
 
         if (result is null) return NotFound();

@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,6 @@ public static class WebApplicationBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
 
         if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
-        {
             builder.Services.AddAuctionQueryCached()
                 .AddAuctionDbContextSqlServer(
                     builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
@@ -28,29 +28,24 @@ public static class WebApplicationBuilderExtensions
                     options.InstanceName = CacheKeys.Prefix;
                 })
                 .AddAuctionServicesCached();
-        }
         else
-        {
             builder.Services.AddAuctionQueryNoCache()
                 .AddAuctionDbContextSqlServer(
                     builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
                 .AddAuctionServicesNoCache();
-        }
 
         var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");
         if (azureStorageConnectionString != null)
-        {
             // Register Azure Clients
             builder.Services.AddAzureClients(azureClientsBuilder =>
             {
                 azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions =>
                 {
-                    queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
+                    queueOptions.MessageEncoding = QueueMessageEncoding.Base64;
                 });
 
                 azureClientsBuilder.UseCredential(new DefaultAzureCredential());
             });
-        }
 
         builder.Services.AddScoped<IMessageQueue, AzureMessageQueue>();
     }

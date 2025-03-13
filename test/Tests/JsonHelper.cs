@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 
 namespace Wallymathieu.Auctions.Tests;
@@ -24,7 +23,7 @@ public static class JsonHelper
     {
         ArgumentNullException.ThrowIfNull(token, nameof(token));
 
-        JArray array = (JArray)(token["bids"] ?? new JArray());
+        var array = (JArray)(token["bids"] ?? new JArray());
         array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}"", ""at"":""{at}""}}"));
         return token;
     }

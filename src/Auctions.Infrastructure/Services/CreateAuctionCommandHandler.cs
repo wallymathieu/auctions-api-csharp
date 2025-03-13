@@ -5,7 +5,7 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.Infrastructure.Services;
 
 /// <summary>
-/// Glue class: Some would prefer to put these classes in an "Application" layer
+///     Glue class: Some would prefer to put these classes in an "Application" layer
 /// </summary>
 internal sealed class CreateAuctionCommandHandler(
     AuctionDbContext auctionDbContext,
@@ -19,10 +19,8 @@ internal sealed class CreateAuctionCommandHandler(
         await auctionDbContext.AddAsync(auction, cancellationToken);
         await auctionDbContext.SaveChangesAsync(cancellationToken);
         if (messageQueue.Enabled)
-        {
             await messageQueue.SendMessageAsync(QueuesModule.AuctionResultQueueName,
                 new UserIdDecorator<Auction>(auction, userContext.UserId), cancellationToken);
-        }
         return auction;
     }
 }

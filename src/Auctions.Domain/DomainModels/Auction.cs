@@ -6,10 +6,10 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.DomainModels;
 
 [JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType,
-    TypeDiscriminatorPropertyName = "$type"),
-JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
-JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
-public abstract class Auction: IState
+    TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(SingleSealedBidAuction), nameof(SingleSealedBidAuction))]
+[JsonDerivedType(typeof(TimedAscendingAuction), nameof(TimedAscendingAuction))]
+public abstract class Auction : IState
 {
 #pragma warning disable CS8618
     protected Auction()
@@ -32,8 +32,13 @@ public abstract class Auction: IState
 
     public bool OpenBidders { get; set; }
 
+    public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
+    public abstract IEnumerable<Bid> GetBids(DateTimeOffset time);
+    public abstract (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time);
+    public abstract bool HasEnded(DateTimeOffset time);
+
     /// <summary>
-    /// Create either a SingleSealedBidAuction or a TimedAscendingAuction based on the command.
+    ///     Create either a SingleSealedBidAuction or a TimedAscendingAuction based on the command.
     /// </summary>
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
@@ -68,15 +73,16 @@ public abstract class Auction: IState
                 Title = cmd.Title,
                 User = userContext.UserId,
                 Options =
-                    {
-                        MinRaise = cmd.MinRaise ?? 0,
-                        ReservePrice = cmd.ReservePrice ?? 0,
-                        TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
-                    }
+                {
+                    MinRaise = cmd.MinRaise ?? 0,
+                    ReservePrice = cmd.ReservePrice ?? 0,
+                    TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero
+                }
             };
         }
     }
-    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
+
+    public Result<Bid, Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
     {
         ArgumentNullException.ThrowIfNull(model, nameof(model));
         ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));
@@ -88,11 +94,6 @@ public abstract class Auction: IState
             ? Result.Ok<Bid, Errors>(bid)
             : Result.Error<Bid, Errors>(error);
     }
-
-    public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
-    public abstract IEnumerable<Bid> GetBids(DateTimeOffset time);
-    public abstract (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time);
-    public abstract bool HasEnded(DateTimeOffset time);
 
     public IBidUserMapper BidUserMapper()
     {
@@ -106,5 +107,5 @@ public abstract class Auction: IState
 public enum AuctionType
 {
     SingleSealedBidAuction,
-    TimedAscendingAuction,
+    TimedAscendingAuction
 }
