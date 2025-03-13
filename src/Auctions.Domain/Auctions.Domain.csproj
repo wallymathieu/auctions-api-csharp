@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>Wallymathieu.Auctions</RootNamespace>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <!--disable missing comment warning-->
-        <NoWarn>$(NoWarn);1591</NoWarn>
-    </PropertyGroup>
-    <ItemGroup>
-      <InternalsVisibleTo Include="Auctions.Infrastructure" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Wallymathieu.Auctions</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--disable missing comment warning-->
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Auctions.Infrastructure"/>
+  </ItemGroup>
 </Project>

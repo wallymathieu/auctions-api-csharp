@@ -1,12 +1,12 @@
 namespace Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
 /// <summary>
-/// Database context setup used to configure and setup the database context
+///     Database context setup used to configure and setup the database context
 /// </summary>
 public class SqliteDatabaseFixture : IDatabaseFixture
 {
-    private string? _db;
     private string? _connectionString;
+    private string? _db;
 
     public Task InitializeAsync()
     {
@@ -18,7 +18,6 @@ public class SqliteDatabaseFixture : IDatabaseFixture
     public Task DisposeAsync()
     {
         if (File.Exists(_db))
-        {
             try
             {
                 File.Delete(_db);
@@ -27,7 +26,6 @@ public class SqliteDatabaseFixture : IDatabaseFixture
             {
                 // ignored
             }
-        }
 
         return Task.CompletedTask;
     }
@@ -36,8 +34,9 @@ public class SqliteDatabaseFixture : IDatabaseFixture
     {
         get
         {
-            if (_connectionString is null) throw new InvalidOperationException(
-                $"Connection string not initialized {nameof(_connectionString)}");
+            if (_connectionString is null)
+                throw new InvalidOperationException(
+                    $"Connection string not initialized {nameof(_connectionString)}");
             return new SqliteDatabaseConfigurator(_connectionString);
         }
     }

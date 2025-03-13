@@ -10,49 +10,11 @@ namespace Wallymathieu.Auctions.Tests.Helpers;
 
 public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisposable, IAsyncLifetime
 {
-    private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
-
-    private TestServer? _testServer;
+    private readonly FakeSystemClock _fakeSystemClock = new(InitialNow);
     private readonly WebApplicationFactory<Program> _webApplicationFactory = new();
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+    private TestServer? _testServer;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposing) return;
-        _testServer?.Dispose();
-        _webApplicationFactory.Dispose();
-    }
-
-    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken) =>
-        await _testServer!.CreateRequest("/auctions").And(r =>
-        {
-            r.Content = Json(auctionRequest);
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).PostAsync();
-
-    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken) =>
-        await _testServer!.CreateRequest($"/auctions/{id}/bids").And(r =>
-        {
-            r.Content = Json(bidRequest);
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).PostAsync();
-    private static StringContent Json(string bidRequest) => new(bidRequest, Encoding.UTF8, "application/json");
-    public async Task<HttpResponseMessage> GetAuction(long id, AuthToken authToken)=>
-        await _testServer!.CreateRequest($"/auctions/{id}").And(r =>
-        {
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).GetAsync();
-    private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-    public void SetTime(DateTimeOffset now) => _fakeSystemClock.Now = now;
     public async Task InitializeAsync()
     {
         await databaseFixture.InitializeAsync();
@@ -76,5 +38,62 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
     public async Task DisposeAsync()
     {
         await databaseFixture.DisposeAsync().ConfigureAwait(false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing) return;
+        _testServer?.Dispose();
+        _webApplicationFactory.Dispose();
+    }
+
+    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken)
+    {
+        return await _testServer!.CreateRequest("/auctions").And(r =>
+        {
+            r.Content = Json(auctionRequest);
+            AcceptJson(r);
+            auth.TryAddAuth(r, authToken);
+        }).PostAsync();
+    }
+
+    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken)
+    {
+        return await _testServer!.CreateRequest($"/auctions/{id}/bids").And(r =>
+        {
+            r.Content = Json(bidRequest);
+            AcceptJson(r);
+            auth.TryAddAuth(r, authToken);
+        }).PostAsync();
+    }
+
+    private static StringContent Json(string bidRequest)
+    {
+        return new StringContent(bidRequest, Encoding.UTF8, "application/json");
+    }
+
+    public async Task<HttpResponseMessage> GetAuction(long id, AuthToken authToken)
+    {
+        return await _testServer!.CreateRequest($"/auctions/{id}").And(r =>
+        {
+            AcceptJson(r);
+            auth.TryAddAuth(r, authToken);
+        }).GetAsync();
+    }
+
+    private static void AcceptJson(HttpRequestMessage r)
+    {
+        r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    }
+
+    public void SetTime(DateTimeOffset now)
+    {
+        _fakeSystemClock.Now = now;
     }
 }

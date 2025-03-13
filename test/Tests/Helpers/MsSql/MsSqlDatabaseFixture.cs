@@ -7,11 +7,10 @@ namespace Wallymathieu.Auctions.Tests.Helpers.MsSql;
 /// </summary>
 public class MsSqlDatabaseFixture : IDatabaseFixture
 {
-    private MsSqlContainer? _dbContainer ;
+    private MsSqlContainer? _dbContainer;
 
     public Task InitializeAsync()
     {
-
         var db = $"{Guid.NewGuid():N}";
         _dbContainer = new MsSqlBuilder()
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
@@ -23,7 +22,7 @@ public class MsSqlDatabaseFixture : IDatabaseFixture
 
     public async Task DisposeAsync()
     {
-        if (_dbContainer!=null)
+        if (_dbContainer != null)
             await _dbContainer.DisposeAsync();
     }
 
@@ -31,9 +30,9 @@ public class MsSqlDatabaseFixture : IDatabaseFixture
     {
         get
         {
-
-            if (_dbContainer is null) throw new InvalidOperationException(
-                "Database not initialized");
+            if (_dbContainer is null)
+                throw new InvalidOperationException(
+                    "Database not initialized");
             return new MsSqlDatabaseConfigurator(_dbContainer.GetConnectionString());
         }
     }

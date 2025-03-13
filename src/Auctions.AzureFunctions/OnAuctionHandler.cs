@@ -1,4 +1,5 @@
 namespace Wallymathieu.Auctions.Functions;
+
 public class OnAuctionHandler(
     ILoggerFactory loggerFactory,
     JsonSerializerOptions serializerOptions,

@@ -13,7 +13,7 @@ public class DomainModelSerializationSpec
         Assert.Multiple(() =>
         {
             Assert.NotNull(deserialized);
-            Assert.Equal(auction.GetType(),deserialized.GetType());
+            Assert.Equal(auction.GetType(), deserialized.GetType());
         });
     }
 

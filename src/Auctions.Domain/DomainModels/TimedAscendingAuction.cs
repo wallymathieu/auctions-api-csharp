@@ -1,9 +1,11 @@
 namespace Wallymathieu.Auctions.DomainModels;
+
 /// <summary>
-/// The responsibility of this class is to handle the domain model of "timed ascending" auction model.
+///     The responsibility of this class is to handle the domain model of "timed ascending" auction model.
 /// </summary>
 /// <remarks>
-/// You can read more about this style of auction model on Wikipedia on the page about [English auction](https://en.wikipedia.org/wiki/English_auction).
+///     You can read more about this style of auction model on Wikipedia on the page about [English
+///     auction](https://en.wikipedia.org/wiki/English_auction).
 /// </remarks>
 public class TimedAscendingAuction : Auction, IState
 {
@@ -11,28 +13,14 @@ public class TimedAscendingAuction : Auction, IState
     {
         AuctionType = AuctionType.TimedAscendingAuction;
     }
+
     public TimedAscendingOptions Options { get; init; } = new();
 
-    private State GetState(DateTimeOffset time)
-    {
-        return (time > StartsAt, time < Expiry) switch
-        {
-            (true, true) => State.OnGoing,
-            (true, false) => State.HasEnded,
-            (false, _) => State.AwaitingStart
-        };
-    }
-
-    private enum State
-    {
-        AwaitingStart,
-        OnGoing,
-        HasEnded,
-    }
+    public DateTimeOffset? EndsAt { get; set; }
 
     public override bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
     {
-        ArgumentNullException.ThrowIfNull(bid,nameof(bid));
+        ArgumentNullException.ThrowIfNull(bid, nameof(bid));
         var state = GetState(time);
         switch (state)
         {
@@ -45,10 +33,11 @@ public class TimedAscendingAuction : Auction, IState
                     var maxBid = Bids.Max(b => b.Amount)!;
                     if (bid.Amount <= maxBid)
                     {
-                       errors |= Errors.MustPlaceBidOverHighestBid;
-                       return false;
+                        errors |= Errors.MustPlaceBidOverHighestBid;
+                        return false;
                     }
-                    if (bid.Amount.Value < maxBid.Value+Options.MinRaise)
+
+                    if (bid.Amount.Value < maxBid.Value + Options.MinRaise)
                     {
                         errors |= Errors.MustRaiseWithAtLeast;
                         return false;
@@ -57,7 +46,7 @@ public class TimedAscendingAuction : Auction, IState
 
                 if (errors != Errors.None) return false;
 
-                EndsAt = new[] { EndsAt, Expiry, time + Options.TimeFrame }.Where(v=>v!=null).Max();
+                EndsAt = new[] { EndsAt, Expiry, time + Options.TimeFrame }.Where(v => v != null).Max();
                 Bids.Add(new BidEntity(0, bid));
                 return true;
             }
@@ -76,14 +65,12 @@ public class TimedAscendingAuction : Auction, IState
         }
     }
 
-    public DateTimeOffset? EndsAt { get; set; }
-
     public override IEnumerable<Bid> GetBids(DateTimeOffset time)
     {
         switch (GetState(time))
         {
             case State.OnGoing:
-            case State.HasEnded: return Bids.Select(b=>b.ToBid());
+            case State.HasEnded: return Bids.Select(b => b.ToBid());
         }
 
         return Array.Empty<Bid>();
@@ -115,4 +102,20 @@ public class TimedAscendingAuction : Auction, IState
         };
     }
 
+    private State GetState(DateTimeOffset time)
+    {
+        return (time > StartsAt, time < Expiry) switch
+        {
+            (true, true) => State.OnGoing,
+            (true, false) => State.HasEnded,
+            (false, _) => State.AwaitingStart
+        };
+    }
+
+    private enum State
+    {
+        AwaitingStart,
+        OnGoing,
+        HasEnded
+    }
 }

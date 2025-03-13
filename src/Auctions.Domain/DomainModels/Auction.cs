@@ -6,10 +6,10 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.DomainModels;
 
 [JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType,
-    TypeDiscriminatorPropertyName = "$type"),
-JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
-JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
-public abstract class Auction: IState
+     TypeDiscriminatorPropertyName = "$type"),
+ JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
+ JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
+public abstract class Auction : IState
 {
 #pragma warning disable CS8618
     protected Auction()
@@ -68,15 +68,16 @@ public abstract class Auction: IState
                 Title = cmd.Title,
                 User = userContext.UserId,
                 Options =
-                    {
-                        MinRaise = cmd.MinRaise ?? 0,
-                        ReservePrice = cmd.ReservePrice ?? 0,
-                        TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
-                    }
+                {
+                    MinRaise = cmd.MinRaise ?? 0,
+                    ReservePrice = cmd.ReservePrice ?? 0,
+                    TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
+                }
             };
         }
     }
-    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
+
+    public Result<Bid, Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
     {
         ArgumentNullException.ThrowIfNull(model, nameof(model));
         ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));
