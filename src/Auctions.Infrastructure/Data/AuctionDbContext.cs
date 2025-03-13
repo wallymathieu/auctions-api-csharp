@@ -72,9 +72,13 @@ public class AuctionDbContext: DbContext
         modelBuilder.Entity<BidEntity>(entity =>
         {
             entity.ToTable("Bids");
-            WithUserId(entity.Property(o => o.User));
-            var amount = entity.OwnsOne(e => e.Amount);
-            HasCurrencyCodeConversion(amount.Property(e => e.Currency));
+            entity.OwnsOne(e => e.Bid, bid=>{
+                WithUserId(bid.Property(o => o.User));
+                var amount = bid.OwnsOne(e => e.Amount);
+                HasCurrencyCodeConversion(amount.Property(e => e.Currency));
+            });
+
+
         });
 
 

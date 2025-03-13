@@ -13,21 +13,21 @@ public record Bid(UserId User, Amount Amount, DateTimeOffset At)
         return errors;
     }
 }
+/// <summary>
+/// Main reason why we have a bid entity is to make it friendly to EF core.
+/// </summary>
 public class BidEntity
 {
 #pragma warning disable CS8618
     private BidEntity(){}
 #pragma warning restore CS8618
-    public BidEntity(long id, UserId user, Amount amount, DateTimeOffset at)
+    public BidEntity(long id, Bid bid)
     {
+        ArgumentNullException.ThrowIfNull(bid);
         Id = id;
-        User = user ?? throw new ArgumentNullException(nameof(user));
-        Amount = amount ?? throw new ArgumentNullException(nameof(amount));
-        At = at;
+        Bid = bid;
     }
+    public Bid Bid { get; init; }
 
     public long Id { get; init; }
-    public UserId User{ get; init; }
-    public Amount Amount{ get; init; }
-    public DateTimeOffset At{ get; init; }
 }

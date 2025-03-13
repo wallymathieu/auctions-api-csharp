@@ -44,7 +44,7 @@ public class SingleSealedBidAuction: Auction, IState
             case State.AcceptingBids:
             {
                 errors = bid.Validate(this);
-                if (Bids.Any(b => b.User == bid.User))
+                if (Bids.Any(b => b.Bid.User == bid.User))
                 {
                     errors |= Errors.AlreadyPlacedBid;
                     return false;
@@ -52,7 +52,7 @@ public class SingleSealedBidAuction: Auction, IState
 
                 if (errors != Errors.None) return false;
 
-                Bids.Add(new BidEntity(0,bid.User,bid.Amount,bid.At));
+                Bids.Add(new BidEntity(0, bid));
                 return true;
             }
             case State.DisclosingBids:
@@ -76,7 +76,7 @@ public class SingleSealedBidAuction: Auction, IState
     {
         return GetState(time) switch
         {
-            State.AcceptingBids or State.DisclosingBids => Bids.Select(b => new Bid(b.User, b.Amount, b.At)),
+            State.AcceptingBids or State.DisclosingBids => Bids.Select(b => b.Bid),
             _ => Array.Empty<Bid>(),
         };
     }
@@ -91,18 +91,18 @@ public class SingleSealedBidAuction: Auction, IState
                 {
                     case SingleSealedBidOptions.Blind when Bids.Count != 0:
                     {
-                        var winningBid = Bids.MaxBy(b => b.Amount);
-                        return (winningBid!.Amount, winningBid.User);
+                        var winningBid = Bids.MaxBy(b => b.Bid.Amount);
+                        return (winningBid!.Bid.Amount, winningBid.Bid.User);
                     }
                     case SingleSealedBidOptions.Vickrey when Bids.Count >= 2:
                     {
-                        var bids = Bids.OrderByDescending(b=>b.Amount).Take(2).ToArray();
-                        return (bids[1].Amount, bids[0].User);
+                        var bids = Bids.OrderByDescending(b=>b.Bid.Amount).Take(2).ToArray();
+                        return (bids[1].Bid.Amount, bids[0].Bid.User);
                     }
                     case SingleSealedBidOptions.Vickrey when Bids.Count == 1:
                     {
                         var bid = Bids.Single();
-                        return (bid.Amount, bid.User);
+                        return (bid.Bid.Amount, bid.Bid.User);
                     }
                 }
 

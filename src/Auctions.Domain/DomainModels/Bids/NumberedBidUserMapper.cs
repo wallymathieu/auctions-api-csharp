@@ -7,13 +7,13 @@ public class NumberedBidUserMapper:IBidUserMapper
     public NumberedBidUserMapper(ICollection<BidEntity> bids)
     {
         _userIdToStringMap = [];
-        var orderedBids = bids.OrderBy(b => b.At).ToArray();
+        var orderedBids = bids.OrderBy(b => b.Bid.At).ToArray();
         for (int i = 0; i < orderedBids.Length; i++)
         {
             var bid = orderedBids[i];
-            if (!_userIdToStringMap.ContainsKey(bid.User))
+            if (!_userIdToStringMap.ContainsKey(bid.Bid.User))
             {
-                _userIdToStringMap.Add(bid.User, $"#{i + 1}");
+                _userIdToStringMap.Add(bid.Bid.User, $"#{i + 1}");
             }
         }
     }

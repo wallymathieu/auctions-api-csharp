@@ -42,7 +42,7 @@ public class TimedAscendingAuction : Auction, IState
 
                 if (Bids.Count != 0)
                 {
-                    var maxBid = Bids.Max(b => b.Amount)!;
+                    var maxBid = Bids.Max(b => b.Bid.Amount)!;
                     if (bid.Amount <= maxBid)
                     {
                        errors |= Errors.MustPlaceBidOverHighestBid;
@@ -58,7 +58,7 @@ public class TimedAscendingAuction : Auction, IState
                 if (errors != Errors.None) return false;
 
                 EndsAt = new[] { EndsAt, Expiry, time + Options.TimeFrame }.Where(v=>v!=null).Max();
-                Bids.Add(new BidEntity(0,bid.User,bid.Amount,bid.At));
+                Bids.Add(new BidEntity(0, bid));
                 return true;
             }
             case State.HasEnded:
@@ -83,7 +83,7 @@ public class TimedAscendingAuction : Auction, IState
         switch (GetState(time))
         {
             case State.OnGoing:
-            case State.HasEnded: return Bids.Select(b=>new Bid(b.User, b.Amount, b.At));
+            case State.HasEnded: return Bids.Select(b=> b.Bid);
         }
 
         return Array.Empty<Bid>();
@@ -95,9 +95,9 @@ public class TimedAscendingAuction : Auction, IState
         {
             case State.HasEnded:
             {
-                var winningBid = Bids.MaxBy(b => b.Amount);
-                return winningBid?.Amount.Value >= Options.ReservePrice
-                    ? (winningBid.Amount, winningBid.User)
+                var winningBid = Bids.MaxBy(b => b.Bid.Amount);
+                return winningBid?.Bid.Amount.Value >= Options.ReservePrice
+                    ? (winningBid.Bid.Amount, winningBid.Bid.User)
                     : null;
             }
             case State.AwaitingStart:
