@@ -58,7 +58,7 @@ public class TimedAscendingAuction : Auction, IState
                 if (errors != Errors.None) return false;
 
                 EndsAt = new[] { EndsAt, Expiry, time + Options.TimeFrame }.Where(v=>v!=null).Max();
-                Bids.Add(new BidEntity(0,bid.User,bid.Amount,bid.At));
+                Bids.Add(new BidEntity(0, bid));
                 return true;
             }
             case State.HasEnded:
@@ -83,7 +83,7 @@ public class TimedAscendingAuction : Auction, IState
         switch (GetState(time))
         {
             case State.OnGoing:
-            case State.HasEnded: return Bids.Select(b=>new Bid(b.User, b.Amount, b.At));
+            case State.HasEnded: return Bids.Select(b=>b.ToBid());
         }
 
         return Array.Empty<Bid>();

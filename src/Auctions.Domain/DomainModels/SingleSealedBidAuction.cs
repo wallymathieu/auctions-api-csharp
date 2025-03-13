@@ -52,7 +52,7 @@ public class SingleSealedBidAuction: Auction, IState
 
                 if (errors != Errors.None) return false;
 
-                Bids.Add(new BidEntity(0,bid.User,bid.Amount,bid.At));
+                Bids.Add(new BidEntity(0,bid));
                 return true;
             }
             case State.DisclosingBids:
@@ -76,8 +76,8 @@ public class SingleSealedBidAuction: Auction, IState
     {
         return GetState(time) switch
         {
-            State.AcceptingBids or State.DisclosingBids => Bids.Select(b => new Bid(b.User, b.Amount, b.At)),
-            _ => Array.Empty<Bid>(),
+            State.AcceptingBids or State.DisclosingBids => Bids.Select(b => b.ToBid()),
+            _ => [],
         };
     }
 
