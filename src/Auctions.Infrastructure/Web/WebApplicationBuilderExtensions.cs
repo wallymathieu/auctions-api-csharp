@@ -19,34 +19,48 @@ public static class WebApplicationBuilderExtensions
 
         if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
         {
-            builder.Services.AddAuctionQueryCached()
+            builder
+                .Services.AddAuctionQueryCached()
                 .AddAuctionDbContextSqlServer(
-                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection)
+                )
                 .AddStackExchangeRedisCache(options =>
                 {
-                    options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
+                    options.Configuration = builder.Configuration.GetConnectionString(
+                        ConnectionStrings.Redis
+                    );
                     options.InstanceName = CacheKeys.Prefix;
                 })
                 .AddAuctionServicesCached();
         }
         else
         {
-            builder.Services.AddAuctionQueryNoCache()
+            builder
+                .Services.AddAuctionQueryNoCache()
                 .AddAuctionDbContextSqlServer(
-                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection)
+                )
                 .AddAuctionServicesNoCache();
         }
 
-        var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");
+        var azureStorageConnectionString = builder.Configuration.GetConnectionString(
+            "AzureStorage"
+        );
         if (azureStorageConnectionString != null)
         {
             // Register Azure Clients
             builder.Services.AddAzureClients(azureClientsBuilder =>
             {
-                azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions =>
-                {
-                    queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
-                });
+                azureClientsBuilder
+                    .AddQueueServiceClient(azureStorageConnectionString)
+                    .ConfigureOptions(queueOptions =>
+                    {
+                        queueOptions.MessageEncoding = Azure
+                            .Storage
+                            .Queues
+                            .QueueMessageEncoding
+                            .Base64;
+                    });
 
                 azureClientsBuilder.UseCredential(new DefaultAzureCredential());
             });

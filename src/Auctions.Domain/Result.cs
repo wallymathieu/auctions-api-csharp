@@ -1,10 +1,12 @@
 namespace Wallymathieu.Auctions;
+
 public static class Result
 {
     public static Result<TOk, TError> Ok<TOk, TError>(TOk ok)
     {
         return new Result<TOk, TError>(ok);
     }
+
     public static Result<TOk, TError> Error<TOk, TError>(TError error)
     {
         return new Result<TOk, TError>(error);
@@ -27,8 +29,9 @@ public sealed class Result<TOk, TError> : IResult
     private enum Tag
     {
         Ok,
-        Error
+        Error,
     }
+
     private Result(Tag tag, TOk? ok, TError? error)
     {
         _tag = tag;
@@ -36,12 +39,11 @@ public sealed class Result<TOk, TError> : IResult
         _error = error;
     }
 
-    public Result(TOk ok): this(Tag.Ok, ok, default)
-    {
-    }
-    public Result(TError error): this(Tag.Error, default, error)
-    {
-    }
+    public Result(TOk ok)
+        : this(Tag.Ok, ok, default) { }
+
+    public Result(TError error)
+        : this(Tag.Error, default, error) { }
 
     public Result<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map)
     {
@@ -79,7 +81,8 @@ public sealed class Result<TOk, TError> : IResult
                 break;
         }
     }
-    public TResult Match<TResult>(Func<TOk,TResult> ok, Func<TError,TResult> error)
+
+    public TResult Match<TResult>(Func<TOk, TResult> ok, Func<TError, TResult> error)
     {
         ArgumentNullException.ThrowIfNull(ok, nameof(ok));
         ArgumentNullException.ThrowIfNull(error, nameof(error));
@@ -94,6 +97,7 @@ public sealed class Result<TOk, TError> : IResult
     public bool IsOk => _tag == Tag.Ok;
     public bool IsError => _tag == Tag.Error;
 }
+
 /// <summary>
 ///
 /// </summary>

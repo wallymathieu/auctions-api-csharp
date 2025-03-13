@@ -18,7 +18,7 @@ public class AuctionMapper(ISystemClock systemClock)
         var bidMapper = new BidMapper(auction, bidUserMapper);
         return new AuctionModel(
             Id: auction.AuctionId.Id,
-            StartsAt :auction.StartsAt,
+            StartsAt: auction.StartsAt,
             Title: auction.Title,
             Expiry: auction.Expiry,
             Seller: auction.User.ToString(),
@@ -26,7 +26,8 @@ public class AuctionMapper(ISystemClock systemClock)
             Price: amountAndWinner?.Amount,
             Winner: bidUserMapper.GetUserString(amountAndWinner?.Winner),
             HasEnded: hasEnded,
-            Bids: auction.GetBids(now)?.Select(bid =>
-                bidMapper.MapToBidModel(bid)).ToArray() ?? Array.Empty<BidModel>());
+            Bids: auction.GetBids(now)?.Select(bid => bidMapper.MapToBidModel(bid)).ToArray()
+                ?? Array.Empty<BidModel>()
+        );
     }
 }

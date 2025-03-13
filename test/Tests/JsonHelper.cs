@@ -25,7 +25,9 @@ public static class JsonHelper
         ArgumentNullException.ThrowIfNull(token, nameof(token));
 
         JArray array = (JArray)(token["bids"] ?? new JArray());
-        array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}"", ""at"":""{at}""}}"));
+        array.Add(
+            JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}"", ""at"":""{at}""}}")
+        );
         return token;
     }
 

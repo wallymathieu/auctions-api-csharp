@@ -15,8 +15,8 @@ public class AuctionsController(
     AuctionMapper auctionMapper,
     ICreateAuctionCommandHandler createAuctionCommandHandler,
     ICreateBidCommandHandler createBidCommandHandler,
-    IAuctionQuery auctionQuery)
-    : ControllerBase
+    IAuctionQuery auctionQuery
+) : ControllerBase
 {
     /// <summary>
     /// Get all auctions
@@ -28,15 +28,23 @@ public class AuctionsController(
     public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
         from auction in await auctionQuery.GetAuctionsAsync(cancellationToken)
         select auctionMapper.MapAuctionToModel(auction);
+
     /// <summary>
     /// Get a single auction
     /// </summary>
     [HttpGet("{auctionId}", Name = "get_auction")]
-    public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
+    public async Task<ActionResult<AuctionModel>> GetSingle(
+        long auctionId,
+        CancellationToken cancellationToken
+    )
     {
-        var auction = await auctionQuery.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
+        var auction = await auctionQuery.GetAuctionAsync(
+            new AuctionId(auctionId),
+            cancellationToken
+        );
         return auction is null ? NotFound() : auctionMapper.MapAuctionToModel(auction);
     }
+
     /// <summary>
     /// Create an auction
     /// </summary>
@@ -46,35 +54,52 @@ public class AuctionsController(
     /// [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction). It can also be a
     /// [Timed ascending auction also known as an English auction](https://en.wikipedia.org/wiki/English_auction).
     /// </remarks>
-    [HttpPost(Name = "create_auction") , Authorize,
-     ProducesResponseType(typeof(void),StatusCodes.Status200OK)]
+    [
+        HttpPost(Name = "create_auction"),
+        Authorize,
+        ProducesResponseType(typeof(void), StatusCodes.Status200OK)
+    ]
     public async Task<ActionResult> Post(
-        CreateAuctionCommand model, CancellationToken cancellationToken)
+        CreateAuctionCommand model,
+        CancellationToken cancellationToken
+    )
     {
         var auction = await createAuctionCommandHandler.Handle(model, cancellationToken);
-        var auctionModel =
-            auctionMapper.MapAuctionToModel(auction);
-        return CreatedAtAction(nameof(GetSingle), new { auctionId = auctionModel.Id }, auctionModel);
+        var auctionModel = auctionMapper.MapAuctionToModel(auction);
+        return CreatedAtAction(
+            nameof(GetSingle),
+            new { auctionId = auctionModel.Id },
+            auctionModel
+        );
     }
+
     /// <summary>
     /// Add a bid on an auction
     /// </summary>
-    [HttpPost("{auctionId}/bids",Name = "add_bid"), Authorize,
-     ProducesResponseType(typeof(void),StatusCodes.Status200OK),
-     ProducesResponseType(typeof(Errors),StatusCodes.Status400BadRequest),
-     ProducesResponseType(typeof(void),StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> PostBid(long auctionId,
-        CreateBidModel model, CancellationToken cancellationToken)
+    [
+        HttpPost("{auctionId}/bids", Name = "add_bid"),
+        Authorize,
+        ProducesResponseType(typeof(void), StatusCodes.Status200OK),
+        ProducesResponseType(typeof(Errors), StatusCodes.Status400BadRequest),
+        ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)
+    ]
+    public async Task<ActionResult> PostBid(
+        long auctionId,
+        CreateBidModel model,
+        CancellationToken cancellationToken
+    )
     {
         ArgumentNullException.ThrowIfNull(model, nameof(model));
 
         var id = new AuctionId(auctionId);
-        var cmd =  new CreateBidCommand(model.Amount, id);
+        var cmd = new CreateBidCommand(model.Amount, id);
         var result = await createBidCommandHandler.Handle(cmd, cancellationToken);
 
-        if (result is null) return NotFound();
-        return result.Match<ActionResult>(_ => Ok(), err => err == Errors.UnknownAuction
-            ? NotFound()
-            : BadRequest(err));
+        if (result is null)
+            return NotFound();
+        return result.Match<ActionResult>(
+            _ => Ok(),
+            err => err == Errors.UnknownAuction ? NotFound() : BadRequest(err)
+        );
     }
 }

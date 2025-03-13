@@ -11,7 +11,9 @@ public class SqliteDatabaseConfigurator(string connectionString) : IDatabaseConf
         ArgumentNullException.ThrowIfNull(services, nameof(services));
 
         services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
-        services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
+        services.Remove(
+            services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>))
+        );
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
         services.AddDbContext<AuctionDbContext>(c =>
         {

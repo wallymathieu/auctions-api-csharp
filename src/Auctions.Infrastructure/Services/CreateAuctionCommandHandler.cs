@@ -10,18 +10,24 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 internal sealed class CreateAuctionCommandHandler(
     AuctionDbContext auctionDbContext,
     IUserContext userContext,
-    IMessageQueue messageQueue)
-    : ICreateAuctionCommandHandler
+    IMessageQueue messageQueue
+) : ICreateAuctionCommandHandler
 {
-    public async Task<Auction> Handle(CreateAuctionCommand model, CancellationToken cancellationToken = default)
+    public async Task<Auction> Handle(
+        CreateAuctionCommand model,
+        CancellationToken cancellationToken = default
+    )
     {
         var auction = Auction.Create(model, userContext);
         await auctionDbContext.AddAsync(auction, cancellationToken);
         await auctionDbContext.SaveChangesAsync(cancellationToken);
         if (messageQueue.Enabled)
         {
-            await messageQueue.SendMessageAsync(QueuesModule.AuctionResultQueueName,
-                new UserIdDecorator<Auction>(auction, userContext.UserId), cancellationToken);
+            await messageQueue.SendMessageAsync(
+                QueuesModule.AuctionResultQueueName,
+                new UserIdDecorator<Auction>(auction, userContext.UserId),
+                cancellationToken
+            );
         }
         return auction;
     }

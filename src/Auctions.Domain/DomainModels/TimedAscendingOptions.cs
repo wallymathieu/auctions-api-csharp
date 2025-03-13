@@ -9,7 +9,6 @@ public class TimedAscendingOptions
     /// </summary>
     public long ReservePrice { get; set; }
 
-
     ///<summary>
     /// Sometimes the auctioneer sets a minimum amount by which the next bid must exceed the current highest bid.
     /// Having min raise equal to 0 is the equivalent of not setting it.

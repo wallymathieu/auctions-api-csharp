@@ -12,6 +12,9 @@ internal sealed class UserContext : IUserContext
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public UserId UserId => new(_httpContextAccessor.HttpContext?.User?.Identity?.Name ??
-                                throw new InvalidOperationException("Missing user identity"));
+    public UserId UserId =>
+        new(
+            _httpContextAccessor.HttpContext?.User?.Identity?.Name
+                ?? throw new InvalidOperationException("Missing user identity")
+        );
 }

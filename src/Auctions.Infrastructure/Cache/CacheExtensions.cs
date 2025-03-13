@@ -11,20 +11,25 @@ public static class CacheExtensions
 {
     public static IServiceCollection AddAuctionQueryCached(this IServiceCollection services)
     {
-        return services.AddAuctionQueryImplementation()
-            .AddScoped<IAuctionQuery>(c=>new CachedAuctionQuery(
+        return services
+            .AddAuctionQueryImplementation()
+            .AddScoped<IAuctionQuery>(c => new CachedAuctionQuery(
                 c.GetRequiredService<IDistributedCache>(),
-                c.GetRequiredService<IOptions<CacheConfiguration>>().Value ?? new CacheConfiguration(),
-                c.GetRequiredService<AuctionDbContext>()));
+                c.GetRequiredService<IOptions<CacheConfiguration>>().Value
+                    ?? new CacheConfiguration(),
+                c.GetRequiredService<AuctionDbContext>()
+            ));
     }
+
     public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
-        services.AddAuctionServicesImplementation()
-            .AddScoped<ICreateAuctionCommandHandler>(c=>
-                new CacheAwareCreateAuctionCommandHandler(
-                    c.GetRequiredService<InnerService<ICreateAuctionCommandHandler>>().Service,
-                    c.GetRequiredService<IDistributedCache>()))
-            .AddScoped<ICreateBidCommandHandler>(c=>
-                new CacheAwareCreateBidCommandHandler(
-                    c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service,
-                    c.GetRequiredService<IDistributedCache>()));
+        services
+            .AddAuctionServicesImplementation()
+            .AddScoped<ICreateAuctionCommandHandler>(c => new CacheAwareCreateAuctionCommandHandler(
+                c.GetRequiredService<InnerService<ICreateAuctionCommandHandler>>().Service,
+                c.GetRequiredService<IDistributedCache>()
+            ))
+            .AddScoped<ICreateBidCommandHandler>(c => new CacheAwareCreateBidCommandHandler(
+                c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service,
+                c.GetRequiredService<IDistributedCache>()
+            ));
 }

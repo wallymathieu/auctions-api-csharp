@@ -9,20 +9,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<FrontendDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection),
-    opt=>opt.MigrationsHistoryTable("__FrontendMigrations")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection),
+        opt => opt.MigrationsHistoryTable("__FrontendMigrations")
+    )
+);
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder
+    .Services.AddDefaultIdentity<IdentityUser>(options =>
+        options.SignIn.RequireConfirmedAccount = true
+    )
     .AddEntityFrameworkStores<FrontendDbContext>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.AddAuctionsWebInfrastructure();
-builder.Services
-    .AddHttpContextAccessor()
-    .AddHttpContextUserContext();
+builder.Services.AddHttpContextAccessor().AddHttpContextUserContext();
 builder.Services.AddAuctionMapper();
 
 var app = builder.Build();
@@ -32,7 +36,6 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
 }
-
 
 app.UseStaticFiles();
 

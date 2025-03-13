@@ -19,6 +19,7 @@ public record Currency(CurrencyCode Code)
         value = default;
         return false;
     }
+
     public static implicit operator CurrencyCode(Currency d)
     {
         ArgumentNullException.ThrowIfNull(d);
@@ -28,5 +29,6 @@ public record Currency(CurrencyCode Code)
     public static implicit operator Currency(CurrencyCode d) => new(d);
 
     public Currency ToCurrency() => new(Code);
+
     public CurrencyCode ToCurrencyCode() => Code;
 }

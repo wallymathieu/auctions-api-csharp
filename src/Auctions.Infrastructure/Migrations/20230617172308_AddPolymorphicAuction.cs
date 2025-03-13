@@ -17,7 +17,8 @@ namespace App.Migrations
                 type: "time",
                 nullable: true,
                 oldClrType: typeof(TimeSpan),
-                oldType: "time");
+                oldType: "time"
+            );
 
             migrationBuilder.AlterColumn<long>(
                 name: "Options_ReservePrice",
@@ -25,7 +26,8 @@ namespace App.Migrations
                 type: "bigint",
                 nullable: true,
                 oldClrType: typeof(long),
-                oldType: "bigint");
+                oldType: "bigint"
+            );
 
             migrationBuilder.AlterColumn<long>(
                 name: "Options_MinRaise",
@@ -33,32 +35,31 @@ namespace App.Migrations
                 type: "bigint",
                 nullable: true,
                 oldClrType: typeof(long),
-                oldType: "bigint");
+                oldType: "bigint"
+            );
 
             migrationBuilder.AddColumn<int>(
                 name: "AuctionType",
                 table: "Auctions",
                 type: "int",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
 
             migrationBuilder.AddColumn<int>(
                 name: "Options",
                 table: "Auctions",
                 type: "int",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "AuctionType",
-                table: "Auctions");
+            migrationBuilder.DropColumn(name: "AuctionType", table: "Auctions");
 
-            migrationBuilder.DropColumn(
-                name: "Options",
-                table: "Auctions");
+            migrationBuilder.DropColumn(name: "Options", table: "Auctions");
 
             migrationBuilder.AlterColumn<TimeSpan>(
                 name: "Options_TimeFrame",
@@ -68,7 +69,8 @@ namespace App.Migrations
                 defaultValue: new TimeSpan(0, 0, 0, 0, 0),
                 oldClrType: typeof(TimeSpan),
                 oldType: "time",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<long>(
                 name: "Options_ReservePrice",
@@ -78,7 +80,8 @@ namespace App.Migrations
                 defaultValue: 0L,
                 oldClrType: typeof(long),
                 oldType: "bigint",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<long>(
                 name: "Options_MinRaise",
@@ -88,7 +91,8 @@ namespace App.Migrations
                 defaultValue: 0L,
                 oldClrType: typeof(long),
                 oldType: "bigint",
-                oldNullable: true);
+                oldNullable: true
+            );
         }
     }
 }

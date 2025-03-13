@@ -15,15 +15,14 @@ namespace App.Migrations
                 table: "Auctions",
                 type: "bit",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: false
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "OpenBidders",
-                table: "Auctions");
+            migrationBuilder.DropColumn(name: "OpenBidders", table: "Auctions");
         }
     }
 }

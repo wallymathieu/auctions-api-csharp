@@ -8,13 +8,18 @@ public record Bid(UserId User, Amount Amount, DateTimeOffset At)
     {
         ArgumentNullException.ThrowIfNull(auction, nameof(auction));
         var errors = Errors.None;
-        if (User == auction.User) errors |= Errors.SellerCannotPlaceBids;
-        if (Amount.Currency != auction.Currency) errors |= Errors.BidCurrencyConversion;
-        if (At < auction.StartsAt) errors |= Errors.AuctionHasNotStarted;
-        if (At > auction.Expiry) errors |= Errors.AuctionHasEnded;
+        if (User == auction.User)
+            errors |= Errors.SellerCannotPlaceBids;
+        if (Amount.Currency != auction.Currency)
+            errors |= Errors.BidCurrencyConversion;
+        if (At < auction.StartsAt)
+            errors |= Errors.AuctionHasNotStarted;
+        if (At > auction.Expiry)
+            errors |= Errors.AuctionHasEnded;
         return errors;
     }
 }
+
 /// <summary>
 /// Main reason to have a separate class is to make it easier to map in Entity Framework Core. This gives us
 /// another implicit dependency on Entity Framework Core.
@@ -24,7 +29,7 @@ public record Bid(UserId User, Amount Amount, DateTimeOffset At)
 public class BidEntity
 {
 #pragma warning disable CS8618
-    private BidEntity(){}
+    private BidEntity() { }
 #pragma warning restore CS8618
     public BidEntity(long id, Bid bid)
     {
@@ -34,10 +39,10 @@ public class BidEntity
         Amount = bid.Amount;
         At = bid.At;
     }
-    #pragma warning disable IDE0051
+#pragma warning disable IDE0051
     [JsonConstructor]
     private BidEntity(long id, UserId user, Amount amount, DateTimeOffset at)
-    #pragma warning restore IDE0051
+#pragma warning restore IDE0051
     {
         Id = id;
         User = user;
@@ -46,9 +51,9 @@ public class BidEntity
     }
 
     public long Id { get; init; }
-    public UserId User{ get; init; }
-    public Amount Amount{ get; init; }
-    public DateTimeOffset At{ get; init; }
+    public UserId User { get; init; }
+    public Amount Amount { get; init; }
+    public DateTimeOffset At { get; init; }
 
     public Bid ToBid()
     {

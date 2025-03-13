@@ -5,17 +5,23 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.DomainModels;
 
-[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType,
-    TypeDiscriminatorPropertyName = "$type"),
-JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
-JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
-public abstract class Auction: IState
+[
+    JsonPolymorphic(
+        UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType,
+        TypeDiscriminatorPropertyName = "$type"
+    ),
+    JsonDerivedType(
+        typeof(SingleSealedBidAuction),
+        typeDiscriminator: nameof(SingleSealedBidAuction)
+    ),
+    JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))
+]
+public abstract class Auction : IState
 {
 #pragma warning disable CS8618
     protected Auction()
 #pragma warning restore CS8618
-    {
-    }
+    { }
 
     public ICollection<BidEntity> Bids { get; init; } = new List<BidEntity>();
     public AuctionId AuctionId { get; set; }
@@ -45,7 +51,10 @@ public abstract class Auction: IState
             ? CreateSingleSealedBidAuction(cmd, userContext)
             : CreateTimedAscendingAuction(cmd, userContext);
 
-        static SingleSealedBidAuction CreateSingleSealedBidAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        static SingleSealedBidAuction CreateSingleSealedBidAuction(
+            CreateAuctionCommand cmd,
+            IUserContext userContext
+        )
         {
             return new SingleSealedBidAuction
             {
@@ -54,11 +63,14 @@ public abstract class Auction: IState
                 StartsAt = cmd.StartsAt,
                 Title = cmd.Title,
                 User = userContext.UserId,
-                Options = cmd.SingleSealedBidOptions.Value
+                Options = cmd.SingleSealedBidOptions.Value,
             };
         }
 
-        static TimedAscendingAuction CreateTimedAscendingAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        static TimedAscendingAuction CreateTimedAscendingAuction(
+            CreateAuctionCommand cmd,
+            IUserContext userContext
+        )
         {
             return new TimedAscendingAuction
             {
@@ -68,15 +80,20 @@ public abstract class Auction: IState
                 Title = cmd.Title,
                 User = userContext.UserId,
                 Options =
-                    {
-                        MinRaise = cmd.MinRaise ?? 0,
-                        ReservePrice = cmd.ReservePrice ?? 0,
-                        TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
-                    }
+                {
+                    MinRaise = cmd.MinRaise ?? 0,
+                    ReservePrice = cmd.ReservePrice ?? 0,
+                    TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
+                },
             };
         }
     }
-    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
+
+    public Result<Bid, Errors> TryAddBid(
+        CreateBidCommand model,
+        IUserContext userContext,
+        ISystemClock systemClock
+    )
     {
         ArgumentNullException.ThrowIfNull(model, nameof(model));
         ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));

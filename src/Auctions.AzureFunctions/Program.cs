@@ -9,21 +9,27 @@ using Wallymathieu.Auctions.Services;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
-    .ConfigureServices((builder,services) =>
-    {
-        services
-            .AddAuctionQueryCached()
-            .AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
-                options.InstanceName = CacheKeys.Prefix;
-            })
-            .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
-            .AddAuctionServicesCached()
-            .AddScoped<ScopedUserContext>()
-            .AddScoped<IUserContext>(c=>c.GetRequiredService<ScopedUserContext>());
-        services.AddSingleton(new JsonSerializerOptions().AddAuctionConverters());
-    })
+    .ConfigureServices(
+        (builder, services) =>
+        {
+            services
+                .AddAuctionQueryCached()
+                .AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = builder.Configuration.GetConnectionString(
+                        ConnectionStrings.Redis
+                    );
+                    options.InstanceName = CacheKeys.Prefix;
+                })
+                .AddAuctionDbContextSqlServer(
+                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection)
+                )
+                .AddAuctionServicesCached()
+                .AddScoped<ScopedUserContext>()
+                .AddScoped<IUserContext>(c => c.GetRequiredService<ScopedUserContext>());
+            services.AddSingleton(new JsonSerializerOptions().AddAuctionConverters());
+        }
+    )
     .Build();
 
 host.Run();

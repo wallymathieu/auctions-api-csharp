@@ -17,7 +17,8 @@ namespace App.Migrations
                 maxLength: 3,
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Currency",
@@ -26,7 +27,8 @@ namespace App.Migrations
                 maxLength: 3,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
         }
 
         /// <inheritdoc />
@@ -39,7 +41,8 @@ namespace App.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(3)",
-                oldMaxLength: 3);
+                oldMaxLength: 3
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Currency",
@@ -48,7 +51,8 @@ namespace App.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(3)",
-                oldMaxLength: 3);
+                oldMaxLength: 3
+            );
         }
     }
 }

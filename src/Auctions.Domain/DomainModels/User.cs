@@ -14,13 +14,11 @@ public abstract partial record User(UserId Id)
         }
     }
 
-
     [Serializable]
     private record Support(UserId Id) : User(Id)
     {
         public override string ToString() => $"Support|{Id}";
     }
-
 
     public static User NewBuyerOrSeller(UserId id, string? name)
     {

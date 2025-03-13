@@ -12,17 +12,20 @@ namespace App.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Bids_Auctions_TimedAscendingAuctionAuctionId",
-                table: "Bids");
+                table: "Bids"
+            );
 
             migrationBuilder.RenameColumn(
                 name: "TimedAscendingAuctionAuctionId",
                 table: "Bids",
-                newName: "AuctionId");
+                newName: "AuctionId"
+            );
 
             migrationBuilder.RenameIndex(
                 name: "IX_Bids_TimedAscendingAuctionAuctionId",
                 table: "Bids",
-                newName: "IX_Bids_AuctionId");
+                newName: "IX_Bids_AuctionId"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Currency",
@@ -30,32 +33,34 @@ namespace App.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Bids_Auctions_AuctionId",
                 table: "Bids",
                 column: "AuctionId",
                 principalTable: "Auctions",
-                principalColumn: "AuctionId");
+                principalColumn: "AuctionId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Bids_Auctions_AuctionId",
-                table: "Bids");
+            migrationBuilder.DropForeignKey(name: "FK_Bids_Auctions_AuctionId", table: "Bids");
 
             migrationBuilder.RenameColumn(
                 name: "AuctionId",
                 table: "Bids",
-                newName: "TimedAscendingAuctionAuctionId");
+                newName: "TimedAscendingAuctionAuctionId"
+            );
 
             migrationBuilder.RenameIndex(
                 name: "IX_Bids_AuctionId",
                 table: "Bids",
-                newName: "IX_Bids_TimedAscendingAuctionAuctionId");
+                newName: "IX_Bids_TimedAscendingAuctionAuctionId"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "Currency",
@@ -63,14 +68,16 @@ namespace App.Migrations
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Bids_Auctions_TimedAscendingAuctionAuctionId",
                 table: "Bids",
                 column: "TimedAscendingAuctionAuctionId",
                 principalTable: "Auctions",
-                principalColumn: "AuctionId");
+                principalColumn: "AuctionId"
+            );
         }
     }
 }

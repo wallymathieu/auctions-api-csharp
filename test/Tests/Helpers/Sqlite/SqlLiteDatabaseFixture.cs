@@ -36,8 +36,10 @@ public class SqliteDatabaseFixture : IDatabaseFixture
     {
         get
         {
-            if (_connectionString is null) throw new InvalidOperationException(
-                $"Connection string not initialized {nameof(_connectionString)}");
+            if (_connectionString is null)
+                throw new InvalidOperationException(
+                    $"Connection string not initialized {nameof(_connectionString)}"
+                );
             return new SqliteDatabaseConfigurator(_connectionString);
         }
     }

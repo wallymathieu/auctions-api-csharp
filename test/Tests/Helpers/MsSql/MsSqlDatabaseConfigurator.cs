@@ -11,9 +11,12 @@ public class MsSqlDatabaseConfigurator(string connectionString) : IDatabaseConfi
         ArgumentNullException.ThrowIfNull(services);
 
         services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
-        services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
+        services.Remove(
+            services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>))
+        );
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
         services.AddDbContext<AuctionDbContext>(c =>
-            c.UseSqlServer(connectionString, opt => opt.MigrationsAssembly(MigrationAssembly.Name)));
+            c.UseSqlServer(connectionString, opt => opt.MigrationsAssembly(MigrationAssembly.Name))
+        );
     }
 }

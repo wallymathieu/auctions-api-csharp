@@ -11,4 +11,5 @@ public record CreateAuctionCommand(
     long? MinRaise,
     long? ReservePrice,
     TimeSpan? TimeFrame,
-    SingleSealedBidOptions? SingleSealedBidOptions);
+    SingleSealedBidOptions? SingleSealedBidOptions
+);

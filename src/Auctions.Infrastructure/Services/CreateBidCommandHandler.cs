@@ -11,13 +11,17 @@ internal sealed class CreateBidCommandHandler(
     AuctionDbContext auctionDbContext,
     IUserContext userContext,
     ISystemClock systemClock,
-    IMessageQueue messageQueue)
-    : ICreateBidCommandHandler
+    IMessageQueue messageQueue
+) : ICreateBidCommandHandler
 {
-    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
+    public async Task<Result<Bid, Errors>?> Handle(
+        CreateBidCommand model,
+        CancellationToken cancellationToken = default
+    )
     {
         var auction = await auctionDbContext.GetAuction(model.AuctionId, cancellationToken);
-        if (auction is null) return Result.Error<Bid, Errors>(Errors.UnknownAuction);
+        if (auction is null)
+            return Result.Error<Bid, Errors>(Errors.UnknownAuction);
         var result = auction.TryAddBid(model, userContext, systemClock);
         if (result.IsOk)
         {
@@ -25,8 +29,11 @@ internal sealed class CreateBidCommandHandler(
         }
         if (messageQueue.Enabled)
         {
-            await messageQueue.SendMessageAsync(QueuesModule.BidResultQueueName,
-                new UserIdDecorator<Result<Bid,Errors>?>(result, userContext.UserId), cancellationToken);
+            await messageQueue.SendMessageAsync(
+                QueuesModule.BidResultQueueName,
+                new UserIdDecorator<Result<Bid, Errors>?>(result, userContext.UserId),
+                cancellationToken
+            );
         }
         return result;
     }

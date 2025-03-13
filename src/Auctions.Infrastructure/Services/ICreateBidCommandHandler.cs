@@ -5,5 +5,8 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 /// </summary>
 public interface ICreateBidCommandHandler
 {
-    Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken=default);
+    Task<Result<Bid, Errors>?> Handle(
+        CreateBidCommand model,
+        CancellationToken cancellationToken = default
+    );
 }

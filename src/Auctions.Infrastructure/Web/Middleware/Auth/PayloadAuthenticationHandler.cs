@@ -6,16 +6,20 @@ namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 /// <summary>
 ///     See also https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
 /// </summary>
-internal sealed class PayloadAuthenticationHandler : AuthenticationHandler<PayloadAuthenticationOptions>
+internal sealed class PayloadAuthenticationHandler
+    : AuthenticationHandler<PayloadAuthenticationOptions>
 {
     private readonly ClaimsPrincipalParser _claimsPrincipalParser;
     private readonly JwtPayloadClaimsPrincipalParser _jwtPayloadClaimsPrincipalParser;
 
-    public PayloadAuthenticationHandler(IOptionsMonitor<PayloadAuthenticationOptions> options,
+    public PayloadAuthenticationHandler(
+        IOptionsMonitor<PayloadAuthenticationOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
         ClaimsPrincipalParser claimsPrincipalParser,
-        JwtPayloadClaimsPrincipalParser jwtPayloadClaimsPrincipalParser) : base(options, logger, encoder)
+        JwtPayloadClaimsPrincipalParser jwtPayloadClaimsPrincipalParser
+    )
+        : base(options, logger, encoder)
     {
         _claimsPrincipalParser = claimsPrincipalParser;
         _jwtPayloadClaimsPrincipalParser = jwtPayloadClaimsPrincipalParser;
@@ -26,16 +30,22 @@ internal sealed class PayloadAuthenticationHandler : AuthenticationHandler<Paylo
         try
         {
             var apiKey = Request.Headers[Options.PrincipalHeader];
-            if (string.IsNullOrEmpty(apiKey)) return Task.FromResult(AuthenticateResult.NoResult());
+            if (string.IsNullOrEmpty(apiKey))
+                return Task.FromResult(AuthenticateResult.NoResult());
 
-            IClaimsPrincipalParser parser = Options.PrincipalHeader == JwtPayloadClaimsPrincipal.Header
-                ? _jwtPayloadClaimsPrincipalParser
-                : _claimsPrincipalParser;
+            IClaimsPrincipalParser parser =
+                Options.PrincipalHeader == JwtPayloadClaimsPrincipal.Header
+                    ? _jwtPayloadClaimsPrincipalParser
+                    : _claimsPrincipalParser;
             if (parser.IsValid(apiKey, out var claimsIdentity))
             {
                 Context.User = claimsIdentity!;
                 var success = AuthenticateResult.Success(
-                    new AuthenticationTicket(claimsIdentity!, PayloadAuthenticationDefaults.AuthenticationScheme));
+                    new AuthenticationTicket(
+                        claimsIdentity!,
+                        PayloadAuthenticationDefaults.AuthenticationScheme
+                    )
+                );
 
                 return Task.FromResult(success);
             }
