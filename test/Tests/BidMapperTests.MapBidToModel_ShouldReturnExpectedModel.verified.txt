@@ -1,0 +1,8 @@
+﻿{
+  Amount: {
+    Value: 100,
+    Currency: SEK
+  },
+  Bidder: #1,
+  At: 1.00:00:00
+}

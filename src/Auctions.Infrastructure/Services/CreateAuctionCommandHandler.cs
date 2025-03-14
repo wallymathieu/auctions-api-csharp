@@ -23,6 +23,7 @@ internal sealed class CreateAuctionCommandHandler(
             await messageQueue.SendMessageAsync(QueuesModule.AuctionResultQueueName,
                 new UserIdDecorator<Auction>(auction, userContext.UserId), cancellationToken);
         }
+
         return auction;
     }
 }

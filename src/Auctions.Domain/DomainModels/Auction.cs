@@ -5,19 +5,31 @@ using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.DomainModels;
 
+/// <summary>
+/// Base class for all auctions. Note that we are using an abstract class to allow for polymorphism.
+/// <br />
+/// Abstract classes is a low level way to share code and is not recommended for most cases. This is an example of
+/// white box reuse. This means that all derived classes are aware of the implementation details of the base class.
+/// Generally you should avoid abstract classes if possible and <a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">prefer composition</a>.
+/// </summary>
 [JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType,
-    TypeDiscriminatorPropertyName = "$type"),
-JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
-JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
-public abstract class Auction: IState
+     TypeDiscriminatorPropertyName = "$type"),
+ JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
+ JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
+public abstract class Auction : IState
 {
-#pragma warning disable CS8618
+#pragma warning disable CS8618 // Note that is used by Entity Framework Core.
     protected Auction()
 #pragma warning restore CS8618
     {
     }
+    /// <summary>
+    /// Raw list of bids. This is the storage of the bids, should not be used directly.
+    /// </summary>
+#pragma warning disable CA1721 // These are expected to be used internally by auction implementations.
+    protected ICollection<BidEntity> Bids { get; init; } = [];
+#pragma warning restore CA1721
 
-    public ICollection<BidEntity> Bids { get; init; } = new List<BidEntity>();
     public AuctionId AuctionId { get; set; }
 
     public DateTimeOffset StartsAt { get; init; }
@@ -32,38 +44,52 @@ public abstract class Auction: IState
 
     public bool OpenBidders { get; set; }
 
+    /// <summary>
+    /// Create either a SingleSealedBidAuction or a TimedAscendingAuction based on the command.
+    /// </summary>
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
         ArgumentNullException.ThrowIfNull(cmd, nameof(cmd));
         ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));
         if (userContext.UserId == null)
             throw new InvalidOperationException("User must be logged in to create an auction.");
-        return cmd.SingleSealedBidOptions!=null
-            ? new SingleSealedBidAuction
+        return cmd.SingleSealedBidOptions != null
+            ? CreateSingleSealedBidAuction(cmd, userContext)
+            : CreateTimedAscendingAuction(cmd, userContext);
+
+        static SingleSealedBidAuction CreateSingleSealedBidAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        {
+            return new SingleSealedBidAuction
+            {
+                Currency = cmd.Currency,
+                Expiry = cmd.EndsAt,
+                StartsAt = cmd.StartsAt,
+                Title = cmd.Title,
+                User = userContext.UserId!,
+                Options = cmd.SingleSealedBidOptions!.Value
+            };
+        }
+
+        static TimedAscendingAuction CreateTimedAscendingAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        {
+            return new TimedAscendingAuction
+            {
+                Currency = cmd.Currency,
+                Expiry = cmd.EndsAt,
+                StartsAt = cmd.StartsAt,
+                Title = cmd.Title,
+                User = userContext.UserId!,
+                Options =
                 {
-                    Currency = cmd.Currency,
-                    Expiry = cmd.EndsAt,
-                    StartsAt = cmd.StartsAt,
-                    Title = cmd.Title,
-                    User = userContext.UserId,
-                    Options = cmd.SingleSealedBidOptions.Value
+                    MinRaise = cmd.MinRaise ?? 0,
+                    ReservePrice = cmd.ReservePrice ?? 0,
+                    TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
                 }
-            : new TimedAscendingAuction
-                {
-                    Currency = cmd.Currency,
-                    Expiry = cmd.EndsAt,
-                    StartsAt = cmd.StartsAt,
-                    Title = cmd.Title,
-                    User = userContext.UserId,
-                    Options =
-                    {
-                        MinRaise = cmd.MinRaise ?? 0,
-                        ReservePrice = cmd.ReservePrice ?? 0,
-                        TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
-                    }
-                };
+            };
+        }
     }
-    public Result<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
+
+    public Result<Bid, Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ISystemClock systemClock)
     {
         ArgumentNullException.ThrowIfNull(model, nameof(model));
         ArgumentNullException.ThrowIfNull(userContext, nameof(userContext));
@@ -89,9 +115,30 @@ public abstract class Auction: IState
         return bidUserMapper;
     }
 }
-
+/// <summary>
+/// Type of auction. Discriminator used by Entity Framework Core.
+/// </summary>
 public enum AuctionType
 {
+    /// <summary>
+    /// Single sealed bid auction.
+    /// </summary>
+    /// <remarks>
+    ///     Single sealed bid auction is a type of auction where the bidders are not aware of the other bids. The bids are
+    ///     disclosed at the end of the auction.
+    ///     You can read more about the different types of blind auctions on Wikipedia:
+    ///     <br />
+    ///     - <a href="https://en.wikipedia.org/wiki/First-price_sealed-bid_auction">First price sealed bid auction</a> or a
+    ///     <br />
+    ///     - <a href="https://en.wikipedia.org/wiki/Vickrey_auction">Vickrey auction</a>
+    /// </remarks>
     SingleSealedBidAuction,
+    /// <summary>
+    /// Timed ascending auction. Also known as an English auction.
+    /// </summary>
+    /// <remarks>
+    ///     You can read more about this style of auction model on Wikipedia on the page about <a href="https://en.wikipedia.org/wiki/English_auction">English
+    ///     auction</a>.
+    /// </remarks>
     TimedAscendingAuction,
 }

@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<FrontendDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection),
-    opt=>opt.MigrationsHistoryTable("__FrontendMigrations")));
+        opt => opt.MigrationsHistoryTable("__FrontendMigrations")));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)

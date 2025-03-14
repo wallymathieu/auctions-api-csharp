@@ -28,6 +28,7 @@ public class AuctionsController(
     public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
         from auction in await auctionQuery.GetAuctionsAsync(cancellationToken)
         select auctionMapper.MapAuctionToModel(auction);
+
     /// <summary>
     /// Get a single auction
     /// </summary>
@@ -37,6 +38,7 @@ public class AuctionsController(
         var auction = await auctionQuery.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
         return auction is null ? NotFound() : auctionMapper.MapAuctionToModel(auction);
     }
+
     /// <summary>
     /// Create an auction
     /// </summary>
@@ -46,8 +48,8 @@ public class AuctionsController(
     /// [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction). It can also be a
     /// [Timed ascending auction also known as an English auction](https://en.wikipedia.org/wiki/English_auction).
     /// </remarks>
-    [HttpPost(Name = "create_auction") , Authorize,
-     ProducesResponseType(typeof(void),StatusCodes.Status200OK)]
+    [HttpPost(Name = "create_auction"), Authorize,
+     ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
     {
@@ -56,20 +58,21 @@ public class AuctionsController(
             auctionMapper.MapAuctionToModel(auction);
         return CreatedAtAction(nameof(GetSingle), new { auctionId = auctionModel.Id }, auctionModel);
     }
+
     /// <summary>
     /// Add a bid on an auction
     /// </summary>
-    [HttpPost("{auctionId}/bids",Name = "add_bid"), Authorize,
-     ProducesResponseType(typeof(void),StatusCodes.Status200OK),
-     ProducesResponseType(typeof(Errors),StatusCodes.Status400BadRequest),
-     ProducesResponseType(typeof(void),StatusCodes.Status404NotFound)]
+    [HttpPost("{auctionId}/bids", Name = "add_bid"), Authorize,
+     ProducesResponseType(typeof(void), StatusCodes.Status200OK),
+     ProducesResponseType(typeof(Errors), StatusCodes.Status400BadRequest),
+     ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(model, nameof(model));
 
         var id = new AuctionId(auctionId);
-        var cmd =  new CreateBidCommand(model.Amount, id);
+        var cmd = new CreateBidCommand(model.Amount, id);
         var result = await createBidCommandHandler.Handle(cmd, cancellationToken);
 
         if (result is null) return NotFound();

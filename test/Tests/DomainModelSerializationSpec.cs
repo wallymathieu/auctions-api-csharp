@@ -13,13 +13,11 @@ public class DomainModelSerializationSpec
         Assert.Multiple(() =>
         {
             Assert.NotNull(deserialized);
-            Assert.Equal(auction.GetType(),deserialized.GetType());
+            Assert.Equal(auction.GetType(), deserialized.GetType());
         });
     }
 
-    public static IEnumerable<object[]> Auctions => new List<object[]>()
-    {
-        new object[] { WithBids(GetEnglishAuction()) },
-        new object[] { WithBids(VickreyAuction) }
-    };
+    public static TheoryData<Auction> Auctions => [
+        AuctionWithBids(GetEnglishAuction()),
+        AuctionWithBids(VickreyAuction)];
 }

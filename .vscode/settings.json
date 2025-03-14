@@ -5,7 +5,11 @@
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "publish (functions)",
     "cSpell.words": [
-        "Wallymathieu"
+        "Newtonsoft",
+        "Unidraw",
+        "Vickrey",
+        "Wallymathieu",
+        "Xunit"
     ],
     "azureFunctions.projectSubpath": "src/AzureFunctions"
 }

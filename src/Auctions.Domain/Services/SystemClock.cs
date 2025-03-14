@@ -1,4 +1,5 @@
 namespace Wallymathieu.Auctions.Services;
+
 /// <summary>
 /// This is the concrete implementation of <see cref="ISystemClock"/>.
 /// </summary>
@@ -6,6 +7,7 @@ public class SystemClock : ISystemClock
 {
     public DateTimeOffset Now => DateTimeOffset.UtcNow;
 }
+
 /// <summary>
 /// Note that we want to be able to fake time in tests.
 /// </summary>

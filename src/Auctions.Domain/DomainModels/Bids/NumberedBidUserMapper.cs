@@ -1,8 +1,8 @@
 namespace Wallymathieu.Auctions.DomainModels.Bids;
 
-public class NumberedBidUserMapper:IBidUserMapper
+public class NumberedBidUserMapper : IBidUserMapper
 {
-    private readonly Dictionary<UserId,string> _userIdToStringMap;
+    private readonly Dictionary<UserId, string> _userIdToStringMap;
 
     public NumberedBidUserMapper(ICollection<BidEntity> bids)
     {
@@ -20,6 +20,6 @@ public class NumberedBidUserMapper:IBidUserMapper
 
     public string? GetUserString(UserId? userId)
     {
-        return userId!=null? _userIdToStringMap[userId] : null;
+        return userId != null ? _userIdToStringMap[userId] : null;
     }
 }

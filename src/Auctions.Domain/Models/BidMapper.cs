@@ -11,6 +11,6 @@ public class BidMapper(Auction auction, IBidUserMapper bidUserMapper)
 
         return new BidModel(bid.Amount,
             bidUserMapper.GetUserString(bid.User),
-            bid.At-auction.StartsAt);
+            bid.At - auction.StartsAt);
     }
 }

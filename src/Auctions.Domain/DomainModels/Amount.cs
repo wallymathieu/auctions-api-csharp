@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Wallymathieu.Auctions.DomainModels;
 
 [Serializable]
-public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amount>
+public partial record Amount(long Value, CurrencyCode Currency) : IComparable<Amount>
 {
     public static Amount Zero(CurrencyCode c) => new(0L, c);
 
@@ -58,7 +58,7 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
         ArgumentNullException.ThrowIfNull(a1, nameof(a1));
         ArgumentNullException.ThrowIfNull(a2, nameof(a2));
         AssertSameCurrency(a1, a2);
-        return a1.Value<=a2.Value;
+        return a1.Value <= a2.Value;
     }
 
     private static void AssertSameCurrency(Amount a1, Amount a2)
@@ -79,6 +79,7 @@ public partial record Amount(long Value, CurrencyCode Currency): IComparable<Amo
 
         return a1.Value >= a2.Value;
     }
+
     public static bool operator >(Amount a1, Amount a2)
     {
         ArgumentNullException.ThrowIfNull(a1, nameof(a1));

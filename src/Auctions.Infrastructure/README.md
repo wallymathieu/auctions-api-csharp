@@ -35,7 +35,8 @@ lifecycle).
 ## Comparison with Vertical Slice Architecture
 
 The [vertical slice architecture](https://web.archive.org/web/20230328220230/https://jimmybogard.com/vertical-slice-architecture/)
-is a reaction against [clean architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
+is a reaction
+against [clean architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 Some of the issue could be due to a formalization of the onion/hexagonal/clean architecture without questioning the
 reason for separating infrastructure and and external dependencies from business code. Look at the context of when the
 article/book was written. He also tries to give you ample examples of how he has written existing systems (but that is
@@ -43,6 +44,8 @@ in the context of the popular frameworks and languages of that time). We need to
 and not the letter. The letter is a snapshot of a specific time and place. The spirit is the reason for the
 architecture. In that sense I do not think that the two architectures are mutually exclusive.
 
-In this case we have a small (but complicated) domain with features of the domain tied to the domain entities, we could see
-this entire app as a slice since it is intended to only model a single bounded context. We could have used transaction scripts
+In this case we have a small (but complicated) domain with features of the domain tied to the domain entities, we could
+see
+this entire app as a slice since it is intended to only model a single bounded context. We could have used transaction
+scripts
 and moved the code that now resides in the domain entities into what is now glue services.

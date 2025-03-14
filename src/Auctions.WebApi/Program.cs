@@ -10,10 +10,7 @@ using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddControllers().AddJsonOptions(opts =>
-{
-    opts.JsonSerializerOptions.AddAuctionConverters();
-});
+builder.Services.AddControllers().AddJsonOptions(opts => { opts.JsonSerializerOptions.AddAuctionConverters(); });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

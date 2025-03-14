@@ -24,6 +24,7 @@ public static class JsonSamples
                 ""winner"": null,
                 ""hasEnded"": false
         }}";
+
     public const string SecondAuctionRequest = @"{
         ""startsAt"": ""2021-12-01T10:00:00.000Z"",
         ""endsAt"": ""2022-12-18T10:00:00.000Z"",
@@ -43,30 +44,4 @@ public static class JsonSamples
                 ""winner"": null,
                 ""hasEnded"": false
         }";
-
-    public static JToken WithBid(JToken token, string amount, string bidder, string at)
-    {
-        ArgumentNullException.ThrowIfNull(token, nameof(token));
-
-        JArray array = (JArray)(token["bids"] ?? new JArray());
-        array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}"", ""at"":""{at}""}}"));
-        return token;
-    }
-
-    public static JToken WithPriceAndWinner(JToken token, string amount, string winner)
-    {
-        ArgumentNullException.ThrowIfNull(token, nameof(token));
-
-        token["price"] = amount;
-        token["winner"] = winner;
-        return token;
-    }
-
-    public static JToken HasEnded(JToken token)
-    {
-        ArgumentNullException.ThrowIfNull(token, nameof(token));
-
-        token["hasEnded"] = true;
-        return token;
-    }
 }
