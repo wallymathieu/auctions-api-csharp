@@ -18,6 +18,6 @@ public class DomainModelSerializationSpec
     }
 
     public static TheoryData<Auction> Auctions => [
-        WithBids(GetEnglishAuction()),
-        WithBids(VickreyAuction)];
+        AuctionWithBids(GetEnglishAuction()),
+        AuctionWithBids(VickreyAuction)];
 }
