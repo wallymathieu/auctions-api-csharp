@@ -9,7 +9,7 @@ public class MsSqlDatabaseFixture : IDatabaseFixture
 {
     private MsSqlContainer? _dbContainer;
 
-    public Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var db = $"{Guid.NewGuid():N}";
         _dbContainer = new MsSqlBuilder()
@@ -17,10 +17,10 @@ public class MsSqlDatabaseFixture : IDatabaseFixture
             .WithPassword("Strong_password_123!")
             .WithHostname(db)
             .Build();
-        return _dbContainer.StartAsync();
+        await _dbContainer.StartAsync();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (_dbContainer != null)
             await _dbContainer.DisposeAsync();
