@@ -23,7 +23,7 @@ public record Bid(UserId User, Amount Amount, DateTimeOffset At)
 /// </summary>
 public class BidEntity
 {
-#pragma warning disable CS8618
+#pragma warning disable CS8618 // Note that is used by Entity Framework Core.
     private BidEntity(){}
 #pragma warning restore CS8618
     public BidEntity(long id, Bid bid)
@@ -34,7 +34,7 @@ public class BidEntity
         Amount = bid.Amount;
         At = bid.At;
     }
-    #pragma warning disable IDE0051
+    #pragma warning disable IDE0051 // Note the presence of JsonConstructor, i.e. we intend for this to be used by System.Text.Json.
     [JsonConstructor]
     private BidEntity(long id, UserId user, Amount amount, DateTimeOffset at)
     #pragma warning restore IDE0051

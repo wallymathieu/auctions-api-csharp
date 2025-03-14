@@ -1,5 +1,8 @@
 namespace Wallymathieu.Auctions;
 
+/// <summary>
+/// Static methods to create <see cref="Result{TOk, TError}"/> instances.
+/// </summary>
 public static class Result
 {
     public static Result<TOk, TError> Ok<TOk, TError>(TOk ok)

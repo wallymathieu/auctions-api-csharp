@@ -27,22 +27,22 @@ public class AuctionDbContext : DbContext
         propertyBuilder.HasConversion(new EnumToStringConverter<CurrencyCode>()).HasMaxLength(3);
 
     /// <summary>
-    /// Returns a detached list of auctions
+    /// Returns a list of auctions that are not tracked by Entity Framework Core.
     /// </summary>
     public async ValueTask<IReadOnlyCollection<Auction>> GetAuctionsAsync(CancellationToken cancellationToken)
     {
         return await Auctions.AsNoTracking()
-            .Include(a => a.Bids)
+            .Include("Bids")
             .ToListAsync(cancellationToken);
     }
 
     /// <summary>
-    /// Get an attached entity if found
+    /// Get a tracked auction aggregate if found (that it is tracked by Entity Framework Core). This will also load the bids.
     /// </summary>
     public async ValueTask<Auction?> GetAuction(AuctionId auctionId, CancellationToken cancellationToken = default)
     {
         var auction = await Auctions.FindAsync(keyValues: [auctionId], cancellationToken: cancellationToken);
-        if (auction is not null) await Entry(auction).Collection(p => p.Bids).LoadAsync(cancellationToken);
+        if (auction is not null) await Entry(auction).Collection("Bids").LoadAsync(cancellationToken);
         return auction;
     }
 
@@ -59,14 +59,14 @@ public class AuctionDbContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(200);
             WithUserId(entity.Property(o => o.User));
             HasCurrencyCodeConversion(entity.Property(e => e.Currency));
-            entity.HasMany(e => e.Bids).WithOne()
-                .HasPrincipalKey(a => a.AuctionId)
+            entity.HasMany("Bids").WithOne()
+                .HasPrincipalKey("AuctionId")
                 .HasForeignKey("AuctionId");
         });
         modelBuilder.Entity<TimedAscendingAuction>(entity =>
         {
             entity.HasDiscriminator(b => b.AuctionType).HasValue(AuctionType.TimedAscendingAuction);
-            entity.OwnsOne<TimedAscendingOptions>(e => e.Options);
+            entity.OwnsOne(e => e.Options);
         });
         modelBuilder.Entity<SingleSealedBidAuction>(entity =>
         {

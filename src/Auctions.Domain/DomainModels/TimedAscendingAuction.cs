@@ -4,8 +4,8 @@ namespace Wallymathieu.Auctions.DomainModels;
 ///     The responsibility of this class is to handle the domain model of "timed ascending" auction model.
 /// </summary>
 /// <remarks>
-///     You can read more about this style of auction model on Wikipedia on the page about [English
-///     auction](https://en.wikipedia.org/wiki/English_auction).
+///     You can read more about this style of auction model on Wikipedia on the page about <a href="https://en.wikipedia.org/wiki/English_auction">English
+///     auction</a>.
 /// </remarks>
 public class TimedAscendingAuction : Auction, IState
 {
