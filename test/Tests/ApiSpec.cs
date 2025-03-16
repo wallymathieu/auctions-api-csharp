@@ -118,24 +118,27 @@ public abstract class BaseApiSpec(ApiFixture application)
     {
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
-        application.SetTime(StartsAt.AddHours(2));
-        var bidResponse = await application.PostBidToAuction(id, """{"amount":"VAC11"}""", AuthToken.Buyer1);
-        application.SetTime(EndsAt.AddHours(2));
-        var auctionResponse = await application.GetAuction(id, AuthToken.Seller1);
-        var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
-        var stringContent = await auctionResponse.Content.ReadAsStringAsync();
-        Assert.Multiple(() =>
+        using (var setTimeScope = application.CreateSetTimeScope())
         {
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.True(bidResponse.IsSuccessStatusCode);
-            Assert.Empty(bidResponseString);
-            Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
-            Assert.Equal(WithId(HasEnded(
-                    WithPriceAndWinner(
-                        WithBid(JToken.Parse(FirstAuctionResponse), "VAC11", "#1", "02:00:00"),
-                        "VAC11", "#1")), id).ToString(Formatting.Indented),
-                JToken.Parse(stringContent).ToString(Formatting.Indented));
-        });
+            setTimeScope.SetTime(StartsAt.AddHours(2));
+            var bidResponse = await application.PostBidToAuction(id, """{"amount":"VAC11"}""", AuthToken.Buyer1);
+            setTimeScope.SetTime(EndsAt.AddHours(2));
+            var auctionResponse = await application.GetAuction(id, AuthToken.Seller1);
+            var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
+            var stringContent = await auctionResponse.Content.ReadAsStringAsync();
+            Assert.Multiple(() =>
+            {
+                Assert.True(response.IsSuccessStatusCode);
+                Assert.True(bidResponse.IsSuccessStatusCode);
+                Assert.Empty(bidResponseString);
+                Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
+                Assert.Equal(WithId(HasEnded(
+                        WithPriceAndWinner(
+                            WithBid(JToken.Parse(FirstAuctionResponse), "VAC11", "#1", "02:00:00"),
+                            "VAC11", "#1")), id).ToString(Formatting.Indented),
+                    JToken.Parse(stringContent).ToString(Formatting.Indented));
+            });
+        }
     }
 }
 

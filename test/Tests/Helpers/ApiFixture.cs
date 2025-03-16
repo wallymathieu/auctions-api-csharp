@@ -94,8 +94,30 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
         r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
-    public void SetTime(DateTimeOffset now)
+    public ITimeSetter CreateSetTimeScope()
     {
-        _fakeSystemClock.Now = now;
+        return new FakeClockSetter(_fakeSystemClock);
     }
+
+    /// <summary>
+    /// Only intended to reset time back to initial now, so that other tests are not affected by
+    /// clock changes.
+    /// </summary>
+    private sealed class FakeClockSetter(FakeSystemClock fakeSystemClock):ITimeSetter,IDisposable
+    {
+        public void Dispose()
+        {
+            fakeSystemClock.Now = InitialNow;
+        }
+
+        public void SetTime(DateTimeOffset now)
+        {
+            fakeSystemClock.Now = now;
+        }
+    }
+}
+
+public interface ITimeSetter:IDisposable
+{
+    void SetTime(DateTimeOffset now);
 }
