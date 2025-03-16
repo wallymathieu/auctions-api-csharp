@@ -71,10 +71,5 @@ public static class TestData
         Assert.True(state.TryAddBid(Bid2.At, Bid2, out var e2), e2.ToString());
         return state;
     }
-    public static Auction AuctionWithBids<T>(T state) where T : Auction
-    {
-        Assert.True(state.TryAddBid(Bid1.At, Bid1, out var e1), e1.ToString());
-        Assert.True(state.TryAddBid(Bid2.At, Bid2, out var e2), e2.ToString());
-        return state;
-    }
+    public static Auction AuctionWithBids<T>(T state) where T : Auction => WithBids(state);
 }
