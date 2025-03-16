@@ -8,14 +8,14 @@ public sealed class SqliteDatabaseFixture : IDatabaseFixture
     private string? _connectionString;
     private string? _db;
 
-    public Task InitializeAsync()
+    public ValueTask InitializeAsync()
     {
         _db = $"{Guid.NewGuid():N}.db";
         _connectionString = $"Data Source={_db}";
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         if (File.Exists(_db))
             try
@@ -29,7 +29,7 @@ public sealed class SqliteDatabaseFixture : IDatabaseFixture
                 // ignored
             }
 
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     public IDatabaseConfigurator Configurator
