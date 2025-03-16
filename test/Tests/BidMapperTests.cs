@@ -6,7 +6,7 @@ namespace Wallymathieu.Auctions.Tests;
 public class BidMapperTests
 {
     [Fact]
-    public async Task MapBidToModel_ShouldReturnExpectedModel()
+    public async ValueTask MapBidToModel_ShouldReturnExpectedModel()
     {
         // Arrange
         var clock = new FakeSystemClock(StartsAt.AddHours(1.0));

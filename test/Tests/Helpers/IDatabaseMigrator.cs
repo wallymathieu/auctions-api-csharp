@@ -4,5 +4,5 @@ namespace Wallymathieu.Auctions.Tests.Helpers;
 
 public interface IDatabaseMigrator
 {
-    Task Migrate(IServiceScope serviceScope);
+    ValueTask Migrate(IServiceScope serviceScope);
 }

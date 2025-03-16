@@ -5,5 +5,5 @@ public interface IMessageQueue
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
 {
     bool Enabled { get; }
-    Task SendMessageAsync(string queueName, object command, CancellationToken cancellationToken);
+    ValueTask SendMessageAsync(string queueName, object command, CancellationToken cancellationToken);
 }

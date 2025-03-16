@@ -13,7 +13,7 @@ public class AuctionMapperTests
     }
 
     [Fact]
-    public async Task MapAuctionToModel_ShouldReturnExpectedModel()
+    public async ValueTask MapAuctionToModel_ShouldReturnExpectedModel()
     {
         // Arrange
         var auction = GetEnglishAuction();

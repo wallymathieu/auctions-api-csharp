@@ -50,7 +50,7 @@ public class ApiSyncSpecMsClientPrincipalMsSql(MsClientAuthAndMsSqlApiFixture fi
 public abstract class BaseApiSpec(ApiFixture application)
 {
     [Fact]
-    public async Task Create_auction_1()
+    public async ValueTask Create_auction_1()
     {
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
@@ -66,7 +66,7 @@ public abstract class BaseApiSpec(ApiFixture application)
 
 
     [Fact]
-    public async Task Create_auction_2()
+    public async ValueTask Create_auction_2()
     {
         var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
@@ -82,7 +82,7 @@ public abstract class BaseApiSpec(ApiFixture application)
 
 
     [Fact]
-    public async Task Cannot_find_unknown_auction()
+    public async ValueTask Cannot_find_unknown_auction()
     {
         var auctionResponse = await application.GetAuction(99, AuthToken.Seller1);
         Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
@@ -107,14 +107,14 @@ public abstract class BaseApiSpec(ApiFixture application)
                         "title": "Some auction",
                     }
                 """, 2)]
-    public async Task Fail_to_create_auction(string sample, int index)
+    public async ValueTask Fail_to_create_auction(string sample, int index)
     {
         var response = await application.PostAuction(sample, AuthToken.Seller1);
         Assert.Multiple(() => { Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode); });
     }
 
     [Fact]
-    public async Task Place_bid_as_buyer_on_auction_1()
+    public async ValueTask Place_bid_as_buyer_on_auction_1()
     {
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
@@ -142,7 +142,7 @@ public abstract class BaseApiSpec(ApiFixture application)
 public abstract class ApiSyncSpec(ApiFixture application) : BaseApiSpec(application)
 {
     [Fact]
-    public async Task Cannot_place_bid_on_unknown_auction()
+    public async ValueTask Cannot_place_bid_on_unknown_auction()
     {
         var bidResponse = await application.PostBidToAuction(999, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);

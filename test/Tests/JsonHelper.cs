@@ -38,11 +38,11 @@ public static class JsonHelper
         return token;
     }
 
-    public static JToken HasEnded(JToken token)
+    public static JToken HasEnded(JToken token, bool hasEnded = true)
     {
         ArgumentNullException.ThrowIfNull(token);
 
-        token["hasEnded"] = true;
+        token["hasEnded"] = hasEnded;
         return token;
     }
 }

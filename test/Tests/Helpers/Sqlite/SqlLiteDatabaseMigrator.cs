@@ -5,7 +5,7 @@ namespace Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
 public class SqliteDatabaseMigrator : IDatabaseMigrator
 {
-    public async Task Migrate(IServiceScope serviceScope)
+    public async ValueTask Migrate(IServiceScope serviceScope)
     {
         ArgumentNullException.ThrowIfNull(serviceScope, nameof(serviceScope));
 
