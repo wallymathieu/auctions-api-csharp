@@ -3,7 +3,7 @@ namespace Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 /// <summary>
 ///     Database context setup used to configure and setup the database context
 /// </summary>
-public class SqliteDatabaseFixture : IDatabaseFixture
+public sealed class SqliteDatabaseFixture : IDatabaseFixture
 {
     private string? _connectionString;
     private string? _db;
@@ -22,7 +22,9 @@ public class SqliteDatabaseFixture : IDatabaseFixture
             {
                 File.Delete(_db);
             }
+#pragma warning disable CA1031 // these files can be locked, but we do not really care if they are unable to be deleted
             catch
+#pragma warning restore CA1031
             {
                 // ignored
             }

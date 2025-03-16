@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
+using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.JwtPayloads;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 

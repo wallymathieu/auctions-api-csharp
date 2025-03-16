@@ -5,7 +5,7 @@ namespace Wallymathieu.Auctions.Tests.Helpers.MsSql;
 /// <summary>
 /// Database context setup used to configure and setup the database context
 /// </summary>
-public class MsSqlDatabaseFixture : IDatabaseFixture
+public sealed class MsSqlDatabaseFixture : IDatabaseFixture
 {
     private MsSqlContainer? _dbContainer;
 

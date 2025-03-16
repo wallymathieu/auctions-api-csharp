@@ -38,6 +38,8 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
     public async Task DisposeAsync()
     {
         await databaseFixture.DisposeAsync().ConfigureAwait(false);
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public void Dispose()

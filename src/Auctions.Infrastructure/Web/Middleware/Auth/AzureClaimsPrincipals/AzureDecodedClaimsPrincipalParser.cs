@@ -3,17 +3,17 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
+namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.AzureClaimsPrincipals;
 
 /// <summary>
 ///     See https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities
 ///     and https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
 /// </summary>
-internal sealed class ClaimsPrincipalParser : IClaimsPrincipalParser
+internal sealed class AzureDecodedClaimsPrincipalParser : IClaimsPrincipalParser
 {
-    private readonly ILogger<ClaimsPrincipalParser> _logger;
+    private readonly ILogger<AzureDecodedClaimsPrincipalParser> _logger;
 
-    public ClaimsPrincipalParser(ILogger<ClaimsPrincipalParser> logger)
+    public AzureDecodedClaimsPrincipalParser(ILogger<AzureDecodedClaimsPrincipalParser> logger)
     {
         _logger = logger;
     }
@@ -34,7 +34,9 @@ internal sealed class ClaimsPrincipalParser : IClaimsPrincipalParser
             claimsIdentity = new ClaimsPrincipal(identity);
             return true;
         }
+#pragma warning disable CA1031 // we want to catch all exceptions and pass error to logger
         catch (Exception e)
+#pragma warning restore CA1031
         {
             _logger.LogWarning(e, "Failed to decode body header");
             return false;

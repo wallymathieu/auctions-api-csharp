@@ -9,7 +9,7 @@ namespace Wallymathieu.Auctions.Tests;
 
 using static JsonSamples;
 using static JsonHelper;
-
+#pragma warning disable CA2000 // these objects are disposed by the class consuming them
 public class JwtAuthAndSqlLiteApiFixture() :
     ApiFixture(new SqliteDatabaseFixture(), new JwtApiAuth());
 
@@ -21,6 +21,7 @@ public class JwtAuthAndMsSqlApiFixture() :
 
 public class MsClientAuthAndMsSqlApiFixture() :
     ApiFixture(new MsSqlDatabaseFixture(), new MsClientPrincipalApiAuth());
+#pragma warning restore CA2000
 
 [Collection("Sqlite")]
 public class ApiSyncSpecJwtTokenSqlLite(JwtAuthAndSqlLiteApiFixture fixture) :

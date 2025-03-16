@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
+namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.JwtPayloads;
 
 internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
 {
@@ -32,7 +32,9 @@ internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
             ]);
             return true;
         }
+#pragma warning disable CA1031 // we want to catch all exceptions and pass error to logger
         catch (Exception e)
+#pragma warning restore CA1031
         {
             _logger.LogWarning(e, "Failed to decode JWT body header");
             return false;
