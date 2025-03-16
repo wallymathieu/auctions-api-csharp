@@ -15,7 +15,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
 
     private TestServer? _testServer;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await databaseFixture.InitializeAsync();
         var application = _webApplicationFactory
@@ -35,7 +35,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
         _testServer = application.Server;
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await databaseFixture.DisposeAsync().ConfigureAwait(false);
         Dispose(true);
