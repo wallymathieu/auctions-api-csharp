@@ -42,7 +42,7 @@ reason for separating infrastructure and and external dependencies from business
 article/book was written. He also tries to give you ample examples of how he has written existing systems (but that is
 in the context of the popular frameworks and languages of that time). We need to learn of the spirit of the architecture
 and not the letter. The letter is a snapshot of a specific time and place. The spirit is the reason for the
-architecture. In that sense I do not think that the two architectures are mutually exclusive.
+architecture. In that sense I do not think that the two architectures are mutually exclusive. Reading up on what [Ardalis writes](https://ardalis.com/stories-too-big-%E2%80%93-vertical-slices/) suggests that you could apply vertical slices to any layered approach.
 
 In this case we have a small (but complicated) domain with features of the domain tied to the domain entities, we could
 see
