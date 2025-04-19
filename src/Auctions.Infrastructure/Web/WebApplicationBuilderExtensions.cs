@@ -15,7 +15,7 @@ public static class WebApplicationBuilderExtensions
 {
     public static void AddAuctionsWebInfrastructure(this WebApplicationBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
         {

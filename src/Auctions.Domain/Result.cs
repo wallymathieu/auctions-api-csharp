@@ -52,7 +52,7 @@ public sealed class Result<TOk, TError> : IResult
 
     public Result<TOkResult, TError> Select<TOkResult>(Func<TOk, TOkResult> map)
     {
-        ArgumentNullException.ThrowIfNull(map, nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
         return _tag switch
         {
             Tag.Ok => Result.Ok<TOkResult, TError>(map(_ok!)),
@@ -63,7 +63,7 @@ public sealed class Result<TOk, TError> : IResult
 
     public Result<TOk, TErrorResult> SelectError<TErrorResult>(Func<TError, TErrorResult> map)
     {
-        ArgumentNullException.ThrowIfNull(map, nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
         return _tag switch
         {
             Tag.Ok => Result.Ok<TOk, TErrorResult>(_ok!),
@@ -74,8 +74,8 @@ public sealed class Result<TOk, TError> : IResult
 
     public void Match(Action<TOk> ok, Action<TError> error)
     {
-        ArgumentNullException.ThrowIfNull(ok, nameof(ok));
-        ArgumentNullException.ThrowIfNull(error, nameof(error));
+        ArgumentNullException.ThrowIfNull(ok);
+        ArgumentNullException.ThrowIfNull(error);
         switch (_tag)
         {
             case Tag.Ok:
@@ -89,8 +89,8 @@ public sealed class Result<TOk, TError> : IResult
 
     public TResult Match<TResult>(Func<TOk, TResult> ok, Func<TError, TResult> error)
     {
-        ArgumentNullException.ThrowIfNull(ok, nameof(ok));
-        ArgumentNullException.ThrowIfNull(error, nameof(error));
+        ArgumentNullException.ThrowIfNull(ok);
+        ArgumentNullException.ThrowIfNull(error);
         return _tag switch
         {
             Tag.Ok => ok(_ok!),

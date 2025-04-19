@@ -59,7 +59,7 @@ public class MsClientPrincipalApiAuth : IApiAuth
 
     public void Configure(IWebHostBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.UseSetting("PrincipalHeader", XMsClientPrincipal);
     }

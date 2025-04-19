@@ -16,7 +16,7 @@ public class AmountConverter : JsonConverter<Amount>
 
     public override void Write(Utf8JsonWriter writer, Amount? value, JsonSerializerOptions options)
     {
-        ArgumentNullException.ThrowIfNull(writer, nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         if (value is not null)
             writer.WriteStringValue(value.ToString());
         else

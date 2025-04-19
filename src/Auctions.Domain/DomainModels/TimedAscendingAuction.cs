@@ -20,7 +20,7 @@ public class TimedAscendingAuction : Auction, IState
 
     public override bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
     {
-        ArgumentNullException.ThrowIfNull(bid, nameof(bid));
+        ArgumentNullException.ThrowIfNull(bid);
         var state = GetState(time);
         switch (state)
         {

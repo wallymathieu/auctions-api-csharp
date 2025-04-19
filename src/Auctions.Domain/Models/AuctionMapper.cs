@@ -10,7 +10,7 @@ public class AuctionMapper(ISystemClock systemClock)
 {
     public AuctionModel MapAuctionToModel(Auction auction)
     {
-        ArgumentNullException.ThrowIfNull(auction, nameof(auction));
+        ArgumentNullException.ThrowIfNull(auction);
         var now = systemClock.Now;
         var amountAndWinner = auction.TryGetAmountAndWinner(now);
         var hasEnded = auction.HasEnded(now);

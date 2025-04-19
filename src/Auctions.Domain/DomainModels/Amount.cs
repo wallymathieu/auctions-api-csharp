@@ -35,8 +35,8 @@ public partial record Amount(long Value, CurrencyCode Currency) : IComparable<Am
 
     public static Amount Add(Amount a1, Amount a2)
     {
-        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
-        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+        ArgumentNullException.ThrowIfNull(a1);
+        ArgumentNullException.ThrowIfNull(a2);
 
         AssertSameCurrency(a1, a2);
 
@@ -47,16 +47,16 @@ public partial record Amount(long Value, CurrencyCode Currency) : IComparable<Am
 
     public static Amount Subtract(Amount a1, Amount a2)
     {
-        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
-        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+        ArgumentNullException.ThrowIfNull(a1);
+        ArgumentNullException.ThrowIfNull(a2);
         AssertSameCurrency(a1, a2);
         return a1 with { Value = a1.Value - a2.Value };
     }
 
     public static bool operator <=(Amount a1, Amount a2)
     {
-        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
-        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+        ArgumentNullException.ThrowIfNull(a1);
+        ArgumentNullException.ThrowIfNull(a2);
         AssertSameCurrency(a1, a2);
         return a1.Value <= a2.Value;
     }
@@ -73,8 +73,8 @@ public partial record Amount(long Value, CurrencyCode Currency) : IComparable<Am
 
     public static bool operator >=(Amount a1, Amount a2)
     {
-        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
-        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+        ArgumentNullException.ThrowIfNull(a1);
+        ArgumentNullException.ThrowIfNull(a2);
         AssertSameCurrency(a1, a2);
 
         return a1.Value >= a2.Value;
@@ -82,8 +82,8 @@ public partial record Amount(long Value, CurrencyCode Currency) : IComparable<Am
 
     public static bool operator >(Amount a1, Amount a2)
     {
-        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
-        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+        ArgumentNullException.ThrowIfNull(a1);
+        ArgumentNullException.ThrowIfNull(a2);
         AssertSameCurrency(a1, a2);
 
         return a1.Value > a2.Value;
@@ -91,8 +91,8 @@ public partial record Amount(long Value, CurrencyCode Currency) : IComparable<Am
 
     public static bool operator <(Amount a1, Amount a2)
     {
-        ArgumentNullException.ThrowIfNull(a1, nameof(a1));
-        ArgumentNullException.ThrowIfNull(a2, nameof(a2));
+        ArgumentNullException.ThrowIfNull(a1);
+        ArgumentNullException.ThrowIfNull(a2);
         AssertSameCurrency(a1, a2);
 
         return a1.Value < a2.Value;
