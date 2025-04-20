@@ -49,3 +49,17 @@ see
 this entire app as a slice since it is intended to only model a single bounded context. We could have used transaction
 scripts
 and moved the code that now resides in the domain entities into what is now glue services.
+
+## Limitations
+
+### Concurrency
+
+We are not dealing with what could happen if you send bids at the same time. How persistence is dealt with is overly simplistic. This could of course (as we often see) be the case even for production apps.
+
+What happens when multiple bidders send the same bid at the same time? Since we do not implement any check for write consistency we could get inconsistent data in the database.
+
+In a real world case, you could have Terms of service with explicit limitations in order to limit the software complexity. You could also design user interface to not expect an immediate response (i.e. that you put the writes behind a queue).
+
+### Administration
+
+In a commercial site you would expect there to be back office staff such as support personal that can view information not accessible to regular users.
