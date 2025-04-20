@@ -82,6 +82,8 @@ cd src/Auctions.AzureFunctions
 func start
 ```
 
+Note that the .env files are only intended to be used for local development. In production there are better ways.
+
 ## Auth
 
 The API assumes that you have auth middleware in front of the app.
