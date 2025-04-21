@@ -56,7 +56,7 @@ and moved the code that now resides in the domain entities into what is now glue
 
 We are not dealing with what could happen if you send bids at the same time. How persistence is dealt with is overly simplistic. This could of course (as we often see) be the case even for production apps.
 
-What happens when multiple bidders send the same bid at the same time? Since we do not implement any check for write consistency we could get inconsistent data in the database.
+What happens when multiple bidders send the same bid at the same time? We implement optimistic concurrency using a [version token in Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/saving/concurrency?tabs=fluent-api). This means that if two users try bid on the same auction at the same time, one of them will succeed and the other will fail with a `DbUpdateConcurrencyException`.
 
 In a real world case, you could have Terms of service with explicit limitations in order to limit the software complexity. You could also design user interface to not expect an immediate response (i.e. that you put the writes behind a queue).
 
