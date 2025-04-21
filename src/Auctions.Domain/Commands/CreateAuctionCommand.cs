@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Commands;
