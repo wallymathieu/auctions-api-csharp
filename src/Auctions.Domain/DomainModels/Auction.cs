@@ -40,9 +40,10 @@ public abstract class Auction : IState
 
     public UserId User { get; init; }
     public CurrencyCode Currency { get; init; }
-    public AuctionType AuctionType { get; set; }
+    public AuctionType AuctionType { get; init; }
 
-    public bool OpenBidders { get; set; }
+    public bool OpenBidders { get; init; }
+    public Guid Version { get; set; }
 
     /// <summary>
     /// Create either a SingleSealedBidAuction or a TimedAscendingAuction based on the command.
@@ -66,6 +67,8 @@ public abstract class Auction : IState
                 StartsAt = cmd.StartsAt,
                 Title = cmd.Title,
                 User = userContext.UserId!,
+                Options = cmd.SingleSealedBidOptions!.Value,
+                OpenBidders = cmd.Open,
                 Version = Guid.NewGuid(),
             };
         }
@@ -84,7 +87,9 @@ public abstract class Auction : IState
                     MinRaise = cmd.MinRaise ?? 0,
                     ReservePrice = cmd.ReservePrice ?? 0,
                     TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
-                }
+                },
+                Version = Guid.NewGuid(),
+                OpenBidders = cmd.Open,
             };
         }
     }
