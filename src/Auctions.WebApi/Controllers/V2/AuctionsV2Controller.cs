@@ -1,16 +1,16 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Data;
-using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Models;
 
-namespace Wallymathieu.Auctions.Api.Controllers;
+namespace Wallymathieu.Auctions.Api.Controllers.V2;
 
 [ApiController]
-[Route("auctions")]
+[Route("auctions"), ApiVersion("2.0")]
 public class AuctionsController(
     AuctionMapper auctionMapper,
     ICreateAuctionCommandHandler createAuctionCommandHandler,
@@ -24,7 +24,7 @@ public class AuctionsController(
     /// <remarks>
     /// Get a list of auctions.
     /// </remarks>
-    [HttpGet(Name = "get_auctions")]
+    [HttpGet(Name = "get_auctions_v2")]
     public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
         from auction in await auctionQuery.GetAuctionsAsync(cancellationToken)
         select auctionMapper.MapAuctionToModel(auction);
@@ -32,7 +32,7 @@ public class AuctionsController(
     /// <summary>
     /// Get a single auction
     /// </summary>
-    [HttpGet("{auctionId}", Name = "get_auction")]
+    [HttpGet("{auctionId}", Name = "get_auction_v2")]
     public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
     {
         var auction = await auctionQuery.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
@@ -48,7 +48,7 @@ public class AuctionsController(
     /// [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction). It can also be a
     /// [Timed ascending auction also known as an English auction](https://en.wikipedia.org/wiki/English_auction).
     /// </remarks>
-    [HttpPost(Name = "create_auction"), Authorize,
+    [HttpPost(Name = "create_auction_v2"), Authorize,
      ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<ActionResult> Post(
         CreateAuctionCommand model, CancellationToken cancellationToken)
@@ -62,7 +62,7 @@ public class AuctionsController(
     /// <summary>
     /// Add a bid on an auction
     /// </summary>
-    [HttpPost("{auctionId}/bids", Name = "add_bid"), Authorize,
+    [HttpPost("{auctionId}/bids", Name = "add_bid_v2"), Authorize,
      ProducesResponseType(typeof(void), StatusCodes.Status200OK),
      ProducesResponseType(typeof(Errors), StatusCodes.Status400BadRequest),
      ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]

@@ -1,55 +1,43 @@
 using System.Reflection;
-using System.Text.Json;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using Wallymathieu.Auctions.DomainModels;
+using Asp.Versioning;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Web;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
-
+using Wallymathieu.Auctions.WebApi;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(opts => { opts.JsonSerializerOptions.AddAuctionConverters(); });
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddApiVersioning(
+                    options =>
+                    {
+                        // reporting api versions will return the headers
+                        // "api-supported-versions" and "api-deprecated-versions"
+                        options.ReportApiVersions = true;
+                        options.AssumeDefaultVersionWhenUnspecified = true;
+                        options.DefaultApiVersion = new ApiVersion(1, 0);
+                        options.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
+                    }).AddApiExplorer(
+                    options =>
+                    {
+                        // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                        // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                        options.GroupNameFormat = "'v'VVV";
+
+                    });
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.OperationFilter<SwaggerDefaultValues>();
     var webAssembly = typeof(Program).GetTypeInfo().Assembly;
-    var informationalVersion =
-        (webAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute))
-            as AssemblyInformationalVersionAttribute[])?.First().InformationalVersion;
-
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = informationalVersion ?? "dev",
-        Title = "Auction API",
-        Description = "Simple implementation of Auction API in C#",
-        Contact = new OpenApiContact
-        {
-            Name = "Oskar Gewalli",
-            Email = "wallymathieu@users.noreply.github.com",
-            Url = new Uri("https://github.com/wallymathieu/auctions-api-csharp")
-        }
-    });
-
     //Set the comments path for the swagger json and ui.
     var xmlPath = webAssembly.Location
         .Replace(".dll", ".xml", StringComparison.OrdinalIgnoreCase)
         .Replace(".exe", ".xml", StringComparison.OrdinalIgnoreCase);
     if (File.Exists(xmlPath))
         options.IncludeXmlComments(xmlPath);
-    var opts = new JsonSerializerOptions().AddAuctionConverters();
-    options.MapType(typeof(Amount), () => new OpenApiSchema
-    {
-        Type = "string",
-        Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
-    });
-    options.MapType<TimeSpan>(() => new OpenApiSchema
-    {
-        Type = "string",
-        Format = "^(\\d{2}:)?\\d{2}:\\d{2}:\\d{2}$",
-        Example = new OpenApiString(JsonSerializer.Serialize(TimeSpan.FromSeconds(1234), opts))
-    });
 });
 builder.AddAuctionsWebInfrastructure();
 builder.Services.AddAuctionsWebJwt()
@@ -76,12 +64,20 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger(c => { c.RouteTemplate = "swagger/{documentName}/swagger.json"; });
 
-    app.UseReDoc(c =>
-    {
-        c.RoutePrefix = "docs";
-        c.EnableUntrustedSpec();
-        c.SpecUrl("/swagger/v1/swagger.json");
-    });
+    app.UseSwaggerUI(
+        options =>
+        {
+            var descriptions = app.DescribeApiVersions();
+
+            // build a swagger endpoint for each discovered API version
+            foreach (var description in descriptions)
+            {
+                Console.WriteLine($"Adding {description.GroupName}");
+                var url = $"/swagger/{description.GroupName}/swagger.json";
+                var name = description.GroupName.ToUpperInvariant();
+                options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+            }
+        });
 }
 
 app.UseHttpsRedirection();
