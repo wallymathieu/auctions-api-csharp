@@ -7,6 +7,7 @@ using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.Models.V1;
 
 namespace Wallymathieu.Auctions.Api.Controllers.V1;
 [ApiController]
@@ -51,9 +52,11 @@ public class AuctionsController(
     [HttpPost("/auction",Name = "create_auction"), Authorize,
      ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<ActionResult> Post(
-        CreateAuctionCommand model, CancellationToken cancellationToken)
+        CreateAuctionModel model, CancellationToken cancellationToken)
     {
-        var auction = await createAuctionCommandHandler.Handle(model, cancellationToken);
+        if (model is null || !model.TryToConvert(out var command))
+            return BadRequest("Invalid auction model");
+        var auction = await createAuctionCommandHandler.Handle(command!, cancellationToken);
         var auctionModel =
             auctionMapper.MapAuctionToModel(auction);
         return CreatedAtAction(nameof(GetSingle), new { auctionId = auctionModel.Id }, auctionModel);

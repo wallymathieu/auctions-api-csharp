@@ -1,7 +1,8 @@
 using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.Models.V1;
 using Wallymathieu.Auctions.Tests.Helpers;
 
-namespace Wallymathieu.Auctions.Tests;
+namespace Wallymathieu.Auctions.Tests.V1;
 
 public class BidMapperTests
 {

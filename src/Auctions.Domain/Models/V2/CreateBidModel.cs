@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
 
-namespace Wallymathieu.Auctions.Models;
+namespace Wallymathieu.Auctions.Models.V2;
 
 /// <summary>
 /// Note that the <see cref="CreateBidCommand"/> takes in an additional parameter that we want to include from the
