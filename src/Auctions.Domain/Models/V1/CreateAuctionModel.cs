@@ -11,7 +11,7 @@ namespace Wallymathieu.Auctions.Models.V1;
 /// <param name="StartsAt"></param>
 /// <param name="EndsAt"></param>
 /// <param name="Currency"></param>
-/// <param name="Type">Is either "English|{reservePrice}|{minRaise}|{timeFrame.Ticks}", "Blind" or "Vickrey"</param>
+/// <param name="Type">Is either nothing or "English|{reservePrice}|{minRaise}|{timeFrame.Ticks}", "Blind" or "Vickrey"</param>
 public record CreateAuctionModel(
     [Required] string Title,
     [Required] DateTimeOffset StartsAt,
