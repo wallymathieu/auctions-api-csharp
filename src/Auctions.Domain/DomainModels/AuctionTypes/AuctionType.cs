@@ -1,8 +1,8 @@
+namespace Wallymathieu.Auctions.DomainModels.AuctionTypes;
 
-namespace Wallymathieu.Auctions.DomainModels;
-public abstract record AuctionTypeWithOptions
+public abstract record AuctionType
 {
-    public static bool TryParse(string? type, out AuctionTypeWithOptions? auctionTypeWithOptions)
+    public static bool TryParse(string? type, out AuctionType? auctionTypeWithOptions)
     {
         auctionTypeWithOptions = null;
         if (string.IsNullOrWhiteSpace(type))
@@ -20,32 +20,22 @@ public abstract record AuctionTypeWithOptions
                     && long.TryParse(parts[2], out var reservePrice)
                     && long.TryParse(parts[3], out var timeFrame)
                     =>
-                new English(
+                new EnglishAuctionType(
                     MinRaise: minRaise,
                     ReservePrice: reservePrice,
                     TimeFrame: TimeSpan.FromTicks(timeFrame)),
-            "blind" => new Blind(),
-            "vickrey" => new Vickrey(),
+            "blind" => new BlindAuctionType(),
+            "vickrey" => new VickreyAuctionType(),
             _ => null
         };
         if (auctionTypeWithOptions != null)
             return true;
         return false;
     }
-    public static AuctionTypeWithOptions Parse(string type)
+    public static AuctionType Parse(string type)
     {
         if (TryParse(type, out var auctionTypeWithOptions))
             return auctionTypeWithOptions!;
         throw new ArgumentException($"Invalid auction type", nameof(type));
     }
-    internal record English(long MinRaise, long ReservePrice, TimeSpan TimeFrame) : AuctionTypeWithOptions
-    {
-    }
-    internal record Vickrey : AuctionTypeWithOptions
-    {
-    }
-    internal record Blind : AuctionTypeWithOptions
-    {
-    }
 }
-

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
+using Wallymathieu.Auctions.DomainModels.AuctionTypes;
 
 namespace Wallymathieu.Auctions.Models.V1;
 
@@ -27,19 +28,19 @@ public record CreateAuctionModel(
         SingleSealedBidOptions? singleSealedBidOptions = null;
         if (!string.IsNullOrWhiteSpace(Type))
         {
-            if (AuctionTypeWithOptions.TryParse(Type, out var auctionTypeWithOptions))
+            if (DomainModels.AuctionTypes.AuctionType.TryParse(Type, out var auctionTypeWithOptions))
             {
                 switch (auctionTypeWithOptions)
                 {
-                    case AuctionTypeWithOptions.English english:
+                    case EnglishAuctionType english:
                         MinRaise = english.MinRaise;
                         ReservePrice = english.ReservePrice;
                         TimeFrame = english.TimeFrame;
                         break;
-                    case AuctionTypeWithOptions.Blind:
+                    case BlindAuctionType:
                         singleSealedBidOptions = SingleSealedBidOptions.Blind;
                         break;
-                    case AuctionTypeWithOptions.Vickrey:
+                    case VickreyAuctionType:
                         singleSealedBidOptions = SingleSealedBidOptions.Vickrey;
                         break;
                     default:
