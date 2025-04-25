@@ -53,6 +53,9 @@ public abstract class BaseApiSpec(ApiFixture application)
     public async Task Create_auction_1()
     {
         var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
+        if (!response.IsSuccessStatusCode)
+            Assert.Fail($"Failed to create auction: {response.StatusCode}");
+
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
         var auction1 = await application.GetAuction(id, AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
@@ -69,6 +72,9 @@ public abstract class BaseApiSpec(ApiFixture application)
     public async Task Create_auction_2()
     {
         var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
+        if (!response.IsSuccessStatusCode)
+            Assert.Fail($"Failed to create auction: {response.StatusCode}");
+
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
         var auction1 = await application.GetAuction(id, AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
@@ -95,17 +101,16 @@ public abstract class BaseApiSpec(ApiFixture application)
                         "endsAt": "2022-12-18T10:00:00.000Z",
                         "title": "Some auction",
                         "currency": "VAC",
-                        "timeFrame": -1,
-                        "reservePrice": null,
-                        "minRaise":null
-                    }
+                        "type": "English|-1"
+                }
                 """, 1)]
     [InlineData("""
                 {
                         "startsAt": "2021-12-01T10:00:00.000Z",
                         "endsAt": "2022-12-18T10:00:00.000Z",
                         "title": "Some auction",
-                    }
+                        "type": "English|1|2|Bla"
+                }
                 """, 2)]
     public async Task Fail_to_create_auction(string sample, int index)
     {
