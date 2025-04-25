@@ -6,25 +6,22 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Json;
-namespace Wallymathieu.Auctions.WebApi;
+
+namespace Wallymathieu.Auctions.Api;
+
 /// <summary>
 /// Configures the Swagger generation options.
 /// </summary>
 /// <remarks>This allows API versioning to define a Swagger document per API version after the
 /// <see cref="IApiVersionDescriptionProvider"/> service has been resolved from the service container.</remarks>
-internal class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
+internal class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) :
+    IConfigureOptions<SwaggerGenOptions>,
+    IConfigureOptions<SwaggerOptions>
 {
-    private readonly IApiVersionDescriptionProvider provider;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigureSwaggerOptions"/> class.
-    /// </summary>
-    /// <param name="provider">The <see cref="IApiVersionDescriptionProvider">provider</see> used to generate Swagger documents.</param>
-    public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) => this.provider = provider;
-
     /// <inheritdoc />
     public void Configure(SwaggerGenOptions options)
     {
@@ -32,7 +29,6 @@ internal class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         var informationalVersion =
             (webAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute))
                 as AssemblyInformationalVersionAttribute[])?.First().InformationalVersion;
-        // TODO: put the version somewhere in the docs
 
         var opts = new JsonSerializerOptions().AddAuctionConverters();
         options.MapType(typeof(Amount), () => new OpenApiSchema
@@ -50,11 +46,11 @@ internal class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         // note: you might choose to skip or document deprecated API versions differently
         foreach (var description in provider.ApiVersionDescriptions)
         {
-            options.SwaggerDoc(description.GroupName, CreateInfoForApiVersion(description));
+            options.SwaggerDoc(description.GroupName, CreateInfoForApiVersion(description, informationalVersion));
         }
     }
 
-    private static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description)
+    private static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description, string? informationalVersion)
     {
         var text = new StringBuilder("Simple implementation of Auction API in C#");
         var info = new OpenApiInfo
@@ -120,8 +116,16 @@ internal class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         }
 
         text.Append("<h4>Additional Information</h4>");
+        text.Append("<p> Informational version: ");
+        text.Append(informationalVersion ?? "dev");
+        text.Append("</p>");
         info.Description = text.ToString();
 
         return info;
+    }
+
+    public void Configure(SwaggerOptions options)
+    {
+        options.RouteTemplate = "swagger/{documentName}/swagger.json";
     }
 }
