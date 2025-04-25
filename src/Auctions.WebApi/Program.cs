@@ -1,8 +1,13 @@
 using System.Reflection;
-using System.Text.Json;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using Wallymathieu.Auctions.DomainModels;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using Wallymathieu.Auctions.Api;
+using Wallymathieu.Auctions.Api.Infrastructure;
+using Wallymathieu.Auctions.Api.Infrastructure.Swagger;
 using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Web;
@@ -11,46 +16,15 @@ using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(opts => { opts.JsonSerializerOptions.AddAuctionConverters(); });
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    var webAssembly = typeof(Program).GetTypeInfo().Assembly;
-    var informationalVersion =
-        (webAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute))
-            as AssemblyInformationalVersionAttribute[])?.First().InformationalVersion;
-
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = informationalVersion ?? "dev",
-        Title = "Auction API",
-        Description = "Simple implementation of Auction API in C#",
-        Contact = new OpenApiContact
-        {
-            Name = "Oskar Gewalli",
-            Email = "wallymathieu@users.noreply.github.com",
-            Url = new Uri("https://github.com/wallymathieu/auctions-api-csharp")
-        }
-    });
-
-    //Set the comments path for the swagger json and ui.
-    var xmlPath = webAssembly.Location
-        .Replace(".dll", ".xml", StringComparison.OrdinalIgnoreCase)
-        .Replace(".exe", ".xml", StringComparison.OrdinalIgnoreCase);
-    if (File.Exists(xmlPath))
-        options.IncludeXmlComments(xmlPath);
-    var opts = new JsonSerializerOptions().AddAuctionConverters();
-    options.MapType(typeof(Amount), () => new OpenApiSchema
-    {
-        Type = "string",
-        Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
-    });
-    options.MapType<TimeSpan>(() => new OpenApiSchema
-    {
-        Type = "string",
-        Format = "^(\\d{2}:)?\\d{2}:\\d{2}:\\d{2}$",
-        Example = new OpenApiString(JsonSerializer.Serialize(TimeSpan.FromSeconds(1234), opts))
-    });
-});
+builder.Services.AddApiVersioning().AddApiExplorer();
+builder.Services
+    .AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>()
+    .AddTransient<IConfigureOptions<SwaggerOptions>, ConfigureSwaggerOptions>()
+    .AddTransient<IConfigureOptions<ApiVersioningOptions>, ConfigureApiVersioning>()
+    .AddTransient<IConfigureOptions<ApiExplorerOptions>, ConfigureApiVersioning>()
+    .AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerGen>()
+    .AddTransient<IConfigureOptions<SwaggerUIOptions>, ConfigureSwaggerUI>();
+builder.Services.AddSwaggerGen();
 builder.AddAuctionsWebInfrastructure();
 builder.Services.AddAuctionsWebJwt()
     .AddHttpContextAccessor()
@@ -74,14 +48,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(c => { c.RouteTemplate = "swagger/{documentName}/swagger.json"; });
+    app.UseSwagger();
 
-    app.UseReDoc(c =>
-    {
-        c.RoutePrefix = "docs";
-        c.EnableUntrustedSpec();
-        c.SpecUrl("/swagger/v1/swagger.json");
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -89,4 +58,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

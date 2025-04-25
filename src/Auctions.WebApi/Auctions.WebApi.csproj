@@ -19,8 +19,8 @@
     <InternalsVisibleTo Include="Tests"/>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.14"/>
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.10.0"/>
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.9.0"/>
     <PackageReference Include="Azure.Storage.Queues" Version="12.22.0"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -1,16 +1,11 @@
-using Wallymathieu.Auctions.Models;
+using Wallymathieu.Auctions.Models.V1;
 using Wallymathieu.Auctions.Tests.Helpers;
 
-namespace Wallymathieu.Auctions.Tests;
+namespace Wallymathieu.Auctions.Tests.V1;
 
 public class AuctionMapperTests
 {
-    private readonly AuctionMapper _sut;
-
-    public AuctionMapperTests()
-    {
-        _sut = new AuctionMapper(new FakeSystemClock(StartsAt.AddHours(1)));
-    }
+    private readonly AuctionMapper _sut = new(new FakeSystemClock(StartsAt.AddHours(1)));
 
     [Fact]
     public async Task MapAuctionToModel_ShouldReturnExpectedModel()

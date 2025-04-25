@@ -1,6 +1,6 @@
 using Wallymathieu.Auctions.DomainModels;
 
-namespace Wallymathieu.Auctions.Models;
+namespace Wallymathieu.Auctions.Models.V2;
 
 /// <summary>
 /// Note that the <see cref="Seller"/> is supposed to be seller description (for instance a nick chosen by the user).
@@ -9,7 +9,7 @@ public record AuctionModel(
     long Id,
     DateTimeOffset StartsAt,
     string Title,
-    DateTimeOffset Expiry,
+    DateTimeOffset EndsAt,
     string? Seller,
     CurrencyCode Currency,
 #pragma warning disable CA1819 // Properties should not return arrays

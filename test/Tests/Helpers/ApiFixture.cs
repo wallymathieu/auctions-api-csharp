@@ -57,7 +57,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
 
     public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken)
     {
-        return await _testServer!.CreateRequest("/auctions").And(r =>
+        return await _testServer!.CreateRequest("/auction").And(r =>
         {
             r.Content = Json(auctionRequest);
             AcceptJson(r);
@@ -67,7 +67,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
 
     public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken)
     {
-        return await _testServer!.CreateRequest($"/auctions/{id}/bids").And(r =>
+        return await _testServer!.CreateRequest($"/auction/{id}/bids").And(r =>
         {
             r.Content = Json(bidRequest);
             AcceptJson(r);
@@ -82,7 +82,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
 
     public async Task<HttpResponseMessage> GetAuction(long id, AuthToken authToken)
     {
-        return await _testServer!.CreateRequest($"/auctions/{id}").And(r =>
+        return await _testServer!.CreateRequest($"/auction/{id}").And(r =>
         {
             AcceptJson(r);
             auth.TryAddAuth(r, authToken);

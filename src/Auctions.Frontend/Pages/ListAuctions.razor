@@ -1,8 +1,7 @@
 ﻿@page "/auctions"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
-@using Wallymathieu.Auctions.Infrastructure.Models
-@using Wallymathieu.Auctions.Models
+@using Wallymathieu.Auctions.Models.V2
 @inject IAuctionQuery Query
 @inject ICreateAuctionCommandHandler CreateAuctionCommandHandler
 @inject AuctionMapper Mapper
@@ -24,7 +23,7 @@ else if (_auctions.Data != null)
         <tr>
             <th>Title</th>
             <th>Starts at</th>
-            <th>Expires at</th>
+            <th>Ends at</th>
             <th>Seller</th>
         </tr>
         </thead>
@@ -34,7 +33,7 @@ else if (_auctions.Data != null)
             <tr>
                 <td><a href="/auctions/@auction.Id">@auction.Title</a></td>
                 <td>@auction.StartsAt.Date.ToShortDateString()</td>
-                <td>@auction.Expiry.Date.ToShortDateString()</td>
+                <td>@auction.EndsAt.Date.ToShortDateString()</td>
                 <td>@auction.Seller</td>
             </tr>
         }

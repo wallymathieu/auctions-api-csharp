@@ -7,7 +7,7 @@ trigger:
 - azdo
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-22.04'
 
 variables:
   solution: '**/*.sln'
