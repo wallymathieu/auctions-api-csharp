@@ -24,7 +24,8 @@ public record CreateAuctionModel(
     long? MinRaise,
     long? ReservePrice,
     TimeSpan? TimeFrame,
-    SingleSealedBidOptions? SingleSealedBidOptions)
+    SingleSealedBidOptions? SingleSealedBidOptions,
+    bool OpenBidders)
 {
     public CreateAuctionCommand ToCommand()
     {
@@ -36,6 +37,7 @@ public record CreateAuctionModel(
             MinRaise: MinRaise,
             ReservePrice: ReservePrice,
             TimeFrame: TimeFrame,
-            SingleSealedBidOptions: SingleSealedBidOptions);
+            SingleSealedBidOptions: SingleSealedBidOptions,
+            Open: OpenBidders);
     }
 }

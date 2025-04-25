@@ -18,7 +18,8 @@ public record CreateAuctionModel(
     [Required] DateTimeOffset StartsAt,
     [Required] DateTimeOffset EndsAt,
     CurrencyCode Currency,
-    string? Type)
+    string? Type,
+    bool Open)
 {
     public bool TryToConvert(out CreateAuctionCommand? command)
     {
@@ -63,7 +64,8 @@ public record CreateAuctionModel(
             MinRaise: MinRaise,
             ReservePrice: ReservePrice,
             TimeFrame: TimeFrame,
-            SingleSealedBidOptions: singleSealedBidOptions);
+            SingleSealedBidOptions: singleSealedBidOptions,
+            Open: Open);
         return true;
     }
 }
