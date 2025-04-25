@@ -1,0 +1,9 @@
+﻿{
+  Id: 1,
+  StartsAt: DateTimeOffset_1,
+  Title: auction,
+  EndsAt: DateTimeOffset_2,
+  Seller: x1,
+  Currency: SEK,
+  HasEnded: false
+}

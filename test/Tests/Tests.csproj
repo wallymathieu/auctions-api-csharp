@@ -32,4 +32,11 @@
     <ProjectReference Include="..\..\src\Auctions.WebApi\Auctions.WebApi.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="BidMapperTests.MapBidToModel_ShouldReturnExpectedModel.verified.txt">
+      <ParentFile>BidMapperTests</ParentFile>
+      <DependentUpon>BidMapperTests.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>
