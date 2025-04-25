@@ -6,6 +6,8 @@ using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Wallymathieu.Auctions.Api;
+using Wallymathieu.Auctions.Api.Infrastructure;
+using Wallymathieu.Auctions.Api.Infrastructure.Swagger;
 using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Web;

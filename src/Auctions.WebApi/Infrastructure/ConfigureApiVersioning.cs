@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 
-namespace Wallymathieu.Auctions.Api;
+namespace Wallymathieu.Auctions.Api.Infrastructure;
 
 internal class ConfigureApiVersioning :
     IConfigureOptions<ApiVersioningOptions>,

@@ -2,7 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Wallymathieu.Auctions.Api.Infrastructure;
+namespace Wallymathieu.Auctions.Api.Infrastructure.Swagger;
 
 internal class ConfigureSwaggerGen :
     IConfigureOptions<SwaggerGenOptions>
