@@ -14,7 +14,7 @@ public abstract record AuctionType
 
         auctionTypeWithOptions = parts[0] switch
         {
-            "english" when
+            "English" when
                     parts.Length == 4
                     && long.TryParse(parts[1], out var minRaise)
                     && long.TryParse(parts[2], out var reservePrice)
@@ -24,13 +24,11 @@ public abstract record AuctionType
                     MinRaise: minRaise,
                     ReservePrice: reservePrice,
                     TimeFrame: TimeSpan.FromTicks(timeFrame)),
-            "blind" => new BlindAuctionType(),
-            "vickrey" => new VickreyAuctionType(),
+            "Blind" => new BlindAuctionType(),
+            "Vickrey" => new VickreyAuctionType(),
             _ => null
         };
-        if (auctionTypeWithOptions != null)
-            return true;
-        return false;
+        return auctionTypeWithOptions != null;
     }
     public static AuctionType Parse(string type)
     {
