@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Json;
 
-namespace Wallymathieu.Auctions.Api;
+namespace Wallymathieu.Auctions.Api.Infrastructure;
 
 /// <summary>
 /// Configures the Swagger generation options.

@@ -2,7 +2,7 @@ using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-namespace Wallymathieu.Auctions.Api;
+namespace Wallymathieu.Auctions.Api.Infrastructure.Swagger;
 
 internal class ConfigureSwaggerUI(IApiVersionDescriptionProvider provider) :
     IConfigureOptions<SwaggerUIOptions>
