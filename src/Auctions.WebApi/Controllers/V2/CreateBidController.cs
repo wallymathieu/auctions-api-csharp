@@ -24,11 +24,8 @@ public class CreateBidController(
     public async Task<ActionResult> PostBid(long auctionId,
         CreateBidModel model, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(model);
-
-        var id = new AuctionId(auctionId);
-        var cmd = new CreateBidCommand(model.Amount, id);
-        var result = await createBidCommandHandler.Handle(cmd, cancellationToken);
+        var result = await createBidCommandHandler.Handle(
+            new CreateBidCommand(model.Amount, new AuctionId(auctionId)), cancellationToken);
 
         if (result is null) return NotFound();
         return result.Match<ActionResult>(_ => Ok(), err => err == Errors.UnknownAuction
