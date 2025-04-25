@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Services;
+using Wallymathieu.Auctions.Tests.Helpers.Http;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisposable, IAsyncLifetime
+public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth, IAuctionClient client)
+    : IDisposable, IAsyncLifetime
 {
     private readonly FakeSystemClock _fakeSystemClock = new(InitialNow);
     private readonly WebApplicationFactory<Program> _webApplicationFactory = new();
@@ -55,43 +57,15 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
         _webApplicationFactory.Dispose();
     }
 
-    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken)
-    {
-        return await _testServer!.CreateRequest("/auction").And(r =>
-        {
-            r.Content = Json(auctionRequest);
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).PostAsync();
-    }
+    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken) =>
+        await client.PostAuction(_testServer!.CreateClient(), auth, auctionRequest, authToken);
 
-    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken)
-    {
-        return await _testServer!.CreateRequest($"/auction/{id}/bids").And(r =>
-        {
-            r.Content = Json(bidRequest);
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).PostAsync();
-    }
-
-    private static StringContent Json(string bidRequest)
-    {
-        return new StringContent(bidRequest, Encoding.UTF8, "application/json");
-    }
+    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken) =>
+        await client.PostBidToAuction(_testServer!.CreateClient(), auth, id, bidRequest, authToken);
 
     public async Task<HttpResponseMessage> GetAuction(long id, AuthToken authToken)
     {
-        return await _testServer!.CreateRequest($"/auction/{id}").And(r =>
-        {
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).GetAsync();
-    }
-
-    private static void AcceptJson(HttpRequestMessage r)
-    {
-        r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        return await client.GetAuction(_testServer!.CreateClient(), auth, id, authToken);
     }
 
     public ITimeSetter CreateSetTimeScope()
@@ -103,7 +77,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
     /// Only intended to reset time back to initial now, so that other tests are not affected by
     /// clock changes.
     /// </summary>
-    private sealed class FakeClockSetter(FakeSystemClock fakeSystemClock):ITimeSetter,IDisposable
+    private sealed class FakeClockSetter(FakeSystemClock fakeSystemClock) : ITimeSetter
     {
         public void Dispose()
         {
@@ -117,7 +91,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
     }
 }
 
-public interface ITimeSetter:IDisposable
+public interface ITimeSetter : IDisposable
 {
     void SetTime(DateTimeOffset now);
 }

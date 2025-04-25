@@ -2,6 +2,7 @@ using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Wallymathieu.Auctions.Tests.Helpers;
+using Wallymathieu.Auctions.Tests.Helpers.Http;
 using Wallymathieu.Auctions.Tests.Helpers.MsSql;
 using Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
@@ -10,40 +11,40 @@ namespace Wallymathieu.Auctions.Tests;
 using static JsonSamples;
 using static JsonHelper;
 #pragma warning disable CA2000 // these objects are disposed by the class consuming them
-public class JwtAuthAndSqlLiteApiFixture() :
-    ApiFixture(new SqliteDatabaseFixture(), new JwtApiAuth());
+public class JwtAuthAndSqlLiteApiV1Fixture() :
+    ApiFixture(new SqliteDatabaseFixture(), new JwtApiAuth(), new ApiV1Client());
 
-public class MsClientAuthAndSqlLiteApiFixture() :
-    ApiFixture(new SqliteDatabaseFixture(), new MsClientPrincipalApiAuth());
+public class MsClientAuthAndSqlLiteApiV1Fixture() :
+    ApiFixture(new SqliteDatabaseFixture(), new MsClientPrincipalApiAuth(), new ApiV1Client());
 
-public class JwtAuthAndMsSqlApiFixture() :
-    ApiFixture(new MsSqlDatabaseFixture(), new JwtApiAuth());
+public class JwtAuthAndMsSqlApiV1Fixture() :
+    ApiFixture(new MsSqlDatabaseFixture(), new JwtApiAuth(), new ApiV1Client());
 
-public class MsClientAuthAndMsSqlApiFixture() :
-    ApiFixture(new MsSqlDatabaseFixture(), new MsClientPrincipalApiAuth());
+public class MsClientAuthAndMsSqlApiV1Fixture() :
+    ApiFixture(new MsSqlDatabaseFixture(), new MsClientPrincipalApiAuth(), new ApiV1Client());
 #pragma warning restore CA2000
 
 [Collection("Sqlite")]
-public class ApiSyncSpecJwtTokenSqlLite(JwtAuthAndSqlLiteApiFixture fixture) :
-    ApiSyncSpec(fixture), IClassFixture<JwtAuthAndSqlLiteApiFixture>, IClassFixture<SqliteDatabaseFixture>
+public class ApiSyncSpecJwtTokenSqlLite(JwtAuthAndSqlLiteApiV1Fixture fixture) :
+    ApiSyncSpec(fixture), IClassFixture<JwtAuthAndSqlLiteApiV1Fixture>, IClassFixture<SqliteDatabaseFixture>
 {
 }
 
 [Collection("Sqlite")]
-public class ApiSyncSpecMsClientPrincipalSqlLite(MsClientAuthAndSqlLiteApiFixture fixture) :
-    ApiSyncSpec(fixture), IClassFixture<MsClientAuthAndSqlLiteApiFixture>, IClassFixture<SqliteDatabaseFixture>
+public class ApiSyncSpecMsClientPrincipalSqlLite(MsClientAuthAndSqlLiteApiV1Fixture fixture) :
+    ApiSyncSpec(fixture), IClassFixture<MsClientAuthAndSqlLiteApiV1Fixture>, IClassFixture<SqliteDatabaseFixture>
 {
 }
 
 [Collection("MsSql")]
-public class ApiSyncSpecJwtTokenMsSql(JwtAuthAndMsSqlApiFixture fixture) :
-    ApiSyncSpec(fixture), IClassFixture<JwtAuthAndMsSqlApiFixture>
+public class ApiSyncSpecJwtTokenMsSql(JwtAuthAndMsSqlApiV1Fixture fixture) :
+    ApiSyncSpec(fixture), IClassFixture<JwtAuthAndMsSqlApiV1Fixture>
 {
 }
 
 [Collection("MsSql")]
-public class ApiSyncSpecMsClientPrincipalMsSql(MsClientAuthAndMsSqlApiFixture fixture) :
-    ApiSyncSpec(fixture), IClassFixture<MsClientAuthAndMsSqlApiFixture>
+public class ApiSyncSpecMsClientPrincipalMsSql(MsClientAuthAndMsSqlApiV1Fixture fixture) :
+    ApiSyncSpec(fixture), IClassFixture<MsClientAuthAndMsSqlApiV1Fixture>
 {
 }
 

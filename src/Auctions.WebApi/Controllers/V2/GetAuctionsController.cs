@@ -20,7 +20,7 @@ public class GetAuctionsController(
     /// Get a list of auctions.
     /// </remarks>
     [HttpGet(Name = "get_auctions_v2")]
-    public async Task<IEnumerable<AuctionModel>> Get(CancellationToken cancellationToken) =>
+    public async Task<IEnumerable<AuctionModel>> GetV2(CancellationToken cancellationToken) =>
         from auction in await auctionQuery.GetAuctionsAsync(cancellationToken)
         select auctionMapper.MapAuctionToModel(auction);
 
@@ -28,7 +28,7 @@ public class GetAuctionsController(
     /// Get a single auction
     /// </summary>
     [HttpGet("{auctionId}", Name = "get_auction_v2")]
-    public async Task<ActionResult<AuctionModel>> GetSingle(long auctionId, CancellationToken cancellationToken)
+    public async Task<ActionResult<AuctionModel>> GetSingleV2(long auctionId, CancellationToken cancellationToken)
     {
         var auction = await auctionQuery.GetAuctionAsync(new AuctionId(auctionId), cancellationToken);
         return auction is null ? NotFound() : auctionMapper.MapAuctionToModel(auction);

@@ -30,6 +30,6 @@ public class CreateAuctionController(
         var auction = await createAuctionCommandHandler.Handle(model.ToCommand(), cancellationToken);
         var auctionModel =
             auctionMapper.MapAuctionToModel(auction);
-        return CreatedAtAction("GetSingle", "GetAuctions", new { auctionId = auctionModel.Id }, auctionModel);
+        return CreatedAtAction("GetSingleV2", "GetAuctions", new { auctionId = auctionModel.Id }, auctionModel);
     }
 }
