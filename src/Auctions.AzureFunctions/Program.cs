@@ -9,7 +9,7 @@ using Wallymathieu.Auctions.Services;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
-    .ConfigureServices((builder,services) =>
+    .ConfigureServices((builder, services) =>
     {
         services
             .AddAuctionQueryCached()
@@ -18,10 +18,11 @@ var host = new HostBuilder()
                 options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
                 options.InstanceName = CacheKeys.Prefix;
             })
-            .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+            .AddAuctionDbContextSqlServer(
+                builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
             .AddAuctionServicesCached()
             .AddScoped<ScopedUserContext>()
-            .AddScoped<IUserContext>(c=>c.GetRequiredService<ScopedUserContext>());
+            .AddScoped<IUserContext>(c => c.GetRequiredService<ScopedUserContext>());
         services.AddSingleton(new JsonSerializerOptions().AddAuctionConverters());
     })
     .Build();

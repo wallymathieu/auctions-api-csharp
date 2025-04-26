@@ -5,23 +5,6 @@ namespace Wallymathieu.Auctions.DomainModels;
 [Serializable]
 public abstract partial record User(UserId Id)
 {
-    [Serializable]
-    private record BuyerOrSeller(UserId Id, string? Name) : User(Id)
-    {
-        public override string ToString()
-        {
-            return $"BuyerOrSeller|{Id}|{Name}";
-        }
-    }
-
-
-    [Serializable]
-    private record Support(UserId Id) : User(Id)
-    {
-        public override string ToString() => $"Support|{Id}";
-    }
-
-
     public static User NewBuyerOrSeller(UserId id, string? name)
     {
         return new BuyerOrSeller(id, name);
@@ -34,7 +17,7 @@ public abstract partial record User(UserId Id)
 
     public static bool TryParse(string user, out User? value)
     {
-        Match match = UserRegex().Match(user);
+        var match = UserRegex().Match(user);
         if (match.Success)
         {
             var typ = match.Groups["type"].Value;
@@ -60,4 +43,23 @@ public abstract partial record User(UserId Id)
 
     [GeneratedRegex("(?<type>\\w*)\\|(?<id>[^|]*)(\\|(?<name>.*))?")]
     private static partial Regex UserRegex();
+
+    [Serializable]
+    private record BuyerOrSeller(UserId Id, string? Name) : User(Id)
+    {
+        public override string ToString()
+        {
+            return $"BuyerOrSeller|{Id}|{Name}";
+        }
+    }
+
+
+    [Serializable]
+    private record Support(UserId Id) : User(Id)
+    {
+        public override string ToString()
+        {
+            return $"Support|{Id}";
+        }
+    }
 }

@@ -1,43 +1,31 @@
 using System.Diagnostics.CodeAnalysis;
 
 namespace Wallymathieu.Auctions.DomainModels;
+
 /// <summary>
-/// The responsibility of this class is to handle the domain model of "single sealed bid" auction model.
+///     The responsibility of this class is to handle the domain model of "single sealed bid" auction model.
 /// </summary>
 /// <remarks>
-/// Single sealed bid auction is a type of auction where the bidders are not aware of the other bids. The bids are disclosed at the end of the auction.
-/// You can read more about the different types of blind auctions on Wikipedia:
-/// - [First price sealed bid auction](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction) or a
-/// - [Vickrey auction](https://en.wikipedia.org/wiki/Vickrey_auction)
+///     Single sealed bid auction is a type of auction where the bidders are not aware of the other bids. The bids are
+///     disclosed at the end of the auction.
+///     You can read more about the different types of blind auctions on Wikipedia:
+///     <br />
+///     - <a href="https://en.wikipedia.org/wiki/First-price_sealed-bid_auction">First price sealed bid auction</a> or a
+///     <br />
+///     - <a href="https://en.wikipedia.org/wiki/Vickrey_auction">Vickrey auction</a>
 /// </remarks>
-public class SingleSealedBidAuction: Auction, IState
+public class SingleSealedBidAuction : Auction, IState
 {
     public SingleSealedBidAuction()
     {
         AuctionType = AuctionType.SingleSealedBidAuction;
     }
+
     public SingleSealedBidOptions Options { get; init; }
-
-    private State GetState(DateTimeOffset time)
-    {
-        return (time > StartsAt, time < Expiry) switch
-        {
-            (true, true) => State.AcceptingBids,
-            (true, false) => State.DisclosingBids,
-            (false, _) => State.AwaitingStart
-        };
-    }
-
-    private enum State
-    {
-        AwaitingStart,
-        AcceptingBids,
-        DisclosingBids,
-    }
 
     public override bool TryAddBid(DateTimeOffset time, Bid bid, [NotNullWhen(true)] out Errors errors)
     {
-        ArgumentNullException.ThrowIfNull(bid, nameof(bid));
+        ArgumentNullException.ThrowIfNull(bid);
         var state = GetState(time);
         switch (state)
         {
@@ -52,7 +40,7 @@ public class SingleSealedBidAuction: Auction, IState
 
                 if (errors != Errors.None) return false;
 
-                Bids.Add(new BidEntity(0,bid.User,bid.Amount,bid.At));
+                Bids.Add(new BidEntity(0, bid));
                 return true;
             }
             case State.DisclosingBids:
@@ -67,7 +55,6 @@ public class SingleSealedBidAuction: Auction, IState
             }
             default:
                 throw new InvalidDataException(state.ToString());
-
         }
     }
 
@@ -76,8 +63,8 @@ public class SingleSealedBidAuction: Auction, IState
     {
         return GetState(time) switch
         {
-            State.AcceptingBids or State.DisclosingBids => Bids.Select(b => new Bid(b.User, b.Amount, b.At)),
-            _ => Array.Empty<Bid>(),
+            State.AcceptingBids or State.DisclosingBids => Bids.Select(b => b.ToBid()),
+            _ => []
         };
     }
 
@@ -96,7 +83,7 @@ public class SingleSealedBidAuction: Auction, IState
                     }
                     case SingleSealedBidOptions.Vickrey when Bids.Count >= 2:
                     {
-                        var bids = Bids.OrderByDescending(b=>b.Amount).Take(2).ToArray();
+                        var bids = Bids.OrderByDescending(b => b.Amount).Take(2).ToArray();
                         return (bids[1].Amount, bids[0].User);
                     }
                     case SingleSealedBidOptions.Vickrey when Bids.Count == 1:
@@ -121,5 +108,22 @@ public class SingleSealedBidAuction: Auction, IState
             State.DisclosingBids => true,
             _ => false
         };
+    }
+
+    private State GetState(DateTimeOffset time)
+    {
+        return (time > StartsAt, time < Expiry) switch
+        {
+            (true, true) => State.AcceptingBids,
+            (true, false) => State.DisclosingBids,
+            (false, _) => State.AwaitingStart
+        };
+    }
+
+    private enum State
+    {
+        AwaitingStart,
+        AcceptingBids,
+        DisclosingBids
     }
 }

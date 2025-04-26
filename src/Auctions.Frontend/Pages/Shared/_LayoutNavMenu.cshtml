@@ -27,10 +27,12 @@
         @if (SignInManager.IsSignedIn(User))
         {
             <div class="nav-item px-3">
-                <a class="nav-link" href="/Identity/Account/Manage" title="Manage"><span class="oi oi-home" aria-hidden="true"></span>Hello @User.Identity?.Name!</a>
+                <a class="nav-link" href="/Identity/Account/Manage" title="Manage"><span class="oi oi-home"
+                                                                                         aria-hidden="true"></span>Hello @User.Identity?.Name!</a>
             </div>
             <div class="nav-item px-3">
-                <a class="nav-link" href="/Identity/Account/Logout" title="Logout"><span class="oi oi-key" aria-hidden="true"></span>Logout</a>
+                <a class="nav-link" href="/Identity/Account/Logout" title="Logout"><span class="oi oi-key"
+                                                                                         aria-hidden="true"></span>Logout</a>
             </div>
         }
         else
@@ -39,7 +41,8 @@
                 <a class="nav-link" href="/Identity/Account/Register"><span class="oi oi-key" aria-hidden="true"></span>Register</a>
             </div>
             <div class="nav-item px-3">
-                <a class="nav-link" href="/Identity/Account/Login"><span class="oi oi-lock-unlocked" aria-hidden="true"></span>Login</a>
+                <a class="nav-link" href="/Identity/Account/Login"><span class="oi oi-lock-unlocked"
+                                                                         aria-hidden="true"></span>Login</a>
             </div>
         }
     </nav>

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Wallymathieu.Auctions.Infrastructure.Json;
 
-public class DateTimeOffsetConverter: JsonConverter<DateTimeOffset>
+public class DateTimeOffsetConverter : JsonConverter<DateTimeOffset>
 {
     public override bool HandleNull => true;
 
@@ -18,7 +18,7 @@ public class DateTimeOffsetConverter: JsonConverter<DateTimeOffset>
 
     public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
     {
-        ArgumentNullException.ThrowIfNull(writer, nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         writer.WriteStringValue(TimeFormatter.Format(value.ToUniversalTime()));
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.JwtPayloads;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
