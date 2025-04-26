@@ -8,7 +8,6 @@ public record CreateAuctionCommand(
     [Required] CurrencyCode Currency,
     [Required] DateTimeOffset StartsAt,
     [Required] DateTimeOffset EndsAt,
-    long? MinRaise,
-    long? ReservePrice,
-    TimeSpan? TimeFrame,
-    SingleSealedBidOptions? SingleSealedBidOptions);
+    TimedAscendingOptions? TimedAscendingOptions,
+    SingleSealedBidOptions? SingleSealedBidOptions,
+    bool Open = false);

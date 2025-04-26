@@ -55,21 +55,11 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
         _webApplicationFactory.Dispose();
     }
 
-    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken)
+    public async Task<HttpResponseMessage> Post(string url, string auctionRequest, AuthToken authToken)
     {
-        return await _testServer!.CreateRequest("/auction").And(r =>
+        return await _testServer!.CreateRequest(url).And(r =>
         {
             r.Content = Json(auctionRequest);
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).PostAsync();
-    }
-
-    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken)
-    {
-        return await _testServer!.CreateRequest($"/auction/{id}/bids").And(r =>
-        {
-            r.Content = Json(bidRequest);
             AcceptJson(r);
             auth.TryAddAuth(r, authToken);
         }).PostAsync();
@@ -79,10 +69,9 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
     {
         return new StringContent(bidRequest, Encoding.UTF8, "application/json");
     }
-
-    public async Task<HttpResponseMessage> GetAuction(long id, AuthToken authToken)
+    public async Task<HttpResponseMessage> Get(string url, AuthToken authToken)
     {
-        return await _testServer!.CreateRequest($"/auction/{id}").And(r =>
+        return await _testServer!.CreateRequest(url).And(r =>
         {
             AcceptJson(r);
             auth.TryAddAuth(r, authToken);

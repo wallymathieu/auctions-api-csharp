@@ -40,9 +40,10 @@ public abstract class Auction : IState
 
     public UserId User { get; init; }
     public CurrencyCode Currency { get; init; }
-    public AuctionType AuctionType { get; set; }
+    public AuctionType AuctionType { get; init; }
 
-    public bool OpenBidders { get; set; }
+    public bool OpenBidders { get; init; }
+    public Guid Version { get; set; }
 
     /// <summary>
     /// Create either a SingleSealedBidAuction or a TimedAscendingAuction based on the command.
@@ -66,7 +67,9 @@ public abstract class Auction : IState
                 StartsAt = cmd.StartsAt,
                 Title = cmd.Title,
                 User = userContext.UserId!,
-                Options = cmd.SingleSealedBidOptions!.Value
+                Options = cmd.SingleSealedBidOptions!.Value,
+                OpenBidders = cmd.Open,
+                Version = Guid.NewGuid(),
             };
         }
 
@@ -79,12 +82,9 @@ public abstract class Auction : IState
                 StartsAt = cmd.StartsAt,
                 Title = cmd.Title,
                 User = userContext.UserId!,
-                Options =
-                {
-                    MinRaise = cmd.MinRaise ?? 0,
-                    ReservePrice = cmd.ReservePrice ?? 0,
-                    TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
-                }
+                Options = cmd.TimedAscendingOptions!,
+                Version = Guid.NewGuid(),
+                OpenBidders = cmd.Open,
             };
         }
     }
@@ -97,9 +97,15 @@ public abstract class Auction : IState
         if (userContext.UserId == null)
             throw new InvalidOperationException("User must be logged in to place a bid.");
         var bid = new Bid(userContext.UserId, model.Amount, systemClock.Now);
-        return TryAddBid(systemClock.Now, bid, out var error)
-            ? Result.Ok<Bid, Errors>(bid)
-            : Result.Error<Bid, Errors>(error);
+        if (TryAddBid(systemClock.Now, bid, out var error))
+        {
+            Version = Guid.NewGuid();
+            return Result.Ok<Bid, Errors>(bid);
+        }
+        else
+        {
+            return Result.Error<Bid, Errors>(error);
+        }
     }
 
     public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
