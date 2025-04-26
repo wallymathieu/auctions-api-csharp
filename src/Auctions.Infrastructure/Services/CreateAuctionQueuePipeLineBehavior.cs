@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Services;
 
@@ -10,10 +10,9 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 internal class CreateAuctionQueuePipeLineBehavior(IMessageQueue messageQueue, IUserContext userContext):
     IPipelineBehavior<CreateAuctionCommand, Auction>
 {
-
-    public async Task<Auction> Handle(CreateAuctionCommand request, RequestHandlerDelegate<Auction> next, CancellationToken cancellationToken)
+    public async ValueTask<Auction> Handle(CreateAuctionCommand message, CancellationToken cancellationToken, MessageHandlerDelegate<CreateAuctionCommand, Auction> next)
     {
-        var result = await next();
+        var result = await next(message, cancellationToken);
         if (messageQueue.Enabled)
         {
             await messageQueue.SendMessageAsync(QueuesModule.AuctionResultQueueName,

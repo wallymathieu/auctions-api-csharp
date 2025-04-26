@@ -1,11 +1,11 @@
 ﻿@page "/auctions/{Id:long}"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
-@using MediatR
+@using Mediator
 @using Wallymathieu.Auctions.DomainModels
 @using Wallymathieu.Auctions.Services
 @inject IAuctionQuery Query
-@inject IMediator MediatR
+@inject IMediator Mediator
 @inject ISystemClock SystemClock
 
 <PageTitle>Auction</PageTitle>
@@ -104,7 +104,7 @@ else
     {
         if (_newBid != null)
         {
-            var result = await MediatR.Send(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), _auction.Data.AuctionId), default);
+            var result = await Mediator.Send(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), _auction.Data.AuctionId), default);
             result?.Match(_ =>
             {
                 _newBid = null;

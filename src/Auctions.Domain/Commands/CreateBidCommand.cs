@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Mediator;
 using Wallymathieu.Auctions.DomainModels;
 
 namespace Wallymathieu.Auctions.Commands;

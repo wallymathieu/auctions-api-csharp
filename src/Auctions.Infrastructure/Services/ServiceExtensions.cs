@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
@@ -13,9 +13,9 @@ public static class ServiceExtensions
         services.TryAddSingleton<ISystemClock, SystemClock>();
         services.RegisterAttributesForType<Auction>();
         services.AddSingleton(typeof(IKeyValueFactory<>), typeof(KeyValueFactory<>));
-        services.AddScoped<IRequestHandler<CreateAuctionCommand, Auction>>(c =>
+        services.AddScoped<ICommandHandler<CreateAuctionCommand, Auction>>(c =>
             c.GetRequiredService<ICommandHandler<CreateAuctionCommand, Auction>>());
-        services.AddScoped<IRequestHandler<CreateBidCommand, Result<Bid, Errors>>>(c =>
+        services.AddScoped<ICommandHandler<CreateBidCommand, Result<Bid, Errors>>>(c =>
             c.GetRequiredService<ICommandHandler<CreateBidCommand, Result<Bid, Errors>>>());
         return services;
     }
@@ -23,12 +23,13 @@ public static class ServiceExtensions
     public static IServiceCollection AddAuctionServicesNoCache(this IServiceCollection services)
     {
         AddAuctionServicesImplementation(services);
-        services.AddMediatR(c =>
+        services.AddMediator(c =>
         {
-            c.RegisterServicesFromAssemblyContaining<CreateAuctionQueuePipeLineBehavior>();
-            c.AddBehavior<CreateAuctionQueuePipeLineBehavior>();
-            c.AddBehavior<CreateBidQueuePipeLineBehavior>();
+            c.ServiceLifetime = ServiceLifetime.Scoped;
         });
+        services
+            .AddScoped<IPipelineBehavior<CreateAuctionCommand, Auction>, CreateAuctionQueuePipeLineBehavior>()
+            .AddScoped<IPipelineBehavior<CreateBidCommand, Result<Bid,Errors>>, CreateBidQueuePipeLineBehavior>();
         return services;
     }
 }

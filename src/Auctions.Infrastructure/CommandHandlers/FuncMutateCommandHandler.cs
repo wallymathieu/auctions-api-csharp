@@ -1,3 +1,4 @@
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
@@ -15,7 +16,7 @@ class FuncMutateCommandHandler<TEntity, TCommand, TResponse>(
     private readonly IRepository<TEntity> _repository=serviceProvider.GetRequiredService<IRepository<TEntity>>();
     private readonly AuctionDbContext _db=serviceProvider.GetRequiredService<AuctionDbContext>();
 
-    public async Task<TResponse?> Handle(TCommand cmd, CancellationToken cancellationToken = default)
+    public async ValueTask<TResponse?> Handle(TCommand cmd, CancellationToken cancellationToken = default)
     {
         var keyValueFactory = serviceProvider.GetRequiredService<IKeyValueFactory<TCommand>>();
         var entity = await _repository.FindAsync(keyValueFactory.Key(cmd), cancellationToken);

@@ -1,10 +1,10 @@
 ﻿@page "/auctions"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
-@using MediatR
+@using Mediator
 @using Wallymathieu.Auctions.DomainModels
 @inject IAuctionQuery Query
-@inject IMediator MediatR
+@inject IMediator Mediator
 
 <PageTitle>Auctions</PageTitle>
 
@@ -78,7 +78,7 @@ else if (_auctions.Data != null)
             && _startsAt != null
             && _endsAt != null)
         {
-            var result = await MediatR.Send(new CreateAuctionCommand(
+            var result = await Mediator.Send(new CreateAuctionCommand(
                 Title: _title,
                 Currency: c,
                 StartsAt: _startsAt.Value,

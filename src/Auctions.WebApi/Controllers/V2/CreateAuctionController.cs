@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Api.Models.V2;

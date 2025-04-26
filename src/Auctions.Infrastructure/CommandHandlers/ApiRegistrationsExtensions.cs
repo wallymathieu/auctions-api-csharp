@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Services;
 

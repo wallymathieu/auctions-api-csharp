@@ -1,3 +1,4 @@
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
@@ -11,7 +12,7 @@ class FuncCreateCommandHandler<TEntity, TCommand>(
     private readonly IRepository<TEntity> _repository= serviceProvider.GetRequiredService<IRepository<TEntity>>();
     private readonly AuctionDbContext _db=serviceProvider.GetRequiredService<AuctionDbContext>();
 
-    public async Task<TEntity?> Handle(TCommand cmd, CancellationToken cancellationToken = default)
+    public async ValueTask<TEntity> Handle(TCommand cmd, CancellationToken cancellationToken = default)
     {
         var entity = func(cmd, serviceProvider);
         await _repository.AddAsync(entity, cancellationToken);

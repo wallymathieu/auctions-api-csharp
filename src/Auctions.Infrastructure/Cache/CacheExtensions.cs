@@ -1,3 +1,4 @@
+using Mediator;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,14 +22,15 @@ public static class CacheExtensions
     public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services)
     {
         services.AddAuctionServicesImplementation();
-        services.AddMediatR(c =>
+        services.AddMediator(c =>
         {
-            c.RegisterServicesFromAssemblyContaining<CreateAuctionCachePipeLineBehavior>();
-            c.AddBehavior<CreateAuctionQueuePipeLineBehavior>();
-            c.AddBehavior<CreateBidQueuePipeLineBehavior>();
-            c.AddBehavior<CreateAuctionCachePipeLineBehavior>();
-            c.AddBehavior<CreateBidCachePipeLineBehavior>();
+            c.ServiceLifetime = ServiceLifetime.Scoped;
         });
+        services
+            .AddScoped<IPipelineBehavior<CreateAuctionCommand, Auction>, CreateAuctionQueuePipeLineBehavior>()
+            .AddScoped<IPipelineBehavior<CreateBidCommand, Result<Bid,Errors>>, CreateBidQueuePipeLineBehavior>()
+            .AddScoped<IPipelineBehavior<CreateAuctionCommand, Auction>, CreateAuctionCachePipeLineBehavior>()
+            .AddScoped<IPipelineBehavior<CreateBidCommand, Result<Bid,Errors>>, CreateBidCachePipeLineBehavior>();
         return services;
     }
 }
