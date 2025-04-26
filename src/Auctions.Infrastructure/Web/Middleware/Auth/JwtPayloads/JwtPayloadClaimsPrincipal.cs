@@ -1,4 +1,4 @@
-namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
+namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.JwtPayloads;
 
 public static class JwtPayloadClaimsPrincipal
 {

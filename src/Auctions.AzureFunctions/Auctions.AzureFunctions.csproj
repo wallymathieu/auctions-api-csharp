@@ -9,9 +9,9 @@
     <UserSecretsId>f53f5151-d9ac-4eeb-a835-cb1ed85fd2d4</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage" Version="6.6.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.23.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.18.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage" Version="6.6.1"/>
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.24.0"/>
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.18.1"/>
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -23,10 +23,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
+    <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Auctions.Domain\Auctions.Domain.csproj" />
-    <ProjectReference Include="..\Auctions.Infrastructure\Auctions.Infrastructure.csproj" />
+    <ProjectReference Include="..\Auctions.Domain\Auctions.Domain.csproj"/>
+    <ProjectReference Include="..\Auctions.Infrastructure\Auctions.Infrastructure.csproj"/>
   </ItemGroup>
 </Project>

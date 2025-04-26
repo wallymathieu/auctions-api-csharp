@@ -1,19 +1,22 @@
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
+using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.JwtPayloads;
 
 namespace Wallymathieu.Auctions.Tests.Helpers;
 
-public class JwtApiAuth: IApiAuth
+public class JwtApiAuth : IApiAuth
 {
     private static string GetToken(string sub, string email)
     {
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes( @"{
-""sub"":"""+sub+@""", ""name"":"""+email+@""", ""u_typ"":""0""
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(@"{
+""sub"":""" + sub + @""", ""name"":""" + email + @""", ""u_typ"":""0""
 }"));
     }
+
     private readonly string Seller1 = GetToken("a1", "seller1@hotmail.com");
-    private readonly string Buyer1 =  GetToken("a2", "buyer1@hotmail.com");
+    private readonly string Buyer1 = GetToken("a2", "buyer1@hotmail.com");
+
     private static void AddXJwtPayload(HttpRequestMessage r, string auth)
     {
         if (!string.IsNullOrWhiteSpace(auth))
@@ -25,9 +28,14 @@ public class JwtApiAuth: IApiAuth
     public bool TryAddAuth(HttpRequestMessage r, AuthToken auth)
     {
         ArgumentNullException.ThrowIfNull(r);
-        switch(auth){
-            case AuthToken.Buyer1: AddXJwtPayload(r, Buyer1); return true;
-            case AuthToken.Seller1: AddXJwtPayload(r, Seller1); return true;
+        switch (auth)
+        {
+            case AuthToken.Buyer1:
+                AddXJwtPayload(r, Buyer1);
+                return true;
+            case AuthToken.Seller1:
+                AddXJwtPayload(r, Seller1);
+                return true;
             default: return false;
         }
     }

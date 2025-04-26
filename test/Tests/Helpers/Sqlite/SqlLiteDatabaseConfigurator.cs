@@ -8,7 +8,7 @@ public class SqliteDatabaseConfigurator(string connectionString) : IDatabaseConf
 {
     public void Use(IServiceCollection services)
     {
-        ArgumentNullException.ThrowIfNull(services, nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
         services.Remove(services.First(s => s.ServiceType == typeof(AuctionDbContext)));
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));

@@ -1,6 +1,4 @@
-# auctions-api-simple
-
-Simple Auction API
+# Auction API written in C\#
 
 There are currently these main implementations:
 
@@ -83,6 +81,8 @@ To run Azure Functions locally using above environment:
 cd src/Auctions.AzureFunctions
 func start
 ```
+
+Note that the .env files are only intended to be used for local development. In production there are better ways.
 
 ## Auth
 

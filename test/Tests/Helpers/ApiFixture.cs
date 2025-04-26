@@ -10,50 +10,12 @@ namespace Wallymathieu.Auctions.Tests.Helpers;
 
 public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisposable, IAsyncLifetime
 {
-    private readonly FakeSystemClock _fakeSystemClock= new(InitialNow);
-
-    private TestServer? _testServer;
+    private readonly FakeSystemClock _fakeSystemClock = new(InitialNow);
     private readonly WebApplicationFactory<Program> _webApplicationFactory = new();
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+    private TestServer? _testServer;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposing) return;
-        _testServer?.Dispose();
-        _webApplicationFactory.Dispose();
-    }
-
-    public async Task<HttpResponseMessage> PostAuction(string auctionRequest, AuthToken authToken) =>
-        await _testServer!.CreateRequest("/auctions").And(r =>
-        {
-            r.Content = Json(auctionRequest);
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).PostAsync();
-
-    public async Task<HttpResponseMessage> PostBidToAuction(long id, string bidRequest, AuthToken authToken) =>
-        await _testServer!.CreateRequest($"/auctions/{id}/bids").And(r =>
-        {
-            r.Content = Json(bidRequest);
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).PostAsync();
-    private static StringContent Json(string bidRequest) => new(bidRequest, Encoding.UTF8, "application/json");
-    public async Task<HttpResponseMessage> GetAuction(long id, AuthToken authToken)=>
-        await _testServer!.CreateRequest($"/auctions/{id}").And(r =>
-        {
-            AcceptJson(r);
-            auth.TryAddAuth(r, authToken);
-        }).GetAsync();
-    private static void AcceptJson(HttpRequestMessage r) => r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-    public void SetTime(DateTimeOffset now) => _fakeSystemClock.Now = now;
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await databaseFixture.InitializeAsync();
         var application = _webApplicationFactory
@@ -73,8 +35,78 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
         _testServer = application.Server;
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await databaseFixture.DisposeAsync().ConfigureAwait(false);
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing) return;
+        _testServer?.Dispose();
+        _webApplicationFactory.Dispose();
+    }
+
+    public async Task<HttpResponseMessage> Post(string url, string auctionRequest, AuthToken authToken)
+    {
+        return await _testServer!.CreateRequest(url).And(r =>
+        {
+            r.Content = Json(auctionRequest);
+            AcceptJson(r);
+            auth.TryAddAuth(r, authToken);
+        }).PostAsync();
+    }
+
+    private static StringContent Json(string bidRequest)
+    {
+        return new StringContent(bidRequest, Encoding.UTF8, "application/json");
+    }
+    public async Task<HttpResponseMessage> Get(string url, AuthToken authToken)
+    {
+        return await _testServer!.CreateRequest(url).And(r =>
+        {
+            AcceptJson(r);
+            auth.TryAddAuth(r, authToken);
+        }).GetAsync();
+    }
+
+    private static void AcceptJson(HttpRequestMessage r)
+    {
+        r.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    }
+
+    public ITimeSetter CreateSetTimeScope()
+    {
+        return new FakeClockSetter(_fakeSystemClock);
+    }
+
+    /// <summary>
+    /// Only intended to reset time back to initial now, so that other tests are not affected by
+    /// clock changes.
+    /// </summary>
+    private sealed class FakeClockSetter(FakeSystemClock fakeSystemClock):ITimeSetter,IDisposable
+    {
+        public void Dispose()
+        {
+            fakeSystemClock.Now = InitialNow;
+        }
+
+        public void SetTime(DateTimeOffset now)
+        {
+            fakeSystemClock.Now = now;
+        }
+    }
+}
+
+public interface ITimeSetter:IDisposable
+{
+    void SetTime(DateTimeOffset now);
 }

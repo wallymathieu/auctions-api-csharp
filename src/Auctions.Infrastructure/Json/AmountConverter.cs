@@ -3,19 +3,20 @@ using System.Text.Json.Serialization;
 
 namespace Wallymathieu.Auctions.Infrastructure.Json;
 
-public class AmountConverter: JsonConverter<Amount>
+public class AmountConverter : JsonConverter<Amount>
 {
     public override bool HandleNull => true;
+
     public override Amount? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return reader.TokenType== JsonTokenType.Null
+        return reader.TokenType == JsonTokenType.Null
             ? null
             : Amount.Parse(reader.GetString()!);
     }
 
     public override void Write(Utf8JsonWriter writer, Amount? value, JsonSerializerOptions options)
     {
-        ArgumentNullException.ThrowIfNull(writer, nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         if (value is not null)
             writer.WriteStringValue(value.ToString());
         else

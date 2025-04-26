@@ -1,10 +1,10 @@
 ﻿@page "/auctions/{Id:long}"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
-@using Wallymathieu.Auctions.Models
+@using Wallymathieu.Auctions.Services
 @inject IAuctionQuery Query
 @inject ICreateBidCommandHandler CreateBidCommandHandler
-@inject AuctionMapper Mapper
+@inject ISystemClock SystemClock
 
 <PageTitle>Auction</PageTitle>
 
@@ -12,7 +12,7 @@
 
 <p>This page display an auction.</p>
 
-@if ( !_auction.Loaded)
+@if (!_auction.Loaded)
 {
     <p>
         <em>Loading...</em>
@@ -30,7 +30,7 @@ else
         <thead>
         <tr>
             <th>Starts at</th>
-            <th>Expires at</th>
+            <th>Ends at</th>
             <th>Title</th>
             <th>Seller</th>
         </tr>
@@ -40,7 +40,7 @@ else
             <td>@_auction.Data.StartsAt.Date.ToShortDateString()</td>
             <td>@_auction.Data.Expiry.Date.ToShortDateString()</td>
             <td>@_auction.Data.Title</td>
-            <td>@_auction.Data.Seller</td>
+            <td>@_auction.Data.User</td>
         </tr>
         </tbody>
     </table>
@@ -54,11 +54,11 @@ else
         </thead>
         <tbody>
         @{
-            foreach (var bid in _auction.Data.Bids)
+            foreach (var bid in _auction.Data.GetBids(SystemClock.Now))
             {
                 <tr>
                     <td>@bid.Amount</td>
-                    <td>@bid.Bidder</td>
+                    <td>@bid.</td>
                     <td>@bid.At.ToString()</td>
                 </tr>
             }
@@ -70,7 +70,7 @@ else
             <td>
             </td>
             <td>
-                <DisplayError Description="@_errorDescription" />
+                <DisplayError Description="@_errorDescription"/>
                 <button @onclick="AddBid">Add bid</button>
             </td>
         </tr>
@@ -80,10 +80,9 @@ else
 
 @code {
 
-    [Parameter]
-    public long Id { get; set; }
+    [Parameter] public long Id { get; set; }
 
-    private readonly RemoteData<AuctionModel> _auction=new();
+    private readonly RemoteData<Auction> _auction = new();
     private int? _newBid;
     private string? _errorDescription;
 
@@ -91,9 +90,7 @@ else
     {
         var auction = await Query.GetAuctionAsync(new AuctionId(this.Id));
         _auction.OnLoad(
-            auction is not null
-            ? Mapper.MapAuctionToModel(auction)
-            : null);
+            auction);
     }
 
     protected override async Task OnInitializedAsync()
@@ -105,14 +102,8 @@ else
     {
         if (_newBid != null)
         {
-            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), new(_auction.Data.Id)));
-            result?.Match(_ =>
-            {
-                _newBid = null;
-            }, err =>
-            {
-                _errorDescription = err.ToString();
-            });
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), _auction.Data.AuctionId));
+            result?.Match(_ => { _newBid = null; }, err => { _errorDescription = err.ToString(); });
             if (result?.IsOk ?? false)
             {
                 await LoadAuction();
@@ -123,4 +114,5 @@ else
             _errorDescription = Errors.MustSpecifyAmount.ToString();
         }
     }
+
 }

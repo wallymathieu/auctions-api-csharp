@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Services;
+
 namespace Wallymathieu.Auctions.Infrastructure.Services;
+
 public static class ServiceExtensions
 {
     internal static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)
@@ -25,6 +27,9 @@ public static class ServiceExtensions
                     new CreateBidQueueDecoratedCommandHandler(
                         c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service,
                         c.GetRequiredService<IMessageQueue>(),
-                        c.GetRequiredService<IUserContext>()));
-
+                        c.GetRequiredService<IUserContext>()))
+            .AddScoped<ICreateAuctionCommandHandler>(c =>
+                c.GetRequiredService<InnerService<ICreateAuctionCommandHandler>>().Service)
+            .AddScoped<ICreateBidCommandHandler>(c =>
+                c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service);
 }

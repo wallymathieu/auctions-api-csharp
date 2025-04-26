@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Wallymathieu.Auctions.Infrastructure.Cache.Data;
 using Wallymathieu.Auctions.Infrastructure.Cache.Services;
 using Wallymathieu.Auctions.Infrastructure.Data;
@@ -14,20 +15,22 @@ public static class CacheExtensions
     public static IServiceCollection AddAuctionQueryCached(this IServiceCollection services)
     {
         return services.AddAuctionQueryImplementation()
-            .AddScoped<IAuctionQuery>(c=>new CachedAuctionQuery(
+            .AddScoped<IAuctionQuery>(c => new CachedAuctionQuery(
                 c.GetRequiredService<IDistributedCache>(),
+                c.GetRequiredService<IOptions<CacheConfiguration>>().Value ?? new CacheConfiguration(),
                 c.GetRequiredService<AuctionDbContext>()));
     }
+
     public static IServiceCollection AddAuctionServicesCached(this IServiceCollection services) =>
         services.AddAuctionServicesImplementation()
-            .AddScoped<ICreateAuctionCommandHandler>(c=>
+            .AddScoped<ICreateAuctionCommandHandler>(c =>
                 new CacheAwareCreateAuctionCommandHandler(
                     new CreateAuctionQueueDecoratedCommandHandler(
                     c.GetRequiredService<InnerService<ICreateAuctionCommandHandler>>().Service,
                         c.GetRequiredService<IMessageQueue>(),
                         c.GetRequiredService<IUserContext>()),
                     c.GetRequiredService<IDistributedCache>()))
-            .AddScoped<ICreateBidCommandHandler>(c=>
+            .AddScoped<ICreateBidCommandHandler>(c =>
                 new CacheAwareCreateBidCommandHandler(
                     new CreateBidQueueDecoratedCommandHandler(
                         c.GetRequiredService<InnerService<ICreateBidCommandHandler>>().Service,

@@ -13,14 +13,16 @@ internal class CreateBidQueueDecoratedCommandHandler(
     IUserContext userContext)
     : ICreateBidCommandHandler
 {
-    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model, CancellationToken cancellationToken = default)
+    public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model,
+        CancellationToken cancellationToken = default)
     {
         var result = await commandHandler.Handle(model, cancellationToken);
         if (messageQueue.Enabled)
         {
             await messageQueue.SendMessageAsync(QueuesModule.BidResultQueueName,
-                new UserIdDecorator<Result<Bid,Errors>?>(result, userContext.UserId), cancellationToken);
+                new UserIdDecorator<Result<Bid, Errors>?>(result, userContext.UserId), cancellationToken);
         }
+
         return result;
     }
 }

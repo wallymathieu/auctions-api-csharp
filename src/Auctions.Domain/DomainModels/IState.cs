@@ -5,7 +5,7 @@ public interface IState
     /// <summary>
     /// increment state and add bid
     /// </summary>
-    bool TryAddBid(DateTimeOffset time,Bid bid, out Errors errors);
+    bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
 
     /// <summary>
     /// get bids for state (will return empty if in a state that does not disclose bids)
