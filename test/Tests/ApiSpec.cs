@@ -7,7 +7,7 @@ using Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
 namespace Wallymathieu.Auctions.Tests;
 
-using static JsonSamples;
+using static JsonSamplesV1;
 using static JsonHelper;
 #pragma warning disable CA2000 // these objects are disposed by the class consuming them
 public class JwtAuthAndSqlLiteApiFixture() :
