@@ -16,7 +16,7 @@ public static class DataExtensions
     public static IServiceCollection AddAuctionQueryNoCache(this IServiceCollection services)
     {
         return AddAuctionQueryImplementation(services)
-            .AddScoped<IAuctionQuery>(c=>
+            .AddScoped<IAuctionQuery>(c =>
                 c.GetRequiredService<AuctionQuery>());
     }
 
@@ -28,5 +28,4 @@ public static class DataExtensions
             e.UseSqlServer(connection,
                 opt => opt.MigrationsAssembly(MigrationAssembly.Name)));
     }
-
 }

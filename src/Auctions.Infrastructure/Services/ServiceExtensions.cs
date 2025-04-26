@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Wallymathieu.Auctions.Infrastructure.CommandHandlers;
 using Wallymathieu.Auctions.Services;
+
 namespace Wallymathieu.Auctions.Infrastructure.Services;
+
 public static class ServiceExtensions
 {
     internal static IServiceCollection AddAuctionServicesImplementation(this IServiceCollection services)

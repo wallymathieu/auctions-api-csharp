@@ -1,7 +1,7 @@
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Services;
 
-namespace Wallymathieu.Auctions.Models;
+namespace Wallymathieu.Auctions.Api.Models.V1;
 
 /// <summary>
 /// Map to API models from domain models. We could use such a library as AutoMapper instead.
@@ -10,7 +10,7 @@ public class AuctionMapper(ISystemClock systemClock)
 {
     public AuctionModel MapAuctionToModel(Auction auction)
     {
-        ArgumentNullException.ThrowIfNull(auction, nameof(auction));
+        ArgumentNullException.ThrowIfNull(auction);
         var now = systemClock.Now;
         var amountAndWinner = auction.TryGetAmountAndWinner(now);
         var hasEnded = auction.HasEnded(now);
@@ -18,7 +18,7 @@ public class AuctionMapper(ISystemClock systemClock)
         var bidMapper = new BidMapper(auction, bidUserMapper);
         return new AuctionModel(
             Id: auction.AuctionId.Id,
-            StartsAt :auction.StartsAt,
+            StartsAt: auction.StartsAt,
             Title: auction.Title,
             Expiry: auction.Expiry,
             Seller: auction.User.ToString(),

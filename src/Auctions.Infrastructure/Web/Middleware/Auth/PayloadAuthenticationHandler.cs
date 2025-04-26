@@ -2,21 +2,20 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.AzureClaimsPrincipals;
+using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.JwtPayloads;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
-/// <summary>
-///     See also https://github.com/MaximRouiller/MaximeRouiller.Azure.AppService.EasyAuth
-/// </summary>
 internal sealed class PayloadAuthenticationHandler : AuthenticationHandler<PayloadAuthenticationOptions>
 {
-    private readonly ClaimsPrincipalParser _claimsPrincipalParser;
+    private readonly AzureDecodedClaimsPrincipalParser _claimsPrincipalParser;
     private readonly JwtPayloadClaimsPrincipalParser _jwtPayloadClaimsPrincipalParser;
 
     public PayloadAuthenticationHandler(IOptionsMonitor<PayloadAuthenticationOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ClaimsPrincipalParser claimsPrincipalParser,
+        AzureDecodedClaimsPrincipalParser claimsPrincipalParser,
         JwtPayloadClaimsPrincipalParser jwtPayloadClaimsPrincipalParser) : base(options, logger, encoder)
     {
         _claimsPrincipalParser = claimsPrincipalParser;
@@ -44,7 +43,9 @@ internal sealed class PayloadAuthenticationHandler : AuthenticationHandler<Paylo
 
             return Task.FromResult(AuthenticateResult.Fail("InvalidClaimsIdentity"));
         }
+#pragma warning disable CA1031 // we want to catch all exceptions and return a fail result
         catch (Exception e)
+#pragma warning restore CA1031
         {
             return Task.FromResult(AuthenticateResult.Fail(e));
         }

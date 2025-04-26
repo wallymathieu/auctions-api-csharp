@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 
-namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
+namespace Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth.JwtPayloads;
 
 internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
 {
@@ -27,13 +27,15 @@ internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
             claimsIdentity = new ClaimsPrincipal(
             [
                 new ClaimsIdentity(
-                    [
-                        new(ClaimTypes.Name, deserialized.Name)
-                    ], "proxy", ClaimTypes.Name, ClaimTypes.Role)
+                [
+                    new(ClaimTypes.Name, deserialized.Name)
+                ], "proxy", ClaimTypes.Name, ClaimTypes.Role)
             ]);
             return true;
         }
+#pragma warning disable CA1031 // we want to catch all exceptions and pass error to logger
         catch (Exception e)
+#pragma warning restore CA1031
         {
             _logger.LogWarning(e, "Failed to decode JWT body header");
             return false;
