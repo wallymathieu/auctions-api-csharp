@@ -13,18 +13,18 @@ namespace Wallymathieu.Auctions.Models.V1;
 /// <param name="EndsAt"></param>
 /// <param name="Currency"></param>
 /// <param name="Type">Is either nothing or "English|{reservePrice}|{minRaise}|{timeFrame.Ticks}", "Blind" or "Vickrey"</param>
+/// <param name="Open">If bidding should be done in the open</param>
 public record CreateAuctionModel(
     [Required] string Title,
     [Required] DateTimeOffset StartsAt,
     [Required] DateTimeOffset EndsAt,
     CurrencyCode Currency,
-    string? Type)
+    string? Type,
+    bool Open)
 {
     public bool TryToConvert(out CreateAuctionCommand? command)
     {
-        long? MinRaise = null;
-        long? ReservePrice = null;
-        TimeSpan? TimeFrame = null;
+        TimedAscendingOptions? timedAscendingOptions = null;
         SingleSealedBidOptions? singleSealedBidOptions = null;
         if (!string.IsNullOrWhiteSpace(Type))
         {
@@ -33,9 +33,12 @@ public record CreateAuctionModel(
                 switch (auctionTypeWithOptions)
                 {
                     case EnglishAuctionType english:
-                        MinRaise = english.MinRaise;
-                        ReservePrice = english.ReservePrice;
-                        TimeFrame = english.TimeFrame;
+                        timedAscendingOptions = new TimedAscendingOptions
+                        {
+                            MinRaise = english.MinRaise,
+                            ReservePrice = english.ReservePrice,
+                            TimeFrame = english.TimeFrame
+                        };
                         break;
                     case BlindAuctionType:
                         singleSealedBidOptions = SingleSealedBidOptions.Blind;
@@ -60,10 +63,9 @@ public record CreateAuctionModel(
             StartsAt: StartsAt,
             EndsAt: EndsAt,
             Currency: Currency,
-            MinRaise: MinRaise,
-            ReservePrice: ReservePrice,
-            TimeFrame: TimeFrame,
-            SingleSealedBidOptions: singleSealedBidOptions);
+            TimedAscendingOptions: timedAscendingOptions,
+            SingleSealedBidOptions: singleSealedBidOptions,
+            Open: Open);
         return true;
     }
 }

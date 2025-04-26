@@ -59,6 +59,7 @@ public class AuctionDbContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(200);
             WithUserId(entity.Property(o => o.User));
             HasCurrencyCodeConversion(entity.Property(e => e.Currency));
+            entity.Property(p => p.Version).IsConcurrencyToken();
             entity.HasMany("Bids").WithOne()
                 .HasPrincipalKey("AuctionId")
                 .HasForeignKey("AuctionId");

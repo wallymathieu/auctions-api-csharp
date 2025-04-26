@@ -7,7 +7,7 @@ using Wallymathieu.Auctions.Tests.Helpers.Sqlite;
 
 namespace Wallymathieu.Auctions.Tests;
 
-using static JsonSamples;
+using static JsonSamplesV1;
 using static JsonHelper;
 #pragma warning disable CA2000 // these objects are disposed by the class consuming them
 public class JwtAuthAndSqlLiteApiFixture() :
@@ -49,15 +49,17 @@ public class ApiSyncSpecMsClientPrincipalMsSql(MsClientAuthAndMsSqlApiFixture fi
 
 public abstract class BaseApiSpec(ApiFixture application)
 {
+    public const string AuctionUrlV1 = "/auction";
+
     [Fact]
     public async Task Create_auction_1()
     {
-        var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
+        var response = await application.Post(AuctionUrlV1, FirstAuctionRequest, AuthToken.Seller1);
         if (!response.IsSuccessStatusCode)
             Assert.Fail($"Failed to create auction: {response.StatusCode}");
 
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
-        var auction1 = await application.GetAuction(id, AuthToken.Seller1);
+        var auction1 = await application.Get($"{AuctionUrlV1}/{(long)id}", AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
         Assert.Multiple(() =>
         {
@@ -71,12 +73,12 @@ public abstract class BaseApiSpec(ApiFixture application)
     [Fact]
     public async Task Create_auction_2()
     {
-        var response = await application.PostAuction(SecondAuctionRequest, AuthToken.Seller1);
+        var response = await application.Post(AuctionUrlV1, SecondAuctionRequest, AuthToken.Seller1);
         if (!response.IsSuccessStatusCode)
             Assert.Fail($"Failed to create auction: {response.StatusCode}");
 
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
-        var auction1 = await application.GetAuction(id, AuthToken.Seller1);
+        var auction1 = await application.Get($"{AuctionUrlV1}/{(long)id}", AuthToken.Seller1);
         var stringContent = await auction1.Content.ReadAsStringAsync();
         Assert.Multiple(() =>
         {
@@ -90,7 +92,7 @@ public abstract class BaseApiSpec(ApiFixture application)
     [Fact]
     public async Task Cannot_find_unknown_auction()
     {
-        var auctionResponse = await application.GetAuction(99, AuthToken.Seller1);
+        var auctionResponse = await application.Get($"{AuctionUrlV1}/{(long)99}", AuthToken.Seller1);
         Assert.Equal(HttpStatusCode.NotFound, auctionResponse.StatusCode);
     }
 
@@ -114,21 +116,21 @@ public abstract class BaseApiSpec(ApiFixture application)
                 """, 2)]
     public async Task Fail_to_create_auction(string sample, int index)
     {
-        var response = await application.PostAuction(sample, AuthToken.Seller1);
+        var response = await application.Post(AuctionUrlV1, sample, AuthToken.Seller1);
         Assert.Multiple(() => { Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode); });
     }
 
     [Fact]
     public async Task Place_bid_as_buyer_on_auction_1()
     {
-        var response = await application.PostAuction(FirstAuctionRequest, AuthToken.Seller1);
+        var response = await application.Post(AuctionUrlV1, FirstAuctionRequest, AuthToken.Seller1);
         var id = GetId(JToken.Parse(await response.Content.ReadAsStringAsync()));
         using (var setTimeScope = application.CreateSetTimeScope())
         {
             setTimeScope.SetTime(StartsAt.AddHours(2));
-            var bidResponse = await application.PostBidToAuction(id, """{"amount":"VAC11"}""", AuthToken.Buyer1);
+            var bidResponse = await application.Post($"{AuctionUrlV1}/{id}/bids", """{"amount":"VAC11"}""", AuthToken.Buyer1);
             setTimeScope.SetTime(EndsAt.AddHours(2));
-            var auctionResponse = await application.GetAuction(id, AuthToken.Seller1);
+            var auctionResponse = await application.Get($"/auction/{(long)id}", AuthToken.Seller1);
             var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
             var stringContent = await auctionResponse.Content.ReadAsStringAsync();
             Assert.Multiple(() =>
@@ -152,7 +154,7 @@ public abstract class ApiSyncSpec(ApiFixture application) : BaseApiSpec(applicat
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()
     {
-        var bidResponse = await application.PostBidToAuction(999, @"{""amount"":""VAC11""}", AuthToken.Buyer1);
+        var bidResponse = await application.Post($"{AuctionUrlV1}/{999}/bids", @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
     }
 }
