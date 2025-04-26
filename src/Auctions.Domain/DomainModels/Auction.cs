@@ -82,12 +82,7 @@ public abstract class Auction : IState
                 StartsAt = cmd.StartsAt,
                 Title = cmd.Title,
                 User = userContext.UserId!,
-                Options =
-                {
-                    MinRaise = cmd.MinRaise ?? 0,
-                    ReservePrice = cmd.ReservePrice ?? 0,
-                    TimeFrame = cmd.TimeFrame ?? TimeSpan.Zero,
-                },
+                Options = cmd.TimedAscendingOptions!,
                 Version = Guid.NewGuid(),
                 OpenBidders = cmd.Open,
             };

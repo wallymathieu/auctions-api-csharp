@@ -49,7 +49,7 @@ public class ApiSyncSpecMsClientPrincipalMsSql(MsClientAuthAndMsSqlApiFixture fi
 
 public abstract class BaseApiSpec(ApiFixture application)
 {
-    private const string AuctionUrl = "/auction";
+    public const string AuctionUrl = "/auction";
 
     [Fact]
     public async Task Create_auction_1()
@@ -128,7 +128,7 @@ public abstract class BaseApiSpec(ApiFixture application)
         using (var setTimeScope = application.CreateSetTimeScope())
         {
             setTimeScope.SetTime(StartsAt.AddHours(2));
-            var bidResponse = await application.Post($"/auction/{id}/bids", """{"amount":"VAC11"}""", AuthToken.Buyer1);
+            var bidResponse = await application.Post($"{AuctionUrl}/{id}/bids", """{"amount":"VAC11"}""", AuthToken.Buyer1);
             setTimeScope.SetTime(EndsAt.AddHours(2));
             var auctionResponse = await application.Get($"/auction/{(long)id}", AuthToken.Seller1);
             var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
@@ -154,7 +154,7 @@ public abstract class ApiSyncSpec(ApiFixture application) : BaseApiSpec(applicat
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()
     {
-        var bidResponse = await application.Post($"/auction/{999}/bids", @"{""amount"":""VAC11""}", AuthToken.Buyer1);
+        var bidResponse = await application.Post($"{AuctionUrl}/{999}/bids", @"{""amount"":""VAC11""}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
     }
 }

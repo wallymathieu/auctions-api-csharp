@@ -85,9 +85,7 @@ else if (_auctions.Data != null)
                 Currency: c,
                 StartsAt: _startsAt.Value,
                 EndsAt: _endsAt.Value,
-                MinRaise: null,
-                ReservePrice: null,
-                TimeFrame: null,
+                TimedAscendingOptions: new TimedAscendingOptions(),
                 SingleSealedBidOptions: null));
             await LoadAuctions();
             _title = string.Empty;
