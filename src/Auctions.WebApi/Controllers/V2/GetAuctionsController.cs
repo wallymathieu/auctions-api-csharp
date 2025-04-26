@@ -1,8 +1,8 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Wallymathieu.Auctions.Api.Models.V2;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.Infrastructure.Data;
-using Wallymathieu.Auctions.Models.V2;
 
 namespace Wallymathieu.Auctions.Api.Controllers.V2;
 

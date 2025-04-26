@@ -1,10 +1,8 @@
 ﻿@page "/auctions"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
-@using Wallymathieu.Auctions.Models.V2
 @inject IAuctionQuery Query
 @inject ICreateAuctionCommandHandler CreateAuctionCommandHandler
-@inject AuctionMapper Mapper
 
 <PageTitle>Auctions</PageTitle>
 
@@ -31,10 +29,10 @@ else if (_auctions.Data != null)
         @foreach (var auction in _auctions.Data)
         {
             <tr>
-                <td><a href="/auctions/@auction.Id">@auction.Title</a></td>
+                <td><a href="/auctions/@auction.AuctionId">@auction.Title</a></td>
                 <td>@auction.StartsAt.Date.ToShortDateString()</td>
-                <td>@auction.EndsAt.Date.ToShortDateString()</td>
-                <td>@auction.Seller</td>
+                <td>@auction.Expiry.Date.ToShortDateString()</td>
+                <td>@auction.User</td>
             </tr>
         }
         </tbody>
@@ -55,7 +53,7 @@ else if (_auctions.Data != null)
 }
 
 @code {
-    private readonly RemoteData<IReadOnlyCollection<AuctionModel>> _auctions = new();
+    private readonly RemoteData<IReadOnlyCollection<Auction>> _auctions = new();
     private string? _title;
     private string? _currency = CurrencyCode.VAC.ToString();
     private DateTime? _startsAt;
@@ -63,9 +61,7 @@ else if (_auctions.Data != null)
 
     private async Task LoadAuctions()
     {
-        _auctions.OnLoad((
-            from auction in await Query.GetAuctionsAsync()
-            select Mapper.MapAuctionToModel(auction)).ToArray());
+        _auctions.OnLoad(await Query.GetAuctionsAsync());
     }
 
     protected override async Task OnInitializedAsync()

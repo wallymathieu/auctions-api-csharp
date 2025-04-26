@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
 
-namespace Wallymathieu.Auctions.Models.V2;
+namespace Wallymathieu.Auctions.Api.Models.V2;
 /// <summary>
 /// This model is used to create an auction.
 /// When creating a timed ascending auction we need to specify the <see cref="TimedAscendingOptions"/>.

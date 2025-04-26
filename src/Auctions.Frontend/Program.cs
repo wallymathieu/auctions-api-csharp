@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Wallymathieu.Auctions.Frontend.Data;
-using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Infrastructure.Web;
 
@@ -23,7 +22,6 @@ builder.AddAuctionsWebInfrastructure();
 builder.Services
     .AddHttpContextAccessor()
     .AddHttpContextUserContext();
-builder.Services.AddAuctionMapper();
 
 var app = builder.Build();
 

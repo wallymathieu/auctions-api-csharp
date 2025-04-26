@@ -3,7 +3,7 @@ using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.DomainModels.AuctionTypes;
 
-namespace Wallymathieu.Auctions.Models.V1;
+namespace Wallymathieu.Auctions.Api.Models.V1;
 
 /// <summary>
 /// This model is used to create an auction.
