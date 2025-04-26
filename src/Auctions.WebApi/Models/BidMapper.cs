@@ -1,7 +1,7 @@
 using Wallymathieu.Auctions.DomainModels;
 using Wallymathieu.Auctions.DomainModels.Bids;
 
-namespace Wallymathieu.Auctions.Models;
+namespace Wallymathieu.Auctions.Api.Models;
 
 public class BidMapper(Auction auction, IBidUserMapper bidUserMapper)
 {

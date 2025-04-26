@@ -8,8 +8,8 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 using Wallymathieu.Auctions.Api;
 using Wallymathieu.Auctions.Api.Infrastructure;
 using Wallymathieu.Auctions.Api.Infrastructure.Swagger;
+using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Infrastructure.Json;
-using Wallymathieu.Auctions.Infrastructure.Models;
 using Wallymathieu.Auctions.Infrastructure.Web;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 

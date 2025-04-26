@@ -1,4 +1,4 @@
-using Wallymathieu.Auctions.Models.V1;
+using Wallymathieu.Auctions.Api.Models.V1;
 using Wallymathieu.Auctions.Tests.Helpers;
 
 namespace Wallymathieu.Auctions.Tests.V1;
