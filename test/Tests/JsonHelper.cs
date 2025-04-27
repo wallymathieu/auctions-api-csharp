@@ -20,16 +20,16 @@ public static class JsonHelper
         return parsed;
     }
 
-    public static JToken WithBid(JToken token, string amount, string bidder, string at)
+    public static JToken WithBid(JToken token, long amount, string bidder, string at)
     {
         ArgumentNullException.ThrowIfNull(token);
 
         JArray array = (JArray)(token["bids"] ?? new JArray());
-        array.Add(JToken.Parse($@"{{""amount"": ""{amount}"",""bidder"": ""{bidder}"", ""at"":""{at}""}}"));
+        array.Add(JToken.Parse($@"{{""amount"": {amount}, ""bidder"": ""{bidder}"", ""at"":""{at}""}}"));
         return token;
     }
 
-    public static JToken WithPriceAndWinner(JToken token, string amount, string winner)
+    public static JToken WithPriceAndWinner(JToken token, long amount, string winner)
     {
         ArgumentNullException.ThrowIfNull(token);
 

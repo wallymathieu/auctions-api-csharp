@@ -2,14 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace Wallymathieu.Auctions.DomainModels;
 
-public record Bid(UserId User, Amount Amount, DateTimeOffset At)
+public record Bid(UserId User, long Amount, DateTimeOffset At)
 {
     public Errors Validate(Auction auction)
     {
         ArgumentNullException.ThrowIfNull(auction);
         var errors = Errors.None;
         if (User == auction.User) errors |= Errors.SellerCannotPlaceBids;
-        if (Amount.Currency != auction.Currency) errors |= Errors.BidCurrencyConversion;
         if (At < auction.StartsAt) errors |= Errors.AuctionHasNotStarted;
         if (At > auction.Expiry) errors |= Errors.AuctionHasEnded;
         return errors;
@@ -36,7 +35,7 @@ public class BidEntity
     }
     #pragma warning disable IDE0051 // Note the presence of JsonConstructor, i.e. we intend for this to be used by System.Text.Json.
     [JsonConstructor]
-    private BidEntity(long id, UserId user, Amount amount, DateTimeOffset at)
+    private BidEntity(long id, UserId user, long amount, DateTimeOffset at)
     #pragma warning restore IDE0051
     {
         Id = id;
@@ -47,7 +46,7 @@ public class BidEntity
 
     public long Id { get; init; }
     public UserId User{ get; init; }
-    public Amount Amount{ get; init; }
+    public long Amount{ get; init; }
     public DateTimeOffset At{ get; init; }
 
     public Bid ToBid()

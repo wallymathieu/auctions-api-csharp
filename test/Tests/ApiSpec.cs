@@ -128,7 +128,7 @@ public abstract class BaseApiSpec(ApiFixture application)
         using (var setTimeScope = application.CreateSetTimeScope())
         {
             setTimeScope.SetTime(StartsAt.AddHours(2));
-            var bidResponse = await application.Post($"{AuctionUrl}/{id}/bids", """{"amount":"VAC11"}""", AuthToken.Buyer1);
+            var bidResponse = await application.Post($"{AuctionUrl}/{id}/bids", """{"amount":11}""", AuthToken.Buyer1);
             setTimeScope.SetTime(EndsAt.AddHours(2));
             var auctionResponse = await application.Get($"{AuctionUrl}/{(long)id}", AuthToken.Seller1);
             var bidResponseString = await bidResponse.Content.ReadAsStringAsync();
@@ -141,8 +141,8 @@ public abstract class BaseApiSpec(ApiFixture application)
                 Assert.Equal(HttpStatusCode.OK, auctionResponse.StatusCode);
                 Assert.Equal(WithId(HasEnded(
                         WithPriceAndWinner(
-                            WithBid(JToken.Parse(FirstAuctionResponse), "VAC11", "#1", "02:00:00"),
-                            "VAC11", "#1")), id).ToString(Formatting.Indented),
+                            WithBid(JToken.Parse(FirstAuctionResponse), 11, "#1", "02:00:00"),
+                            11, "#1")), id).ToString(Formatting.Indented),
                     JToken.Parse(stringContent).ToString(Formatting.Indented));
             });
         }
@@ -154,7 +154,7 @@ public abstract class ApiSyncSpec(ApiFixture application) : BaseApiSpec(applicat
     [Fact]
     public async Task Cannot_place_bid_on_unknown_auction()
     {
-        var bidResponse = await application.Post($"{AuctionUrl}/{999}/bids", @"{""amount"":""VAC11""}", AuthToken.Buyer1);
+        var bidResponse = await application.Post($"{AuctionUrl}/{999}/bids", @"{""amount"":11}", AuthToken.Buyer1);
         Assert.Equal(HttpStatusCode.NotFound, bidResponse.StatusCode);
     }
 }
