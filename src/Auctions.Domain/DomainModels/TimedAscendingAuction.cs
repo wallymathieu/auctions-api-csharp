@@ -37,7 +37,7 @@ public class TimedAscendingAuction : Auction, IState
                         return false;
                     }
 
-                    if (bid.Amount.Value < maxBid.Value + Options.MinRaise)
+                    if (bid.Amount < maxBid + Options.MinRaise)
                     {
                         errors |= Errors.MustRaiseWithAtLeast;
                         return false;
@@ -76,14 +76,14 @@ public class TimedAscendingAuction : Auction, IState
         return Array.Empty<Bid>();
     }
 
-    public override (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)
+    public override (long Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)
     {
         switch (GetState(time))
         {
             case State.HasEnded:
             {
                 var winningBid = Bids.MaxBy(b => b.Amount);
-                return winningBid?.Amount.Value >= Options.ReservePrice
+                return winningBid?.Amount >= Options.ReservePrice
                     ? (winningBid.Amount, winningBid.User)
                     : null;
             }

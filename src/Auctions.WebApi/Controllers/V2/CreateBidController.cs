@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Api.Models;
 using Wallymathieu.Auctions.Commands;
 using Wallymathieu.Auctions.DomainModels;
+using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers.V2;
 

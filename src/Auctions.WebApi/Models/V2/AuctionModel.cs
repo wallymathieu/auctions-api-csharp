@@ -15,6 +15,6 @@ public record AuctionModel(
 #pragma warning disable CA1819 // Properties should not return arrays
     BidModel[] Bids,
 #pragma warning restore CA1819 // Properties should not return arrays
-    Amount? Price,
+    long? Price,
     string? Winner,
     bool HasEnded);

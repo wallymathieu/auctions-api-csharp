@@ -48,21 +48,21 @@ public static class TestData
     public static Bid BidOf100 =>
         new(
             User: Buyer,
-            Amount: Sek(100L),
+            Amount: 100L,
             At: new DateTime(2016, 1, 2, 0, 0, 0, DateTimeKind.Utc));
 
-    public static Bid BidOf200 => BidOf100 with { Amount = Sek(200L) };
+    public static Bid BidOf200 => BidOf100 with { Amount = 200L };
     public static readonly UserId Buyer1 = new("x2");
     public static readonly UserId Buyer2 = new("x3");
 
     public static Bid Bid1 => new(
         User: Buyer1,
-        Amount: Amount.Parse("SEK10"),
+        Amount: 10,
         At: StartsAt.AddHours(1.0));
 
     public static Bid Bid2 => new(
         User: Buyer2,
-        Amount: Amount.Parse("SEK12"),
+        Amount: 12,
         At: StartsAt.AddHours(2.0));
 
     public static T WithBids<T>(T state) where T : IState

@@ -68,7 +68,7 @@ public class SingleSealedBidAuction : Auction, IState
         };
     }
 
-    public override (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)
+    public override (long Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)
     {
         switch (GetState(time))
         {
