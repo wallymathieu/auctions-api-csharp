@@ -112,7 +112,7 @@ public abstract class Auction: IEntity, IState
 
     public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
     public abstract IEnumerable<Bid> GetBids(DateTimeOffset time);
-    public abstract (Amount Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time);
+    public abstract (long Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time);
     public abstract bool HasEnded(DateTimeOffset time);
 
     public IBidUserMapper BidUserMapper()

@@ -6,6 +6,6 @@ namespace Wallymathieu.Auctions.Api.Models;
 /// Note that the <see cref="Bidder"/> is supposed to be a auction specific number or description.
 /// </summary>
 public record BidModel(
-    Amount Amount,
+    long Amount,
     string? Bidder,
     TimeSpan At);

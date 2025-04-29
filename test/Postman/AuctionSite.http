@@ -27,7 +27,7 @@ Content-Type: application/json
 
 {
   "auction": "1",
-  "amount": "VAC11"
+  "amount": 11
 }
 
 ###

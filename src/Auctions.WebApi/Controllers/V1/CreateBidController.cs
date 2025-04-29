@@ -11,7 +11,7 @@ namespace Wallymathieu.Auctions.Api.Controllers.V1;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("auction")]
+[Route("auctions")]
 public class CreateBidController(IMediator mediator)
     : ControllerBase
 {

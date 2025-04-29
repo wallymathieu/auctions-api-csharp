@@ -8,7 +8,7 @@
     "currency": "VAC",
     "bids": [
       {
-        "amount": "VAC11",
+        "amount": 11,
         "bidder": "Buyer"
       }
     ]
