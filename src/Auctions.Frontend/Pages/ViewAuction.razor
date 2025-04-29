@@ -103,7 +103,7 @@ else
     {
         if (_newBid != null)
         {
-            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), _auction.Data.AuctionId));
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(_newBid.Value, _auction.Data.AuctionId));
             result?.Match(_ => { _newBid = null; }, err => { _errorDescription = err.ToString(); });
             if (result?.IsOk ?? false)
             {

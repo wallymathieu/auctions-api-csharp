@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Api.Models.V2;
 using Wallymathieu.Auctions.Application.Services;
-using Wallymathieu.Auctions.Infrastructure.Services;
 
 namespace Wallymathieu.Auctions.Api.Controllers.V2;
 

@@ -213,7 +213,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{ \"auction\":\"1\",\"amount\":\"VAC11\" }"
+              "raw": "{ \"auction\":\"1\",\"amount\":11 }"
             },
             "url": {
               "raw": "{{url}}/auctions/1/bids",
@@ -246,7 +246,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{ \"auction\":\"1\",\"amount\":\"VAC11\" }",
+                  "raw": "{ \"auction\":\"1\",\"amount\":11 }",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -303,7 +303,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{ \"auction\":\"1\",\"amount\":\"VAC11\" }",
+                  "raw": "{ \"auction\":\"1\",\"amount\":11 }",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -409,7 +409,7 @@
                 }
               ],
               "cookie": [],
-              "body": "[\n    {\n        \"id\": 1,\n        \"startsAt\": \"2023-04-29T05:21:07Z\",\n        \"title\": \"Some auction\",\n        \"expiry\": \"2023-04-29T07:21:07Z\",\n        \"user\": \"Test\",\n        \"currency\": \"VAC\",\n        \"bids\": [\n            {\n                \"amount\": \"VAC11\",\n                \"bidder\": \"Buyer\"\n            }\n        ]\n    },\n    {\n        \"id\": 2,\n        \"startsAt\": \"2023-04-29T05:21:33Z\",\n        \"title\": \"Some auction\",\n        \"expiry\": \"2023-04-29T07:21:33Z\",\n        \"user\": \"Test\",\n        \"currency\": \"VAC\",\n        \"bids\": []\n    }\n]"
+              "body": "[\n    {\n        \"id\": 1,\n        \"startsAt\": \"2023-04-29T05:21:07Z\",\n        \"title\": \"Some auction\",\n        \"expiry\": \"2023-04-29T07:21:07Z\",\n        \"user\": \"Test\",\n        \"currency\": \"VAC\",\n        \"bids\": [\n            {\n                \"amount\": 11,\n                \"bidder\": \"Buyer\"\n            }\n        ]\n    },\n    {\n        \"id\": 2,\n        \"startsAt\": \"2023-04-29T05:21:33Z\",\n        \"title\": \"Some auction\",\n        \"expiry\": \"2023-04-29T07:21:33Z\",\n        \"user\": \"Test\",\n        \"currency\": \"VAC\",\n        \"bids\": []\n    }\n]"
             }
           ]
         }

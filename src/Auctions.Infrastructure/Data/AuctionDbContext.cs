@@ -80,8 +80,6 @@ public class AuctionDbContext: DbContext, IAuctionDbContext
         {
             entity.ToTable("Bids");
             WithUserId(entity.Property(o => o.User));
-            var amount = entity.OwnsOne(e => e.Amount);
-            HasCurrencyCodeConversion(amount.Property(e => e.Currency));
         });
 
 

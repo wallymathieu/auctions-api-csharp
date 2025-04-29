@@ -26,6 +26,6 @@ public static class DataExtensions
         return services.AddDbContext<AuctionDbContext>(e =>
                 e.UseSqlServer(connection,
                     opt => opt.MigrationsAssembly(MigrationAssembly.Name)))
-            .AddScoped<IAuctionDbContext>(c=>c.GetRequiredService<AuctionDbContext>());;
+            .AddScoped<IAuctionDbContext>(c=>c.GetRequiredService<AuctionDbContext>());
     }
 }

@@ -6,7 +6,7 @@ public class EnglishAuctionBidSpec
 {
     static Bid ValidBid(Auction auction) =>
         new(User: Buyer,
-            Amount: Amount.Parse("SEK10"),
+            Amount: 10,
             At: auction.StartsAt.AddHours(1.0));
 
     static Bid BidWithSameUser(Auction auction) => ValidBid(auction) with { User = Seller };
