@@ -31,7 +31,7 @@ public class ApiFixture(IDatabaseFixture databaseFixture, IApiAuth auth) : IDisp
                 builder.UseEnvironment("Test");
             });
         using var serviceScope = application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        await databaseFixture.Migrator.Migrate(serviceScope);
+        await databaseFixture.Migrator.Migrate();
         _testServer = application.Server;
     }
 

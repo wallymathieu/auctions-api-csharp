@@ -2,11 +2,12 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "dotnet-ef": {
-      "version": "8.0.0",
+    "fluentmigrator.dotnet.cli": {
+      "version": "7.1.0",
       "commands": [
-        "dotnet-ef"
-      ]
+        "dotnet-fm"
+      ],
+      "rollForward": false
     }
   }
 }

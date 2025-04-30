@@ -63,8 +63,8 @@ To run migrations and api using above environment:
 
 ```bash
 dotnet tool restore
+dotnet dotnet-fm migrate --connection $ConnectionStrings__DefaultConnection --processor SqlServer2016  --assembly ...?
 cd src/Auctions.WebApi
-dotnet ef database update
 dotnet run
 ```
 

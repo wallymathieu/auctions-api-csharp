@@ -14,6 +14,6 @@ public class MsSqlDatabaseConfigurator(string connectionString) : IDatabaseConfi
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions<AuctionDbContext>)));
         services.Remove(services.First(s => s.ServiceType == typeof(DbContextOptions)));
         services.AddDbContext<AuctionDbContext>(c =>
-            c.UseSqlServer(connectionString, opt => opt.MigrationsAssembly(MigrationAssembly.Name)));
+            c.UseSqlServer(connectionString));
     }
 }

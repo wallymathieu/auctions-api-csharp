@@ -38,5 +38,5 @@ public sealed class MsSqlDatabaseFixture : IDatabaseFixture
         }
     }
 
-    public IDatabaseMigrator Migrator => new MsSqlDatabaseMigrator();
+    public IDatabaseMigrator Migrator => new MsSqlDatabaseMigrator(_dbContainer.GetConnectionString());
 }

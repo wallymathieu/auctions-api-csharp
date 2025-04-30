@@ -1,6 +1,7 @@
 using System.Reflection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using FluentMigrator.Runner;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -9,6 +10,7 @@ using Wallymathieu.Auctions.Api;
 using Wallymathieu.Auctions.Api.Infrastructure;
 using Wallymathieu.Auctions.Api.Infrastructure.Swagger;
 using Wallymathieu.Auctions.Api.Models;
+using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Json;
 using Wallymathieu.Auctions.Infrastructure.Web;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;

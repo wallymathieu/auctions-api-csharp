@@ -1,15 +1,13 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using FluentMigrator.Runner;
 using Wallymathieu.Auctions.Infrastructure.Data;
 
 namespace Wallymathieu.Auctions.Tests.Helpers.MsSql;
 
-public class MsSqlDatabaseMigrator : IDatabaseMigrator
+public class MsSqlDatabaseMigrator(string? connection) : IDatabaseMigrator
 {
-    public async Task Migrate(IServiceScope serviceScope)
+    public async Task Migrate()
     {
-        ArgumentNullException.ThrowIfNull(serviceScope);
-        var context = serviceScope.ServiceProvider.GetRequiredService<AuctionDbContext>();
-        await context.Database.MigrateAsync();
+        await using var migrations = new Migrations(connection);
+        migrations.MigrationRunner().MigrateUp();
     }
 }
