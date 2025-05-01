@@ -7,6 +7,12 @@
       "commands": [
         "dotnet-ef"
       ]
+    },
+    "dotnet-stryker": {
+      "version": "4.0.5",
+      "commands": [
+        "dotnet-stryker"
+      ]
     }
   }
 }
