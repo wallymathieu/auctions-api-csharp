@@ -25,13 +25,13 @@ public class MsClientAuthAndMsSqlApiFixture() :
 
 [Collection("Sqlite")]
 public class ApiSyncSpecJwtTokenSqlLite(JwtAuthAndSqlLiteApiFixture fixture) :
-    ApiSyncSpec(fixture), IClassFixture<JwtAuthAndSqlLiteApiFixture>, IClassFixture<SqliteDatabaseFixture>
+    ApiSyncSpec(fixture), IClassFixture<JwtAuthAndSqlLiteApiFixture>
 {
 }
 
 [Collection("Sqlite")]
 public class ApiSyncSpecMsClientPrincipalSqlLite(MsClientAuthAndSqlLiteApiFixture fixture) :
-    ApiSyncSpec(fixture), IClassFixture<MsClientAuthAndSqlLiteApiFixture>, IClassFixture<SqliteDatabaseFixture>
+    ApiSyncSpec(fixture), IClassFixture<MsClientAuthAndSqlLiteApiFixture>
 {
 }
 
