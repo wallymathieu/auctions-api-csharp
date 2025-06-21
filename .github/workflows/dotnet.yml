@@ -27,6 +27,12 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
     - name: SecurityCodeScan
       uses: security-code-scan/security-code-scan-results-action@v1.3
+    - name: ReportGenerator
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+      with:
+        reports: '**/coverage.cobertura.xml'
+        targetdir: coveragereport
+        reporttypes: 'HtmlInline;Cobertura'
