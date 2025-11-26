@@ -1,13 +1,10 @@
 using Azure.Identity;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Wallymathieu.Auctions.Application.Queues;
 using Wallymathieu.Auctions.Infrastructure.Cache;
 using Wallymathieu.Auctions.Infrastructure.Data;
 using Wallymathieu.Auctions.Infrastructure.Services;
-using Wallymathieu.Auctions.Infrastructure.Web.Queues;
 
 namespace Wallymathieu.Auctions.Infrastructure.Web;
 
@@ -17,14 +14,14 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        if (builder.Configuration.GetConnectionString(ConnectionStrings.Redis) != null)
+        if (builder.Configuration.GetConnectionString("redis") != null)
         {
             builder.Services.AddAuctionQueryCached()
                 .AddAuctionDbContextSqlServer(
-                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                    builder.Configuration.GetConnectionString("auctions"))
                 .AddStackExchangeRedisCache(options =>
                 {
-                    options.Configuration = builder.Configuration.GetConnectionString(ConnectionStrings.Redis);
+                    options.Configuration = builder.Configuration.GetConnectionString("redis");
                     options.InstanceName = CacheKeys.Prefix;
                 })
                 .AddAuctionServicesCached();
@@ -32,26 +29,9 @@ public static class WebApplicationBuilderExtensions
         else
         {
             builder.Services.AddAuctionQueryNoCache()
-                .AddAuctionDbContextSqlServer(
-                    builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection))
+                .AddAuctionDbContextSqlServer(builder.Configuration.GetConnectionString("auctions"))
                 .AddAuctionServicesNoCache();
         }
 
-        var azureStorageConnectionString = builder.Configuration.GetConnectionString("AzureStorage");
-        if (azureStorageConnectionString != null)
-        {
-            // Register Azure Clients
-            builder.Services.AddAzureClients(azureClientsBuilder =>
-            {
-                azureClientsBuilder.AddQueueServiceClient(azureStorageConnectionString).ConfigureOptions(queueOptions =>
-                {
-                    queueOptions.MessageEncoding = Azure.Storage.Queues.QueueMessageEncoding.Base64;
-                });
-
-                azureClientsBuilder.UseCredential(new DefaultAzureCredential());
-            });
-        }
-
-        builder.Services.AddScoped<IMessageQueue, AzureMessageQueue>();
     }
 }

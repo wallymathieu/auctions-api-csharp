@@ -1,15 +1,9 @@
-using System.Reflection;
-using System.Text.Json;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using Wallymathieu.Auctions.DomainModels;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using Wallymathieu.Auctions.Api;
 using Wallymathieu.Auctions.Api.Infrastructure;
 using Wallymathieu.Auctions.Api.Infrastructure.Swagger;
 using Wallymathieu.Auctions.Api.Models;
@@ -18,7 +12,12 @@ using Wallymathieu.Auctions.Infrastructure.Web;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
+builder.AddSqlServerClient(connectionName: "auctions");
+builder.AddRedisClient("redis");
+
 // Add services to the container.
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers().AddJsonOptions(opts => { opts.JsonSerializerOptions.AddAuctionConverters(); });
 builder.Services.AddApiVersioning().AddApiExplorer();
 builder.Services
@@ -61,5 +60,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
