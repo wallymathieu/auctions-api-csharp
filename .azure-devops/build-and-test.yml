@@ -7,7 +7,7 @@ trigger:
 - azdo
 
 pool:
-  vmImage: 'ubuntu-22.04'
+  vmImage: 'ubuntu-latest'
 
 variables:
   solution: '**/*.sln'
@@ -16,6 +16,9 @@ variables:
 
 steps:
 - task: NuGetToolInstaller@1
+- task: UseDotNet@2
+  inputs:
+    useGlobalJson: true
 
 - task: NuGetCommand@2
   inputs:
