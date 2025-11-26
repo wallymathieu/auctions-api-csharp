@@ -4,8 +4,7 @@ using System.Text.Json;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Wallymathieu.Auctions.DomainModels;
@@ -33,14 +32,14 @@ internal class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) 
         var opts = new JsonSerializerOptions().AddAuctionConverters();
         options.MapType(typeof(Amount), () => new OpenApiSchema
         {
-            Type = "string",
-            Example = new OpenApiString(Amount.Zero(CurrencyCode.VAC).ToString())
+            Type = JsonSchemaType.String,
+            Example = Amount.Zero(CurrencyCode.VAC).ToString()
         });
         options.MapType<TimeSpan>(() => new OpenApiSchema
         {
-            Type = "string",
+            Type = JsonSchemaType.String,
             Format = "^(\\d{2}:)?\\d{2}:\\d{2}:\\d{2}$",
-            Example = new OpenApiString(JsonSerializer.Serialize(TimeSpan.FromSeconds(1234), opts))
+            Example = JsonSerializer.Serialize(TimeSpan.FromSeconds(1234), opts)
         });
         // add a swagger document for each discovered API version
         // note: you might choose to skip or document deprecated API versions differently
