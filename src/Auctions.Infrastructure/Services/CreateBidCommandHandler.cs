@@ -1,5 +1,4 @@
 using Wallymathieu.Auctions.Infrastructure.Data;
-using Wallymathieu.Auctions.Infrastructure.Queues;
 using Wallymathieu.Auctions.Services;
 
 namespace Wallymathieu.Auctions.Infrastructure.Services;
@@ -10,8 +9,7 @@ namespace Wallymathieu.Auctions.Infrastructure.Services;
 internal sealed class CreateBidCommandHandler(
     AuctionDbContext auctionDbContext,
     IUserContext userContext,
-    ISystemClock systemClock,
-    IMessageQueue messageQueue)
+    ISystemClock systemClock)
     : ICreateBidCommandHandler
 {
     public async Task<Result<Bid, Errors>?> Handle(CreateBidCommand model,
@@ -23,12 +21,6 @@ internal sealed class CreateBidCommandHandler(
         if (result.IsOk)
         {
             await auctionDbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        if (messageQueue.Enabled)
-        {
-            await messageQueue.SendMessageAsync(QueuesModule.BidResultQueueName,
-                new UserIdDecorator<Result<Bid, Errors>?>(result, userContext.UserId), cancellationToken);
         }
 
         return result;
