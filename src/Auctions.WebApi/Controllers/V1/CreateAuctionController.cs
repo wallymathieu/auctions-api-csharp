@@ -3,8 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wallymathieu.Auctions.Api.Models.V1;
-using Wallymathieu.Auctions.Infrastructure.Services;
-
 namespace Wallymathieu.Auctions.Api.Controllers.V1;
 
 [ApiController]

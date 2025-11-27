@@ -25,9 +25,7 @@ public static class ServiceExtensions
         AddAuctionServicesImplementation(services);
         services.AddMediatR(c =>
         {
-            c.RegisterServicesFromAssemblyContaining<CreateAuctionQueuePipeLineBehavior>();
-            c.AddBehavior<CreateAuctionQueuePipeLineBehavior>();
-            c.AddBehavior<CreateBidQueuePipeLineBehavior>();
+            c.RegisterServicesFromAssemblyContaining<Cache.Services.CreateAuctionCachePipeLineBehavior>();
         });
         return services;
     }

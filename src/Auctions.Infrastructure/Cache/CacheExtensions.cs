@@ -24,8 +24,6 @@ public static class CacheExtensions
         services.AddMediatR(c =>
         {
             c.RegisterServicesFromAssemblyContaining<CreateAuctionCachePipeLineBehavior>();
-            c.AddBehavior<CreateAuctionQueuePipeLineBehavior>();
-            c.AddBehavior<CreateBidQueuePipeLineBehavior>();
             c.AddBehavior<CreateAuctionCachePipeLineBehavior>();
             c.AddBehavior<CreateBidCachePipeLineBehavior>();
         });

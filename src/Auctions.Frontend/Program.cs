@@ -5,10 +5,14 @@ using Wallymathieu.Auctions.Infrastructure.Services;
 using Wallymathieu.Auctions.Infrastructure.Web;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
+builder.AddSqlServerClient(connectionName: "auctions");
+builder.AddRedisClient("redis");
 
 // Add services to the container.
+builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<FrontendDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString(ConnectionStrings.DefaultConnection),
+    options.UseSqlServer(builder.Configuration.GetConnectionString("auctions"),
         opt => opt.MigrationsHistoryTable("__FrontendMigrations")));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -40,5 +44,7 @@ app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+app.MapHealthChecks("/health");
 
 app.Run();

@@ -1,8 +1,19 @@
 ﻿@page "/auctions/{Id:long}"
 @using Wallymathieu.Auctions.Commands
 @using Wallymathieu.Auctions.Frontend.Data
+<<<<<<< HEAD
 @using MediatR
 @using Wallymathieu.Auctions.DomainModels
+||||||| merged common ancestors
+<<<<<<<<< Temporary merge branch 1
+<<<<<<<<< Temporary merge branch 1
+@using Wallymathieu.Auctions.Models
+||||||||| b5fc0b3
+@using Wallymathieu.Auctions.Infrastructure.Models
+@using Wallymathieu.Auctions.Models
+=========
+=======
+>>>>>>> command-handlers-infrastructure
 @using Wallymathieu.Auctions.Services
 @inject IAuctionQuery Query
 @inject IMediator MediatR
@@ -104,7 +115,19 @@ else
     {
         if (_newBid != null)
         {
+<<<<<<< HEAD
             var result = await MediatR.Send(new CreateBidCommand(_newBid.Value, _auction.Data.AuctionId), default);
+||||||| merged common ancestors
+<<<<<<<<< Temporary merge branch 1
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), _auction.Data.AuctionId));
+||||||||| da242d9
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(new Amount(_newBid.Value, _auction.Data!.Currency), new(_auction.Data.Id)));
+=========
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(_newBid.Value, _auction.Data.AuctionId));
+>>>>>>>>> Temporary merge branch 2
+=======
+            var result = await CreateBidCommandHandler.Handle(new CreateBidCommand(_newBid.Value, _auction.Data.AuctionId));
+>>>>>>> command-handlers-infrastructure
             result?.Match(_ => { _newBid = null; }, err => { _errorDescription = err.ToString(); });
             if (result?.IsOk ?? false)
             {
