@@ -7,7 +7,7 @@ trigger:
 - azdo
 
 pool:
-  vmImage: 'ubuntu-22.04'
+  vmImage: 'ubuntu-latest'
 
 variables:
   solution: '**/*.sln'
@@ -15,11 +15,16 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
+- task: UseDotNet@2
   inputs:
-    restoreSolution: '$(solution)'
+    useGlobalJson: true
+
+- task: DotNetCoreCLI@2
+  name: 'restore'
+  displayName: 'Restore solution'
+  inputs:
+    command: 'restore'
+    configuration: '$(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   name: 'build'

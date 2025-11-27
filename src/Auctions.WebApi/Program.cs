@@ -14,7 +14,12 @@ using Wallymathieu.Auctions.Infrastructure.Web;
 using Wallymathieu.Auctions.Infrastructure.Web.Middleware.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
+builder.AddSqlServerClient(connectionName: "auctions");
+builder.AddRedisClient("redis");
+
 // Add services to the container.
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers().AddJsonOptions(opts => { opts.JsonSerializerOptions.AddAuctionConverters(); });
 builder.Services.AddApiVersioning().AddApiExplorer();
 builder.Services
@@ -57,5 +62,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
