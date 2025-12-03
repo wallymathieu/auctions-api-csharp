@@ -12,18 +12,18 @@
     <ProjectReference Include="..\Auctions.Domain\Auctions.Domain.csproj" />
     <ProjectReference Include="..\Auctions.Infrastructure\Auctions.Infrastructure.csproj" />
     <ProjectReference Include="..\Auctions.ServiceDefaults\Auctions.ServiceDefaults.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" Version="13.0.1" />
-    <PackageReference Include="Aspire.StackExchange.Redis" Version="13.0.1" />
-    <PackageReference Include="Aspire.Azure.Storage.Blobs" Version="13.0.1" />
+    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" />
+    <PackageReference Include="Aspire.StackExchange.Redis" />
+    <PackageReference Include="Aspire.Azure.Storage.Blobs" />
   </ItemGroup>
 
 
