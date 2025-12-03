@@ -21,9 +21,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" Version="13.0.0" />
-    <PackageReference Include="Aspire.StackExchange.Redis" Version="13.0.0" />
-    <PackageReference Include="Aspire.Azure.Storage.Blobs" Version="13.0.0" />
+    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" Version="13.0.1" />
+    <PackageReference Include="Aspire.StackExchange.Redis" Version="13.0.1" />
+    <PackageReference Include="Aspire.Azure.Storage.Blobs" Version="13.0.1" />
   </ItemGroup>
 
 
