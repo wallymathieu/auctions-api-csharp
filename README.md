@@ -27,6 +27,27 @@ Either the decoded JWT in the `x-jwt-payload` header or specify an encoded claim
 dotnet ef migrations add NewMigration --project ./src/Auctions.Infrastructure/Auctions.Infrastructure.csproj --startup-project ./src/Auctions.WebApi/Auctions.WebApi.csproj
 ```
 
+## Testing
+
+To run tests:
+
+```bash
+dotnet test
+```
+
+To run tests with coverage:
+
+```bash
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+To generate coverage report:
+```bash
+dotnet tool restore
+dotnet reportgenerator -reports:"./test/Tests/TestResults/*/coverage.cobertura.xml" -targetdir:./test/Tests/TestResults/CoverageReport
+# then open|start ./test/Tests/TestResults/CoverageReport/index.html
+```
+
 ## Inspiration
 
 The main inspiration for the architecture of the API is found in this book:
