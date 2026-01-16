@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
 
 trigger:
-- azdo
+- main # trigger on main branch besides the configured pull request triggers
 
 pool:
   vmImage: 'ubuntu-latest'
