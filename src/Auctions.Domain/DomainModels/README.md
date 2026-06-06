@@ -75,7 +75,7 @@ Most programmers would argue to use the CleanClass rather than a pure function i
 Since we have a simple domain we have instead opted for the approach of having the infrastructure execute methods on the domain model objects in order to be a bit more object oriented in the sense that the domain objects actually receive the commands and interpret them. A natural step would be to allow `Task<>` as a return type of command handler (but that can be left as an exercise to the reader).
 
 ```csharp
-public abstract class Auction : IEntity
+public class Auction : IEntity
 {
     //...
     public IResult<Bid,Errors> TryAddBid(CreateBidCommand model, IUserContext userContext, ITime time)
