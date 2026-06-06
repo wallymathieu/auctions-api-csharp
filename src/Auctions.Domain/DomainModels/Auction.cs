@@ -257,18 +257,28 @@ public class Auction : IState
         var options = GetSingleSealedBidAuction().Options;
         return options switch
         {
-            SingleSealedBidOptions.Blind when Bids.Count != 0 =>
-                (Bids.MaxBy(b => b.Amount)!.Amount, Bids.MaxBy(b => b.Amount)!.User),
+            SingleSealedBidOptions.Blind when Bids.Count != 0 => GetBlindWinner(),
             SingleSealedBidOptions.Vickrey when Bids.Count >= 2 => GetVickreyWinner(),
-            SingleSealedBidOptions.Vickrey when Bids.Count == 1 =>
-                (Bids.Single().Amount, Bids.Single().User),
+            SingleSealedBidOptions.Vickrey when Bids.Count == 1 => GetOnlyBidWinner(),
             _ => null
         };
+
+        (long Amount, UserId Winner)? GetBlindWinner()
+        {
+            var winningBid = Bids.MaxBy(b => b.Amount)!;
+            return (winningBid.Amount, winningBid.User);
+        }
 
         (long Amount, UserId Winner)? GetVickreyWinner()
         {
             var bids = Bids.OrderByDescending(b => b.Amount).Take(2).ToArray();
             return (bids[1].Amount, bids[0].User);
+        }
+
+        (long Amount, UserId Winner)? GetOnlyBidWinner()
+        {
+            var bid = Bids.Single();
+            return (bid.Amount, bid.User);
         }
     }
 
@@ -335,9 +345,9 @@ public class Auction : IState
 public enum AuctionType
 {
     /// <summary>
-    /// Unknown auction type.
+    /// Base discriminator value used for the root entity in persistence.
     /// </summary>
-    Unknown = -1,
+    Base = -1,
     /// <summary>
     /// Single sealed bid auction.
     /// </summary>

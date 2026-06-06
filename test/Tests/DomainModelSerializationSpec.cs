@@ -14,12 +14,17 @@ public class DomainModelSerializationSpec
         {
             Assert.NotNull(deserialized);
             Assert.Equal(auction.AuctionType, deserialized.AuctionType);
-            Assert.Equal(
-                (auction as TimedAscendingAuction)?.Options.MinRaise,
-                (deserialized as TimedAscendingAuction)?.Options.MinRaise);
-            Assert.Equal(
-                (auction as SingleSealedBidAuction)?.Options,
-                (deserialized as SingleSealedBidAuction)?.Options);
+            switch (auction.AuctionType)
+            {
+                case AuctionType.TimedAscendingAuction:
+                    Assert.IsType<TimedAscendingAuction>(deserialized);
+                    Assert.Equal(((TimedAscendingAuction)auction).Options.MinRaise, ((TimedAscendingAuction)deserialized).Options.MinRaise);
+                    break;
+                case AuctionType.SingleSealedBidAuction:
+                    Assert.IsType<SingleSealedBidAuction>(deserialized);
+                    Assert.Equal(((SingleSealedBidAuction)auction).Options, ((SingleSealedBidAuction)deserialized).Options);
+                    break;
+            }
         });
     }
 

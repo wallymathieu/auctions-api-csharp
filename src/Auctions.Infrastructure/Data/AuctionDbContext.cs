@@ -53,7 +53,7 @@ public class AuctionDbContext : DbContext
         modelBuilder.Entity<Auction>(entity =>
         {
             entity.HasDiscriminator(b => b.AuctionType)
-                .HasValue<Auction>(AuctionType.Unknown)
+                .HasValue<Auction>(AuctionType.Base)
                 .IsComplete(false);
             entity.ToTable("Auctions");
             entity.HasKey(e => e.AuctionId);
