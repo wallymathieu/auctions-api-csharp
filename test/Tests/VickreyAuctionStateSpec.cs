@@ -4,7 +4,7 @@ namespace Wallymathieu.Auctions.Tests;
 
 public class VickreyAuctionStateSpec
 {
-    private static SingleSealedBidAuction GetState() => WithBids(VickreyAuction);
+    private static Auction GetState() => WithBids(VickreyAuction);
 
     [Fact]
     public void bid_after_auction_has_ended()

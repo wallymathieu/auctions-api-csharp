@@ -4,7 +4,7 @@ namespace Wallymathieu.Auctions.Tests;
 
 public class EnglishAuctionStateSpec
 {
-    private static TimedAscendingAuction GetState() => WithBids(GetEnglishAuction());
+    private static Auction GetState() => WithBids(GetEnglishAuction());
 
     [Fact]
     public void bid_after_auction_has_ended()

@@ -6,20 +6,16 @@ using Wallymathieu.Auctions.Services;
 namespace Wallymathieu.Auctions.DomainModels;
 
 /// <summary>
-/// Base class for all auctions. Note that we are using an abstract class to allow for polymorphism.
-/// <br />
-/// Abstract classes is a low level way to share code and is not recommended for most cases. This is an example of
-/// white box reuse. This means that all derived classes are aware of the implementation details of the base class.
-/// Generally you should avoid abstract classes if possible and <a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">prefer composition</a>.
+/// Represents all auction variants as one aggregate root and uses <see cref="AuctionType" /> as discriminator.
 /// </summary>
 [JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType,
      TypeDiscriminatorPropertyName = "$type"),
  JsonDerivedType(typeof(SingleSealedBidAuction), typeDiscriminator: nameof(SingleSealedBidAuction)),
  JsonDerivedType(typeof(TimedAscendingAuction), typeDiscriminator: nameof(TimedAscendingAuction))]
-public abstract class Auction : IState
+public class Auction : IState
 {
-#pragma warning disable CS8618 // Note that is used by Entity Framework Core.
-    protected Auction()
+#pragma warning disable CS8618 // Note that is used by Entity Framework Core and serialization.
+    public Auction()
 #pragma warning restore CS8618
     {
     }
@@ -46,7 +42,7 @@ public abstract class Auction : IState
     public Guid Version { get; set; }
 
     /// <summary>
-    /// Create either a SingleSealedBidAuction or a TimedAscendingAuction based on the command.
+    /// Create an auction aggregate with shape determined by <see cref="AuctionType" />.
     /// </summary>
     public static Auction Create(CreateAuctionCommand cmd, IUserContext userContext)
     {
@@ -58,7 +54,7 @@ public abstract class Auction : IState
             ? CreateSingleSealedBidAuction(cmd, userContext)
             : CreateTimedAscendingAuction(cmd, userContext);
 
-        static SingleSealedBidAuction CreateSingleSealedBidAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        static Auction CreateSingleSealedBidAuction(CreateAuctionCommand cmd, IUserContext userContext)
         {
             return new SingleSealedBidAuction
             {
@@ -73,7 +69,7 @@ public abstract class Auction : IState
             };
         }
 
-        static TimedAscendingAuction CreateTimedAscendingAuction(CreateAuctionCommand cmd, IUserContext userContext)
+        static Auction CreateTimedAscendingAuction(CreateAuctionCommand cmd, IUserContext userContext)
         {
             return new TimedAscendingAuction
             {
@@ -108,10 +104,46 @@ public abstract class Auction : IState
         }
     }
 
-    public abstract bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors);
-    public abstract IEnumerable<Bid> GetBids(DateTimeOffset time);
-    public abstract (long Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time);
-    public abstract bool HasEnded(DateTimeOffset time);
+    public bool TryAddBid(DateTimeOffset time, Bid bid, out Errors errors)
+    {
+        ArgumentNullException.ThrowIfNull(bid);
+        return AuctionType switch
+        {
+            AuctionType.SingleSealedBidAuction => TryAddSingleSealedBid(time, bid, out errors),
+            AuctionType.TimedAscendingAuction => TryAddTimedAscendingBid(time, bid, out errors),
+            _ => throw new InvalidDataException(AuctionType.ToString())
+        };
+    }
+
+    public IEnumerable<Bid> GetBids(DateTimeOffset time)
+    {
+        return AuctionType switch
+        {
+            AuctionType.SingleSealedBidAuction => GetSingleSealedBidBids(time),
+            AuctionType.TimedAscendingAuction => GetTimedAscendingBids(time),
+            _ => throw new InvalidDataException(AuctionType.ToString())
+        };
+    }
+
+    public (long Amount, UserId Winner)? TryGetAmountAndWinner(DateTimeOffset time)
+    {
+        return AuctionType switch
+        {
+            AuctionType.SingleSealedBidAuction => TryGetSingleSealedBidAmountAndWinner(time),
+            AuctionType.TimedAscendingAuction => TryGetTimedAscendingAmountAndWinner(time),
+            _ => throw new InvalidDataException(AuctionType.ToString())
+        };
+    }
+
+    public bool HasEnded(DateTimeOffset time)
+    {
+        return AuctionType switch
+        {
+            AuctionType.SingleSealedBidAuction => GetSingleSealedBidState(time) == SingleSealedBidState.DisclosingBids,
+            AuctionType.TimedAscendingAuction => GetTimedAscendingState(time) == TimedAscendingState.HasEnded,
+            _ => throw new InvalidDataException(AuctionType.ToString())
+        };
+    }
 
     public IBidUserMapper BidUserMapper()
     {
@@ -120,12 +152,192 @@ public abstract class Auction : IState
             : new NumberedBidUserMapper(Bids);
         return bidUserMapper;
     }
+
+    private bool TryAddSingleSealedBid(DateTimeOffset time, Bid bid, out Errors errors)
+    {
+        switch (GetSingleSealedBidState(time))
+        {
+            case SingleSealedBidState.AcceptingBids:
+            {
+                errors = bid.Validate(this);
+                if (Bids.Any(b => b.User == bid.User))
+                {
+                    errors |= Errors.AlreadyPlacedBid;
+                    return false;
+                }
+
+                if (errors != Errors.None) return false;
+                Bids.Add(new BidEntity(0, bid));
+                return true;
+            }
+            case SingleSealedBidState.DisclosingBids:
+            {
+                errors = Errors.AuctionHasEnded;
+                return false;
+            }
+            case SingleSealedBidState.AwaitingStart:
+            {
+                errors = Errors.AuctionHasNotStarted;
+                return false;
+            }
+            default:
+                throw new InvalidDataException(AuctionType.ToString());
+        }
+    }
+
+    private bool TryAddTimedAscendingBid(DateTimeOffset time, Bid bid, out Errors errors)
+    {
+        switch (GetTimedAscendingState(time))
+        {
+            case TimedAscendingState.OnGoing:
+            {
+                var timedAscendingAuction = GetTimedAscendingAuction();
+                var options = timedAscendingAuction.Options;
+                errors = bid.Validate(this);
+
+                if (Bids.Count != 0)
+                {
+                    var maxBid = Bids.Max(b => b.Amount)!;
+                    if (bid.Amount <= maxBid)
+                    {
+                        errors |= Errors.MustPlaceBidOverHighestBid;
+                        return false;
+                    }
+
+                    if (bid.Amount < maxBid + options.MinRaise)
+                    {
+                        errors |= Errors.MustRaiseWithAtLeast;
+                        return false;
+                    }
+                }
+
+                if (errors != Errors.None) return false;
+
+                timedAscendingAuction.EndsAt = new[] { timedAscendingAuction.EndsAt, Expiry, time + options.TimeFrame }.Where(v => v != null).Max();
+                Bids.Add(new BidEntity(0, bid));
+                return true;
+            }
+            case TimedAscendingState.HasEnded:
+            {
+                errors = Errors.AuctionHasEnded;
+                return false;
+            }
+            case TimedAscendingState.AwaitingStart:
+            {
+                errors = Errors.AuctionHasNotStarted;
+                return false;
+            }
+            default:
+                throw new InvalidDataException(AuctionType.ToString());
+        }
+    }
+
+    private IEnumerable<Bid> GetSingleSealedBidBids(DateTimeOffset time)
+    {
+        return GetSingleSealedBidState(time) switch
+        {
+            SingleSealedBidState.AcceptingBids or SingleSealedBidState.DisclosingBids => Bids.Select(b => b.ToBid()),
+            _ => []
+        };
+    }
+
+    private IEnumerable<Bid> GetTimedAscendingBids(DateTimeOffset time)
+    {
+        return GetTimedAscendingState(time) switch
+        {
+            TimedAscendingState.OnGoing or TimedAscendingState.HasEnded => Bids.Select(b => b.ToBid()),
+            _ => []
+        };
+    }
+
+    private (long Amount, UserId Winner)? TryGetSingleSealedBidAmountAndWinner(DateTimeOffset time)
+    {
+        if (GetSingleSealedBidState(time) != SingleSealedBidState.DisclosingBids)
+            return null;
+        var options = GetSingleSealedBidAuction().Options;
+        return options switch
+        {
+            SingleSealedBidOptions.Blind when Bids.Count != 0 =>
+                (Bids.MaxBy(b => b.Amount)!.Amount, Bids.MaxBy(b => b.Amount)!.User),
+            SingleSealedBidOptions.Vickrey when Bids.Count >= 2 => GetVickreyWinner(),
+            SingleSealedBidOptions.Vickrey when Bids.Count == 1 =>
+                (Bids.Single().Amount, Bids.Single().User),
+            _ => null
+        };
+
+        (long Amount, UserId Winner)? GetVickreyWinner()
+        {
+            var bids = Bids.OrderByDescending(b => b.Amount).Take(2).ToArray();
+            return (bids[1].Amount, bids[0].User);
+        }
+    }
+
+    private (long Amount, UserId Winner)? TryGetTimedAscendingAmountAndWinner(DateTimeOffset time)
+    {
+        if (GetTimedAscendingState(time) != TimedAscendingState.HasEnded)
+            return null;
+        var options = GetTimedAscendingAuction().Options;
+        var winningBid = Bids.MaxBy(b => b.Amount);
+        return winningBid?.Amount >= options.ReservePrice
+            ? (winningBid.Amount, winningBid.User)
+            : null;
+    }
+
+    private TimedAscendingAuction GetTimedAscendingAuction()
+    {
+        return this as TimedAscendingAuction
+               ?? throw new InvalidOperationException("TimedAscendingAuction payload is required for timed ascending auctions.");
+    }
+
+    private SingleSealedBidAuction GetSingleSealedBidAuction()
+    {
+        return this as SingleSealedBidAuction
+               ?? throw new InvalidOperationException("SingleSealedBidAuction payload is required for single sealed bid auctions.");
+    }
+
+    private SingleSealedBidState GetSingleSealedBidState(DateTimeOffset time)
+    {
+        return (time > StartsAt, time < Expiry) switch
+        {
+            (true, true) => SingleSealedBidState.AcceptingBids,
+            (true, false) => SingleSealedBidState.DisclosingBids,
+            (false, _) => SingleSealedBidState.AwaitingStart
+        };
+    }
+
+    private TimedAscendingState GetTimedAscendingState(DateTimeOffset time)
+    {
+        return (time > StartsAt, time < Expiry) switch
+        {
+            (true, true) => TimedAscendingState.OnGoing,
+            (true, false) => TimedAscendingState.HasEnded,
+            (false, _) => TimedAscendingState.AwaitingStart
+        };
+    }
+
+    private enum SingleSealedBidState
+    {
+        AwaitingStart,
+        AcceptingBids,
+        DisclosingBids
+    }
+
+    private enum TimedAscendingState
+    {
+        AwaitingStart,
+        OnGoing,
+        HasEnded
+    }
 }
 /// <summary>
 /// Type of auction. Discriminator used by Entity Framework Core.
 /// </summary>
 public enum AuctionType
 {
+    /// <summary>
+    /// Unknown auction type.
+    /// </summary>
+    Unknown = -1,
     /// <summary>
     /// Single sealed bid auction.
     /// </summary>

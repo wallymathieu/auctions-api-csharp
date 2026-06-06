@@ -12,7 +12,7 @@ public static class TestData
     public static readonly UserId Seller = new("x1");
     public static readonly UserId Buyer = new("x2");
 
-    public static TimedAscendingAuction GetEnglishAuction() =>
+    public static Auction GetEnglishAuction() =>
         new TimedAscendingAuction
         {
             AuctionId = AuctionId,
@@ -21,7 +21,7 @@ public static class TestData
             Expiry = EndsAt,
             User = Seller,
             Currency = CurrencyCode.SEK,
-            Options =
+            Options = new TimedAscendingOptions
             {
                 MinRaise = 1,
                 TimeFrame = TimeSpan.FromMinutes(1),
@@ -29,7 +29,7 @@ public static class TestData
             }
         };
 
-    public static SingleSealedBidAuction VickreyAuction =>
+    public static Auction VickreyAuction =>
         new SingleSealedBidAuction
         {
             AuctionId = AuctionId,
@@ -71,5 +71,5 @@ public static class TestData
         Assert.True(state.TryAddBid(Bid2.At, Bid2, out var e2), e2.ToString());
         return state;
     }
-    public static Auction AuctionWithBids<T>(T state) where T : Auction => WithBids(state);
+    public static Auction AuctionWithBids(Auction state) => WithBids(state);
 }
