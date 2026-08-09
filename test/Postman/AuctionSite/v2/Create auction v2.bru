@@ -1,0 +1,45 @@
+meta {
+  name: Create auction v2
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/auctions
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-jwt-payload: {{seller}}
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: 13123213
+}
+
+body:json {
+  {
+      "id": 1,
+      "startsAt": "{{startsAt}}",
+      "endsAt": "{{endsAt}}",
+      "title": "Some auction",
+      "currency": "VAC"
+  }
+}
+
+script:pre-request {
+  const now = new Date()
+  const h = 2
+  const hourInMillis = 60*60*1000
+  const endsAt = new Date(now.getTime()+ (h*hourInMillis))
+  bru.setGlobalEnvVar("startsAt", now.toISOString());
+  bru.setGlobalEnvVar("endsAt", endsAt.toISOString());
+}
+
+tests {
+  test("Response time is less than 2000ms", function (){
+      expect(res.getResponseTime()).to.be.below(2000);
+  });
+}

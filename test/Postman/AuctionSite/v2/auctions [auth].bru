@@ -1,0 +1,15 @@
+meta {
+  name: auctions [auth]
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{url}}/auctions
+  body: none
+  auth: none
+}
+
+headers {
+  x-jwt-payload: {{buyer}}
+}
