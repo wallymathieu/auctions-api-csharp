@@ -20,7 +20,9 @@ internal sealed class JwtPayloadClaimsPrincipalParser : IClaimsPrincipalParser
         if (string.IsNullOrWhiteSpace(apiKey)) return false;
         try
         {
-            var json = Encoding.UTF8.GetString(Convert.FromBase64String(apiKey));
+            var normalized = apiKey.Replace('-', '+').Replace('_', '/');
+            var json = Encoding.UTF8.GetString(Convert.FromBase64String(
+                normalized.PadRight((normalized.Length + 3) / 4 * 4, '=')));
             var deserialized = JsonSerializer.Deserialize<JwtPayload>(json);
             if (deserialized == null || string.IsNullOrEmpty(deserialized.Name)) return false;
             claimsIdentity = new ClaimsPrincipal(

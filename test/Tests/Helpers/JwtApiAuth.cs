@@ -42,5 +42,6 @@ public class JwtApiAuth : IApiAuth
 
     public void Configure(IWebHostBuilder builder)
     {
+        builder.UseSetting("PrincipalHeader", "x-jwt-payload");
     }
 }
