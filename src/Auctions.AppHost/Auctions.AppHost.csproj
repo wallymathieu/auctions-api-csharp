@@ -13,6 +13,9 @@
     <ProjectReference Include="..\Auctions.Frontend\Auctions.Frontend.csproj" />
     <ProjectReference Include="..\Auctions.MigrationService\Auctions.MigrationService.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\deploy\envoy\envoy.yaml" Link="envoy.yaml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Redis" />
