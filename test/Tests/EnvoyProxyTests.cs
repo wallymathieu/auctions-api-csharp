@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -144,7 +145,8 @@ public class EnvoyProxyTests
                          Token(rotatedKey, Issuer, Audience, DateTimeOffset.UtcNow.AddMinutes(5), "forged"),
                          Token(key, "https://other.example/", Audience, DateTimeOffset.UtcNow.AddMinutes(5), "forged"),
                          Token(key, Issuer, "wrong", DateTimeOffset.UtcNow.AddMinutes(5), "forged"),
-                         Token(key, Issuer, Audience, DateTimeOffset.UtcNow.AddMinutes(-5), "forged")
+                         Token(key, Issuer, Audience, DateTimeOffset.UtcNow.AddMinutes(-5), "forged"),
+                         Token(key, Issuer, Audience, null, "forged")
                      })
             {
                 using var rejected = await Send(client, invalid);
@@ -206,13 +208,13 @@ public class EnvoyProxyTests
             n = Url(parameters.Modulus!), e = Url(parameters.Exponent!) };
     }
 
-    private static string Token(RSA rsa, string issuer, string audience, DateTimeOffset expiration, string name)
+    private static string Token(RSA rsa, string issuer, string audience, DateTimeOffset? expiration, string name)
     {
         var header = Url(JsonSerializer.SerializeToUtf8Bytes(new { alg = "RS256", typ = "JWT", kid = "test" }));
         var body = Url(JsonSerializer.SerializeToUtf8Bytes(new
         {
-            iss = issuer, aud = audience, exp = expiration.ToUnixTimeSeconds(), sub = "different-id", name
-        }));
+            iss = issuer, aud = audience, exp = expiration?.ToUnixTimeSeconds(), sub = "different-id", name
+        }, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
         var signingInput = $"{header}.{body}";
         return $"{signingInput}.{Url(rsa.SignData(Encoding.ASCII.GetBytes(signingInput),
             HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))}";
