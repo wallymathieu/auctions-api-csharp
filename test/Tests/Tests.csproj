@@ -31,6 +31,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Auctions.WebApi\Auctions.WebApi.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\deploy\envoy\envoy.yaml" Link="envoy.yaml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="BidMapperTests.MapBidToModel_ShouldReturnExpectedModel.verified.txt">

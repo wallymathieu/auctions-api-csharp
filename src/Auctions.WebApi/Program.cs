@@ -1,6 +1,7 @@
 using System.Reflection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -36,6 +37,17 @@ builder.Services.AddAuctionsWebJwt()
     .AddHttpContextUserContext();
 builder.Services.AddAuctionMapper();
 builder.Services.AddOptions<PayloadAuthenticationOptions>();
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardLimit = 1;
+    foreach (var network in builder.Configuration.GetSection("ReverseProxy:KnownNetworks").Get<string[]>() ?? [])
+    {
+        if (!System.Net.IPNetwork.TryParse(network, out var parsed))
+            throw new InvalidOperationException($"Invalid trusted proxy network: {network}");
+        options.KnownIPNetworks.Add(parsed);
+    }
+});
 //#if DEBUG // Only for development since it otherwise assumes that the network is 100% secure
 builder.Services
     .AddAuthentication()
@@ -58,6 +70,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 

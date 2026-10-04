@@ -1,0 +1,89 @@
+# Replace the __...__ values with the deployment's validated issuer, audience,
+# JWKS URI/hostname, and API DNS name/port before starting Envoy.
+static_resources:
+  listeners:
+    - name: api_listener
+      address:
+        socket_address: { address: 0.0.0.0, port_value: 10000 }
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: api
+                route_config:
+                  name: api_routes
+                  virtual_hosts:
+                    - name: api
+                      domains: ["*"]
+                      routes:
+                        - match: { prefix: "/" }
+                          route: { cluster: api }
+                http_filters:
+                  - name: envoy.filters.http.header_mutation
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.header_mutation.v3.HeaderMutation
+                      mutations:
+                        request_mutations:
+                          - remove: x-jwt-payload
+                          - remove: x-ms-client-principal
+                  - name: envoy.filters.http.jwt_authn
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                      providers:
+                        auctions:
+                          issuer: __ISSUER__
+                          audiences: [__AUDIENCE__]
+                          require_expiration: true
+                          from_headers:
+                            - name: Authorization
+                              value_prefix: "Bearer "
+                          remote_jwks:
+                            http_uri:
+                              uri: __JWKS_URI__
+                              cluster: issuer_jwks
+                              timeout: 5s
+                            cache_duration: 300s
+                          forward: false
+                          forward_payload_header: x-jwt-payload
+                      rules:
+                        - match: { prefix: "/" }
+                          requires: { allow_missing: {} }
+                  - name: envoy.filters.http.header_mutation
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.header_mutation.v3.HeaderMutation
+                      mutations:
+                        request_mutations:
+                          - remove: authorization
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+  clusters:
+    - name: api
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: api
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: { address: __API_HOST__, port_value: __API_PORT__ }
+    - name: issuer_jwks
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: issuer_jwks
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: { address: __JWKS_HOST__, port_value: 443 }
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+          sni: __JWKS_HOST__
+          auto_sni_san_validation: true
+          common_tls_context:
+            validation_context:
+              trusted_ca:
+                filename: /etc/ssl/certs/ca-certificates.crt

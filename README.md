@@ -15,11 +15,51 @@ To build the apps run:
 dotnet watch run --project ./src/Auctions.AppHost
 ```
 
-## Auth
+## Auth and ingress
 
-The API assumes that you have auth middleware in front of the app.
+The Aspire host runs standalone Envoy in front of the API. Supply these required
+Aspire parameters (through user secrets or environment variables) before starting:
 
-Either the decoded JWT in the `x-jwt-payload` header or specify an encoded claims principal by using configuration value in `PrincipalHeader`, such as `x-ms-client-principal`.
+| Parameter | Environment variable | Meaning |
+| --- | --- | --- |
+| `jwt-issuer` | `Parameters__jwt-issuer` | Exact HTTPS JWT `iss` value |
+| `jwt-audience` | `Parameters__jwt-audience` | Expected API `aud` |
+| `jwt-jwks-uri` | `Parameters__jwt-jwks-uri` | HTTPS JWKS URL on port 443 |
+
+For example, set those three environment variables to your issuer's values,
+then run `dotnet watch run --project ./src/Auctions.AppHost` and use the Envoy
+endpoint shown in the Aspire dashboard. Send a signed JWT in the HTTP
+Authorization header with the bearer-token scheme.
+The issuer must include a nonempty `name` claim: **`name`, not `sub`, is the
+application user ID**. Envoy checks issuer, audience, signature and expiration
+against the issuer's JWKS, removes the bearer token and forwards only verified
+Base64URL claims in `x-jwt-payload`. Missing tokens can read auctions; invalid
+tokens are rejected, and creating auctions or bids requires authentication.
+Clients must never supply claims headers as credentials.
+
+`deploy/envoy/envoy.yaml` is the configuration template used by Aspire. For
+another hosting target, replace its `__...__` placeholders with properly
+YAML-escaped deployment values, retain the pinned Envoy image and HTTPS JWKS
+certificate/hostname verification, and publish only Envoy. Configure the API
+as a private upstream with ingress/firewall rules allowing **only Envoy** to
+connect to it; removing Aspire's external endpoint flag does not by itself
+prevent local direct access or enforce production network isolation. The
+hosting target and its network/ingress controls must be specified and a direct
+external connection to the API must be tested as blocked before deployment.
+The frontend is a separate external application and is not an API security
+boundary.
+
+If TLS terminates before the API, configure `ReverseProxy__KnownNetworks__0`
+to the trusted Envoy network CIDR (and additional numbered entries if needed)
+so ASP.NET Core accepts forwarded scheme information before HTTPS redirection.
+Do not trust arbitrary client IP ranges. The address must match the actual
+network used by the chosen hosting target; do not assume the Aspire development
+network is a production trust boundary. Local tests that call the API directly
+with claims headers are not tests of this proxy boundary.
+
+For legacy deployments using Azure's encoded claims principal, `PrincipalHeader`
+can still be set to `x-ms-client-principal`, but do not expose that backend
+directly to untrusted clients.
 
 ## Add migration
 

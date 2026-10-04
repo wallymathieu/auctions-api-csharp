@@ -26,8 +26,10 @@ internal sealed class PayloadAuthenticationHandler : AuthenticationHandler<Paylo
         {
             var apiKey = Request.Headers[Options.PrincipalHeader];
             if (string.IsNullOrEmpty(apiKey)) return Task.FromResult(AuthenticateResult.NoResult());
+            if (apiKey.Count != 1) return Task.FromResult(AuthenticateResult.Fail("DuplicateClaimsIdentity"));
 
-            IClaimsPrincipalParser parser = Options.PrincipalHeader == JwtPayloadClaimsPrincipal.Header
+            IClaimsPrincipalParser parser = string.Equals(Options.PrincipalHeader, JwtPayloadClaimsPrincipal.Header,
+                StringComparison.OrdinalIgnoreCase)
                 ? _jwtPayloadClaimsPrincipalParser
                 : _claimsPrincipalParser;
             if (parser.IsValid(apiKey, out var claimsIdentity))

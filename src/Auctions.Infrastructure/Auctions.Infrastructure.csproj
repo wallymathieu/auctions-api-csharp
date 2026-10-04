@@ -24,5 +24,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Auctions.Domain\Auctions.Domain.csproj"/>
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Tests" />
+  </ItemGroup>
 
 </Project>
